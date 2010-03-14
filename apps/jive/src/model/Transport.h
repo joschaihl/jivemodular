@@ -113,6 +113,14 @@ public:
     */
     void stop ();
 
+    /** Toggle playback of the transport (support traditional play/pause combined command)
+
+        All listeners will be notified about the change. 
+        
+        @see play, isPlaying, stop
+    */
+    void togglePlay ();
+    
     /** Activate/deactivate recording
 
         Regardless of the transport state, we will activate recording: it will be

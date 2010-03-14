@@ -151,7 +151,7 @@
 #endif
 
 #ifndef JOST_USE_SURFACE
- #define JOST_USE_SURFACE                   1
+ #define JOST_USE_SURFACE                   0
 #endif
 
 

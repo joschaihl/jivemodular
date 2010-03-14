@@ -101,6 +101,14 @@ void Transport::play ()
     }
 }
 
+void Transport::togglePlay ()
+{
+   if (playing)
+      stop();
+   else 
+      play();
+}
+
 void Transport::stop ()
 {
     DBG ("Transport::stop");

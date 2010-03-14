@@ -54,6 +54,7 @@ namespace CommandIDs
     static const int audioRecord        = 0x2203;
     static const int audioRewind        = 0x2204;
     static const int audioLoop          = 0x2205;
+    static const int audioPlayPause     = 0x2206;
 
     static const int appToolbar         = 0x2400;
     static const int appBrowser         = 0x2401;
