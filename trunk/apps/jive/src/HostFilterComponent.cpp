@@ -451,7 +451,10 @@ void HostFilterComponent::setBrowserVisible (const bool isVisible,
        DBG ("HostFilterComponent::setBrowserVisible");
     Config* config = Config::getInstance();
    if (!browser)
+   {
       config->showBrowser = false;
+      return;
+   }
 
     config->showBrowser = isVisible;
     config->browserLeft = positionLeft;
@@ -608,7 +611,7 @@ const PopupMenu HostFilterComponent::getMenuForIndex (int menuIndex,
             menu.addCommandItem (commandManager, CommandIDs::audioOptions);
             menu.addSeparator ();
 #endif
-            menu.addCommandItem (commandManager, CommandIDs::audioPlay);
+            menu.addCommandItem (commandManager, CommandIDs::audioPlayPause);
             menu.addCommandItem (commandManager, CommandIDs::audioRecord);
             menu.addCommandItem (commandManager, CommandIDs::audioStop);
             menu.addCommandItem (commandManager, CommandIDs::audioRewind);
@@ -693,6 +696,7 @@ void HostFilterComponent::getAllCommands (Array <CommandID>& commands)
                                 CommandIDs::audioRecord,
                                 CommandIDs::audioRewind,
                                 CommandIDs::audioLoop,
+                                CommandIDs::audioPlayPause,
 
                                 CommandIDs::sessionNew,
                                 CommandIDs::sessionLoad,
@@ -767,6 +771,15 @@ void HostFilterComponent::getCommandInfo (const CommandID commandID, Application
         if (! transport->isPlaying())
             result.addDefaultKeypress (KeyPress::spaceKey, none);
         result.setActive (! transport->isPlaying());
+        break;
+        }
+    case CommandIDs::audioPlayPause:
+        {
+        if (transport->isPlaying())
+            result.setInfo (T("Pause"), T("Pause sequencers"), CommandCategories::audio, 0);
+        else
+            result.setInfo (T("Play"), T("Play sequencers"), CommandCategories::audio, 0);
+         result.addDefaultKeypress (KeyPress::spaceKey, none);
         break;
         }
     case CommandIDs::audioStop:
@@ -899,6 +912,11 @@ bool HostFilterComponent::perform (const InvocationInfo& info)
     case CommandIDs::audioPlay:
         {
             transport->play ();
+            break;
+        }
+    case CommandIDs::audioPlayPause:
+        {
+            transport->togglePlay ();
             break;
         }
     case CommandIDs::audioStop:
