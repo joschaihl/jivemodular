@@ -881,6 +881,7 @@
 					"JUCE_NAMESPACE=juce_JiveHostNamespace",
 					"JUCE_ObjCExtraSuffix=juce_JiveHostObjCSuffix",
 					"JUCE_MAC=1",
+					NDEBUG,
 				);
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
