@@ -809,8 +809,6 @@ void Component::toBehind (Component* const other)
 
 void Component::toBack()
 {
-   DBG(String("sending component ") + String(this) + String(" to the back"));
-
     if (isOnDesktop())
     {
         jassertfalse //xxx need to add this to native window
