@@ -270,11 +270,13 @@ BasePlugin* PluginLoader::handlePopupMenu (const bool subChannelPlugin,
     }
 
     {
+#ifdef ENABLE_SUBCHANNELS // off right now!! 
         if (!subChannelPlugin)
         {
             audioMenu.addItem (JOST_PLUGINTYPE_CHANNEL,       "Mono Channel");
 	        audioMenu.addItem (JOST_PLUGINTYPE_CHANNELSTEREO, "Stereo Channel");
         }
+#endif
 
         PopupMenu effectsMenu;
 	    effectsMenu.addItem (JOST_PLUGINTYPE_DETUNER,		"Detuner");
@@ -289,7 +291,7 @@ BasePlugin* PluginLoader::handlePopupMenu (const bool subChannelPlugin,
 
     menu.addSubMenu("Midi", midiMenu);
     menu.addSubMenu("Audio", audioMenu);
-    menu.addSubMenu("Juce", juceVSTAUMenu);
+    menu.addSubMenu("External", juceVSTAUMenu);
 
     BasePlugin* plugin = 0;
 
