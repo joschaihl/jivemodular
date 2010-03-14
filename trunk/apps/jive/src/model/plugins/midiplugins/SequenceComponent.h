@@ -100,26 +100,28 @@ public:
 
 protected:
 
-    /** Handy function that returns the type casted plugin */
-    MidiSequencePlugin* getPlugin () const        { return (MidiSequencePlugin*) plugin; }
+   /** Handy function that returns the type casted plugin */
+   MidiSequencePlugin* getPlugin () const        { return (MidiSequencePlugin*) plugin; }
 
-    Transport* transport;
+   Transport* transport;
 
-	ToggleButton* enabledButton;
+   ToggleButton* enabledButton;
    ParamSlider* ccEnabledSlider;
    Slider* partPatternNumSlider;
 
-    ImageSlider* zoomSlider;
-    Slider* barSlider;
+   Label* quantizeLabel;
+   ComboBox* quantizeBox;
 
-    ComboBox* quantizeBox;
-    ComboBox* noteLengthBox;
+   Label* barLabel;
+   Slider* barSlider;
+   Label* zoomLabel;
+   ImageSlider* zoomSlider;
 
-	StretchableLayoutManager myLayout;
-	StretchableLayoutResizerBar* layoutResizer;
+   StretchableLayoutManager myLayout;
+   StretchableLayoutResizerBar* layoutResizer;
 
-	NoteEditComponent* noteEditor;
-	AutomationEditComponent* automationEditor;
+   NoteEditComponent* noteEditor;
+   AutomationEditComponent* automationEditor;
 };
 
 
