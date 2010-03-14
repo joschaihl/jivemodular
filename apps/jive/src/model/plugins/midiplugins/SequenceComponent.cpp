@@ -47,9 +47,13 @@ public:
 
     int getMidiKeyboardWidth () const               { return 52; }
 
+   ComboBox* getNoteLengthBox() {return noteLengthBox;};
 protected:
     MidiSequencePlugin* plugin;
     Transport* transport;
+
+    Label* noteLengthLabel;
+    ComboBox* noteLengthBox;
 
     PianoGrid* pianoGrid;
     Viewport* pianoViewport;
@@ -62,39 +66,59 @@ protected:
 
 NoteEditComponent::NoteEditComponent(MidiSequencePlugin* _plugin, Transport* _transport)
 :
-	plugin(_plugin),
-	transport(_transport),
-    pianoGrid (0),
-    pianoViewport (0),
-    dropShadower (0),
-    midiKeyboard (0),
-	gridLeftX (120){
-    // grid
-    pianoGrid = new PianoGrid ();
-    pianoGrid->setTimeDivision (transport->getTimeDenominator());
-    pianoGrid->setSnapQuantize (plugin->getIntValue (PROP_SEQNOTESNAP, 4));
-    pianoGrid->setNumBars (plugin->getIntValue (PROP_SEQBAR, transport->getNumBars()));
-    pianoGrid->setBarWidth (plugin->getIntValue (PROP_SEQCOLSIZE, 120));
-    pianoGrid->setRowsOffset (plugin->getIntValue (PROP_SEQROWOFFSET, 0));
-    pianoGrid->setListener (plugin);
+   plugin(_plugin),
+   transport(_transport),
+   pianoGrid (0),
+   pianoViewport (0),
+   dropShadower (0),
+   midiKeyboard (0),
+   gridLeftX (120),
+   noteLengthLabel(0),
+   noteLengthBox(0)
+{
+   // note length combobox
+   addAndMakeVisible (noteLengthLabel = new Label ("NoteLabel", "Note:"));
+   addAndMakeVisible (noteLengthBox = new ComboBox (String::empty));
+   noteLengthBox->setEditableText (false);
+   noteLengthBox->setTooltip (T("Note length"));
+   noteLengthBox->setJustificationType (Justification::centredLeft);
+   noteLengthBox->addItem (T("64th"), 64);
+   noteLengthBox->addItem (T("32th"), 32);
+   noteLengthBox->addItem (T("16th"), 16);
+   noteLengthBox->addItem (T("8th"), 8);
+   noteLengthBox->addItem (T("beat"), 4);
+   noteLengthBox->addItem (T("1/2 bar"), 2);
+   noteLengthBox->addItem (T("1 bar"), 1);
+   noteLengthBox->setTooltip (T("Note length"));
+//   noteLengthBox->addListener (this);
+   noteLengthBox->setSelectedId (plugin->getIntValue (PROP_SEQNOTELENGTH, 4));
 
-    addAndMakeVisible (pianoViewport = new Viewport (String::empty));
-    pianoViewport->setScrollBarsShown (false, true);
-    pianoViewport->setScrollBarThickness (12);
-    pianoViewport->setViewedComponent (pianoGrid);
+   // grid
+   pianoGrid = new PianoGrid ();
+   pianoGrid->setTimeDivision (transport->getTimeDenominator());
+   pianoGrid->setSnapQuantize (plugin->getIntValue (PROP_SEQNOTESNAP, 4));
+   pianoGrid->setNumBars (plugin->getIntValue (PROP_SEQBAR, transport->getNumBars()));
+   pianoGrid->setBarWidth (plugin->getIntValue (PROP_SEQCOLSIZE, 120));
+   pianoGrid->setRowsOffset (plugin->getIntValue (PROP_SEQROWOFFSET, 0));
+   pianoGrid->setListener (plugin);
 
-    // midi keyboard
-    addAndMakeVisible (midiKeyboard = new PianoGridKeyboard (plugin->getKeyboardState ()));
-    midiKeyboard->setMidiChannel (1);
-    midiKeyboard->setMidiChannelsToDisplay (1 << 0);
-    midiKeyboard->setKeyPressBaseOctave (3);
-    midiKeyboard->setLowestVisibleKey (pianoGrid->getRowsOffset());
-    midiKeyboard->setKeyWidth (12); // fixed !
-    midiKeyboard->setAvailableRange (0, 119);
-    midiKeyboard->setScrollButtonsVisible (true);
+   addAndMakeVisible (pianoViewport = new Viewport (String::empty));
+   pianoViewport->setScrollBarsShown (false, true);
+   pianoViewport->setScrollBarThickness (12);
+   pianoViewport->setViewedComponent (pianoGrid);
 
-    dropShadower = new DropShadower (0.4f, 2, 0, 2.5f);
-    dropShadower->setOwner (midiKeyboard);
+   // midi keyboard
+   addAndMakeVisible (midiKeyboard = new PianoGridKeyboard (plugin->getKeyboardState ()));
+   midiKeyboard->setMidiChannel (1);
+   midiKeyboard->setMidiChannelsToDisplay (1 << 0);
+   midiKeyboard->setKeyPressBaseOctave (3);
+   midiKeyboard->setLowestVisibleKey (pianoGrid->getRowsOffset());
+   midiKeyboard->setKeyWidth (12); // fixed !
+   midiKeyboard->setAvailableRange (0, 119);
+   midiKeyboard->setScrollButtonsVisible (true);
+
+   dropShadower = new DropShadower (0.4f, 2, 0, 2.5f);
+   dropShadower->setOwner (midiKeyboard);
 }
 
 NoteEditComponent::~NoteEditComponent()
@@ -109,6 +133,9 @@ void NoteEditComponent::resized ()
     int keysButtonHeight = 12;
 
     // content
+    noteLengthLabel->setBounds (0, 0, 60, 16);
+    noteLengthBox->setBounds (0, 16, 60, 16);
+
     midiKeyboard->setBounds (gridLeftX - keysWidth, 0, keysWidth, getHeight());
     pianoViewport->setBounds (gridLeftX,
                               0,
@@ -468,104 +495,94 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
    enabledButton(0),
    ccEnabledSlider(0),
    partPatternNumSlider(0),
-   zoomSlider(0),
-   barSlider(0),
+   quantizeLabel(0),
    quantizeBox(0),
-   noteLengthBox(0)
+   zoomLabel(0),
+   barLabel(0),
+   zoomSlider(0),
+   barSlider(0)
 {
-    MidiSequencePlugin* seq = getPlugin ();
+   MidiSequencePlugin* seq = getPlugin ();
 
-    transport = seq->getParentHost ()->getTransport();
+   transport = seq->getParentHost ()->getTransport();
 
-    seq->addChangeListener (this);
-    transport->addChangeListener (this);
+   seq->addChangeListener (this);
+   transport->addChangeListener (this);
 
-    // note length combobox
-    addAndMakeVisible (noteLengthBox = new ComboBox (String::empty));
-    noteLengthBox->setEditableText (false);
-    noteLengthBox->setJustificationType (Justification::centredLeft);
-    noteLengthBox->addItem (T("64th"), 64);
-    noteLengthBox->addItem (T("32th"), 32);
-    noteLengthBox->addItem (T("16th"), 16);
-    noteLengthBox->addItem (T("8th"), 8);
-    noteLengthBox->addItem (T("beat"), 4);
-    noteLengthBox->addItem (T("1/2 bar"), 2);
-    noteLengthBox->addItem (T("1 bar"), 1);
-    noteLengthBox->setTooltip (T("Note length"));
-    noteLengthBox->addListener (this);
+   // bar count slider
+   addAndMakeVisible (barLabel = new Label (String::empty, "Bars:"));
+   addAndMakeVisible (barSlider = new Slider (String::empty));
+   barSlider->setRange (1, 16, 1);
+   barSlider->setSliderStyle (Slider::IncDecButtons);
+   barSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+   barSlider->setValue (transport->getNumBars (), false);
+   barSlider->setTooltip (T("Bar count"));
+   barSlider->addListener (this);
 
-    noteLengthBox->setSelectedId (seq->getIntValue (PROP_SEQNOTELENGTH, 4));
+   // quantize box
+   addAndMakeVisible (quantizeLabel = new Label (String::empty, "Quantise:"));
+   addAndMakeVisible (quantizeBox = new ComboBox (String::empty));
+   quantizeBox->setEditableText (false);
+   quantizeBox->setJustificationType (Justification::centredLeft);
+   quantizeBox->addItem (T("off"), 1);
+   quantizeBox->addItem (T("1 bar"), 2);
+   quantizeBox->addItem (T("1/2 bar"), 3);
+   quantizeBox->addItem (T("beat"), 5);
+   quantizeBox->addItem (T("8th"), 9);
+   quantizeBox->addItem (T("16th"), 17);
+   quantizeBox->addItem (T("32th"), 33);
+   quantizeBox->addItem (T("64th"), 65);
+   quantizeBox->setTooltip (T("Snap"));
+   quantizeBox->addListener (this);
 
-    // bar count slider
-    addAndMakeVisible (barSlider = new Slider (String::empty));
-    barSlider->setRange (1, 16, 1);
-    barSlider->setSliderStyle (Slider::IncDecButtons);
-    barSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
-    barSlider->setValue (transport->getNumBars (), false);
-    barSlider->setTooltip (T("Bar count"));
-    barSlider->addListener (this);
+   quantizeBox->setSelectedId (seq->getIntValue (PROP_SEQNOTESNAP, 4) + 1);
 
-    // quantize box
-    addAndMakeVisible (quantizeBox = new ComboBox (String::empty));
-    quantizeBox->setEditableText (false);
-    quantizeBox->setJustificationType (Justification::centredLeft);
-    quantizeBox->addItem (T("off"), 1);
-    quantizeBox->addItem (T("1 bar"), 2);
-    quantizeBox->addItem (T("1/2 bar"), 3);
-    quantizeBox->addItem (T("beat"), 5);
-    quantizeBox->addItem (T("8th"), 9);
-    quantizeBox->addItem (T("16th"), 17);
-    quantizeBox->addItem (T("32th"), 33);
-    quantizeBox->addItem (T("64th"), 65);
-    quantizeBox->setTooltip (T("Snap"));
-    quantizeBox->addListener (this);
+   myLayout.setItemLayout (0, -0.2, -0.9, -0.6); // piano/note editor 60% default
+   myLayout.setItemLayout (1, 8, 8, 8); // resizer bar always 8 pixels
+   myLayout.setItemLayout (2, -0.1, -0.8, -0.4); // controlller automation editor 40% default
 
-    quantizeBox->setSelectedId (seq->getIntValue (PROP_SEQNOTESNAP, 4) + 1);
+   addAndMakeVisible(layoutResizer = new StretchableLayoutResizerBar(&myLayout, 1, false));
 
-	myLayout.setItemLayout (0, -0.1, -0.9, -0.6); // piano/note editor 60% default
-	myLayout.setItemLayout (1, 8, 8, 8); // resizer bar always 8 pixels
-	myLayout.setItemLayout (2, -0.1, -0.9, -0.4); // controlller automation editor 40% default
+   addAndMakeVisible(noteEditor = new NoteEditComponent(seq, transport));
+   noteEditor->getMidiKeyboard()->addChangeListener (this);
+   noteEditor->getNoteLengthBox()->addListener (this);
 
-	addAndMakeVisible(layoutResizer = new StretchableLayoutResizerBar(&myLayout, 1, false));
-	
-	addAndMakeVisible(noteEditor = new NoteEditComponent(seq, transport));
-    noteEditor->getMidiKeyboard()->addChangeListener (this);
+   MidiSequencePlugin* pluginAuto = dynamic_cast<MidiSequencePlugin*> (plugin_);
+   if (pluginAuto)
+      addAndMakeVisible(automationEditor = new AutomationEditComponent(pluginAuto, transport));
 
-	MidiSequencePlugin* pluginAuto = dynamic_cast<MidiSequencePlugin*> (plugin_);
-	if (pluginAuto)
-		addAndMakeVisible(automationEditor = new AutomationEditComponent(pluginAuto, transport));
+   // zoom slider
+   addAndMakeVisible (zoomLabel = new Label (String::empty, "Zoom:"));
+   addAndMakeVisible (zoomSlider = new ImageSlider ("Zoom:"));
+   zoomSlider->setOrientation (ImageSlider::LinearHorizontal);
+   zoomSlider->setRange (10, 1024, 1);
+   zoomSlider->setSkewFactor (0.5f);
+   zoomSlider->setValue (noteEditor->getPianoGrid()->getBarWidth (), false);
+   zoomSlider->setSliderStyle (Slider::LinearHorizontal);
+   zoomSlider->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
+   zoomSlider->setTooltip (T("Zoom factor"));
+   zoomSlider->addListener (this);
 
-    // zoom slider
-    addAndMakeVisible (zoomSlider = new ImageSlider (String::empty));
-    zoomSlider->setOrientation (ImageSlider::LinearHorizontal);
-    zoomSlider->setRange (10, 1024, 1);
-    zoomSlider->setSkewFactor (0.5f);
-    zoomSlider->setValue (noteEditor->getPianoGrid()->getBarWidth (), false);
-    zoomSlider->setSliderStyle (Slider::LinearHorizontal);
-    zoomSlider->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-    zoomSlider->setTooltip (T("Zoom factor"));
-    zoomSlider->addListener (this);
+   //	addAndMakeVisible (enabledButton = new ToggleButton(String("Enable")));
+   //	enabledButton->setToggleState(seq->getBoolValue(PROP_SEQENABLED, true), false);
+   //	enabledButton->addButtonListener (this);
 
-//	addAndMakeVisible (enabledButton = new ToggleButton(String("Enable")));
-//	enabledButton->setToggleState(seq->getBoolValue(PROP_SEQENABLED, true), false);
-//	enabledButton->addButtonListener (this);
-   
    const int patternsPerPart = MAXPATTERNSPERPART;
    AudioParameter* theEnablyParameter = plugin->getParameterObject(0);
    addAndMakeVisible(ccEnabledSlider = new ParamSlider(plugin, theEnablyParameter, 0));
    ccEnabledSlider->setTextBoxIsEditable(false);
    if (theEnablyParameter)
       theEnablyParameter->setIncrAmount(1.0 / patternsPerPart);
-   
+
    addAndMakeVisible(partPatternNumSlider = new Slider("Pattern Number"));
    partPatternNumSlider->setSliderStyle(Slider::IncDecButtons);
    partPatternNumSlider->setRange(1, patternsPerPart, 1);   
    partPatternNumSlider->addListener(this);
 
-    updateParameters ();
+   updateParameters ();
 
-    if (transport->isPlaying ())
-        startTimer (1000 / 20); // 20 frames per seconds
+   if (transport->isPlaying ())
+      startTimer (1000 / 20); // 20 frames per seconds
 }
 
 SequenceComponent::~SequenceComponent ()
@@ -578,23 +595,27 @@ SequenceComponent::~SequenceComponent ()
 //==============================================================================
 void SequenceComponent::resized ()
 {
-    int headHeight = 32;
+   int headHeight = 32;
 
-    // header
-    noteLengthBox->setBounds (getWidth () - 340, 2, 60, 16);
-    barSlider->setBounds (getWidth () - 260, 2, 60, 16);
-    quantizeBox->setBounds (getWidth () - 180, 2, 60, 16);
-    zoomSlider->setBounds (getWidth () - 100, 2, 100, 16);
+   // header-left
+   ccEnabledSlider->setBounds (0, 2, 76, 16);
+   partPatternNumSlider->setBounds (76, 2, 75, 16);
 
-//    enabledButton->setBounds (0, 2, 60, 16);
-    ccEnabledSlider->setBounds (0, 2, 76, 16);
-    partPatternNumSlider->setBounds (76, 2, 75, 16);
+   // header-centre
+   quantizeLabel->setBounds (160, 2, 70, 16);
+   quantizeBox->setBounds (230, 2, 60, 16);
 
-    // content - 2 panes, top for note editor, bottom for automation editor
-	Component* comps[] = { noteEditor, layoutResizer, automationEditor }; 
-	myLayout.layOutComponents (comps, 3,
-							   0, headHeight, getWidth(), getHeight() - headHeight,
-							   true, true);
+   // header-right
+   barLabel->setBounds (getWidth () - 210, 2, 45, 16);
+   barSlider->setBounds (getWidth () - 170, 2, 60, 16);
+   zoomLabel->setBounds (getWidth () - 115, 2, 45, 16);
+   zoomSlider->setBounds (getWidth () - 80, 2, 80, 16);
+
+   // content - 2 panes, top for note editor, bottom for automation editor
+   Component* comps[] = { noteEditor, layoutResizer, automationEditor }; 
+   myLayout.layOutComponents (comps, 3,
+      0, headHeight, getWidth(), getHeight() - headHeight,
+      true, true);
 }
 
 //==============================================================================
@@ -645,8 +666,8 @@ void SequenceComponent::updateParameters ()
 //         double pianoGridTimeDivision =    pianoGrid->getTimeDivision ();
 //         double pianoGridNoteLen =    pianoGrid->getNoteLengthInBeats ();
          double notelen = sequencer->getIntValue (PROP_SEQNOTELENGTH, 4);   
-         if (noteLengthBox)
-            noteLengthBox->setSelectedId(notelen, true);
+         if (noteEditor->getNoteLengthBox())
+            noteEditor->getNoteLengthBox()->setSelectedId(notelen, true);
       }
    }
 
@@ -749,13 +770,13 @@ void SequenceComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         automationEditor->getAutomationGrid()->setSnapQuantize (snap);
         seq->setValue(PROP_SEQNOTESNAP, snap);
     }
-    else if (comboBoxThatHasChanged == noteLengthBox)
+    else if (comboBoxThatHasChanged == noteEditor->getNoteLengthBox())
     {
-        float noteLength = pianoGrid->getTimeDivision () / (float) noteLengthBox->getSelectedId ();
+        float noteLength = pianoGrid->getTimeDivision () / (float) noteEditor->getNoteLengthBox()->getSelectedId ();
 
         pianoGrid->setNoteLengthInBeats (noteLength);
 
-        seq->setValue (PROP_SEQNOTELENGTH, noteLengthBox->getSelectedId ());
+        seq->setValue (PROP_SEQNOTELENGTH, noteEditor->getNoteLengthBox()->getSelectedId ());
     }
 }
 
