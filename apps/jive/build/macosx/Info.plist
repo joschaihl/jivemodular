@@ -9,7 +9,7 @@
 	<key>CFBundleIconFile</key>
 	<string>Jive.icns</string>
 	<key>CFBundleIdentifier</key>
-	<string>com.google.code.${PRODUCT_NAME:identifier}</string>
+	<string>com.google.code.jivemodular.${PRODUCT_NAME:identifier}</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
