@@ -391,7 +391,7 @@ void MidiAutomatorManager::clearMidiAutomatableFromCC (const int ccNumber)
     
 void MidiAutomatorManager::clearMidiAutomatableFromNote (const int note)
 {
-    jassert (ccNumber >= 0 && note < 128)
+    jassert (note >= 0 && note < 128)
 
     VoidArray* array = notes.getUnchecked (note);
     
@@ -399,7 +399,7 @@ void MidiAutomatorManager::clearMidiAutomatableFromNote (const int note)
 }
 void MidiAutomatorManager::clearMidiAutomatableFromNoteOff (const int note)
 {
-    jassert (ccNumber >= 0 && note < 128)
+    jassert (note >= 0 && note < 128)
 
     VoidArray* array = noteOffs.getUnchecked (note);
     
