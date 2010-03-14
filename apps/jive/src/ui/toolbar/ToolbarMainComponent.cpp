@@ -321,10 +321,10 @@ ToolbarItemComponent* ToolbarMainItemFactory::createItem (const int itemId)
     case jost_search:
         return createButtonFromZipFile (itemId, T("search"), T("jost_search.png"), -1);
 
-    case jost_fullscreen:
-        return createButtonFromZipFile (itemId, T("fullscreen"), T("jost_fullscreen.png"), CommandIDs::appFullScreen);
-    case jost_favorities:
-        return createButtonFromZipFile (itemId, T("favorities"), T("jost_favorities.png"), -1);
+//    case jost_fullscreen:
+//        return createButtonFromZipFile (itemId, T("fullscreen"), T("jost_fullscreen.png"), CommandIDs::appFullScreen);
+//    case jost_favorities:
+//        return createButtonFromZipFile (itemId, T("favorities"), T("jost_favorities.png"), -1);
 //    case jost_browser:
 //        return createButtonFromZipFile (itemId, T("browser"), T("jost_browse.png"), CommandIDs::appBrowser);
     case jost_toolbar:
