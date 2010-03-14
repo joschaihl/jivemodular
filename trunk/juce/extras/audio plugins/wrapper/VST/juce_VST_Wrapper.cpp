@@ -133,6 +133,7 @@
 #endif
 
 #include "../juce_PluginHeaders.h"
+#include "../juce_PluginHostType.h"
 
 
 #ifdef _MSC_VER
@@ -210,21 +211,19 @@ static HWND findMDIParentOf (HWND w)
 }
 
 //==============================================================================
-#elif JUCE_LINUX || defined(JUCE_MAC)
+#elif JUCE_LINUX
 
 class SharedMessageThread : public Thread
 {
 public:
     SharedMessageThread()
       : Thread (T("VstMessageThread")),
-        isInitialized (false)
+        initialised (false)
     {
         startThread (7);
 
-        while(! isInitialized)
-        {
-           Thread::sleep(1);
-        }
+        while (! initialised)
+            sleep (1);
     }
 
     ~SharedMessageThread()
@@ -243,21 +242,19 @@ public:
         messageManager->setCurrentMessageThread (Thread::getCurrentThreadId());
 
         initialiseJuce_GUI();
-        isInitialized = true;
+        initialised = true;
 
         while ((! threadShouldExit()) && messageManager->runDispatchLoopUntil (250))
         {
         }
 
         messageManager->setCurrentMessageThread (originalThreadId);
-
-        shutdownJuce_GUI();
     }
 
     juce_DeclareSingleton (SharedMessageThread, false)
 
 private:
-    bool isInitialized; 
+    bool initialised;
 };
 
 juce_ImplementSingleton (SharedMessageThread)
@@ -454,6 +451,7 @@ public:
 #if JUCE_LINUX
             SharedMessageThread::deleteInstance();
 #endif
+            shutdownJuce_GUI();
         }
     }
 
@@ -1232,8 +1230,6 @@ public:
 
         if (opCode == effEditIdle)
         {
-           const MessageManagerLock mmLock; 
-
             doIdleCallback();
             return 0;
         }
@@ -1463,7 +1459,7 @@ void EditorCompWrapper::handleAsyncUpdate()
 /** Somewhere in the codebase of your plugin, you need to implement this function
     and make it create an instance of the filter subclass that you're building.
 */
-extern AudioProcessor* JUCE_CALLTYPE createPluginFilter (const String& commandLine);
+extern AudioProcessor* JUCE_CALLTYPE createPluginFilter();
 
 
 //==============================================================================
@@ -1475,7 +1471,7 @@ static AEffect* pluginEntryPoint (audioMasterCallback audioMaster)
     {
         if (audioMaster (0, audioMasterVersion, 0, 0, 0, 0) != 0)
         {
-            AudioProcessor* const filter = createPluginFilter (String::empty);
+            AudioProcessor* const filter = createPluginFilter();
 
             if (filter != 0)
             {
