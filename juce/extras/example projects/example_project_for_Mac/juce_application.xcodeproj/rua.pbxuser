@@ -1,0 +1,90 @@
+// !$*UTF8*$!
+{
+	20286C28FDCF999611CA2CEA /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = 93B9172D11195134008A302E /* juce_application */;
+		activeTarget = 8D0C4E890486CD37000505A6 /* juce_application */;
+		codeSenseManager = 93B9173911195152008A302E /* Code sense */;
+		executables = (
+			93B9172D11195134008A302E /* juce_application */,
+		);
+		perUserDictionary = {
+			PBXPerProjectTemplateStateSaveDate = 286871860;
+			PBXWorkspaceStateSaveDate = 286871860;
+		};
+		sourceControlManager = 93B9173811195152008A302E /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	841083D20DB36EA400AB8583 /* includes.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1109, 488}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1342}";
+			sepNavWindowFrame = "{{61, 139}, {1168, 592}}";
+		};
+	};
+	84FBB86E0E06CAC200B52196 /* juce_LibrarySource.mm */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1109, 488}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 396}";
+			sepNavWindowFrame = "{{15, 181}, {1168, 592}}";
+		};
+	};
+	84FBB8700E06CAD300B52196 /* juce_AppConfig.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1109, 488}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1292}";
+			sepNavWindowFrame = "{{38, 160}, {1168, 592}}";
+		};
+	};
+	8D0C4E890486CD37000505A6 /* juce_application */ = {
+		activeExec = 0;
+		executables = (
+			93B9172D11195134008A302E /* juce_application */,
+		);
+	};
+	93B9172D11195134008A302E /* juce_application */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 0;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		libgmallocEnabled = 0;
+		name = juce_application;
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+	};
+	93B9173811195152008A302E /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	93B9173911195152008A302E /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+}
