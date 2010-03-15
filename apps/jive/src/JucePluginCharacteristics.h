@@ -67,12 +67,12 @@
 
 /** The name of your company. (Try to keep this as short as possible)
 */
-#define JucePlugin_Manufacturer             "Cartoon Beats"
+#define JucePlugin_Manufacturer             "Jive"
 
 /** A four-character code for your company.
     Use single quotes - this isn't a string!
 */
-#define JucePlugin_ManufacturerCode         'CBR_'
+#define JucePlugin_ManufacturerCode         'Jive'
 
 /** A unique four-character code for your plugin.
     Use single quotes - this isn't a string!
