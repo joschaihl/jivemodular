@@ -128,7 +128,8 @@ void VstPluginWindow::setPlugin (BasePlugin* plugin_)
         bool limitHeight = false;
 
         // we got a plugin to show
-        setName (plugin->getName ());
+        String windowTitle(plugin->getInstanceName() + String(" - ") + plugin->getName());
+        setName (windowTitle);
 
         if (plugin->hasEditor ())
         {

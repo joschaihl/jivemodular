@@ -43,6 +43,8 @@ VstPluginNativeEditor::VstPluginNativeEditor (BasePlugin* plugin_,
     int height = 5;
     int labelWidth = 110;
     int displayWidth = 80;
+    
+   String windowTitle(plugin->getInstanceName() + String(" - ") + plugin->getName());
 
     Colour backgroundColour = window->getBackgroundColour ();
 
