@@ -63,15 +63,14 @@
 */
 #define JucePlugin_Manufacturer             "Jive"
 
-/** A four-character code for your company.
-    Use single quotes - this isn't a string!
+/** A longer decription of your plugin.
 */
-#define JucePlugin_ManufacturerCode         'Jive'
+#define JucePlugin_Desc                     "A basic sampler"
 
 /** A four-character code for your company.
     Use single quotes - this isn't a string!
 */
-#define JucePlugin_ManufacturerCode         'CRBh'
+#define JucePlugin_ManufacturerCode         'Jive'
 
 /** A unique four-character code for your plugin.
     Use single quotes - this isn't a string!
@@ -79,7 +78,7 @@
     Note that for AU compatibility, this must contain at least one
     upper-case letter.
 */
-#define JucePlugin_PluginCode               'HLoL'
+#define JucePlugin_PluginCode               'LowL'
 
 //==============================================================================
 /** The maximum number of channels of audio input that the plugin can handle.
@@ -249,7 +248,7 @@
     plugin's plist, it allows the plugin to work out its own path, which is
     needed if you want to use File::getSpecialLocation (currentExecutableFile)
 */
-#define JucePlugin_CFBundleIdentifier       "com.cartoonbeats.haszari.Lowlife"
+#define JucePlugin_CFBundleIdentifier       "com.google.code.jivemodular.Lowlife"
 
 /** In an AU, some hosts take the name of Cocoa class that creates the UI and
     actually show it to the user in a list (why??)... Anyway, this macro lets you
