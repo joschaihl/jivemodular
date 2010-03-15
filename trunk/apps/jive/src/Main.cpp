@@ -108,6 +108,9 @@ public:
 
         if (window)
         {
+#if JUCE_MAC
+         MenuBarModel::setMacMainMenu(0);
+#endif
             window->setVisible (false);
             window->setMenuBar (0);
 

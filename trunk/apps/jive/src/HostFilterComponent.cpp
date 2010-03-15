@@ -106,10 +106,8 @@ HostFilterComponent::HostFilterComponent (HostFilterBase* const ownerFilter_)
     addKeyListener (commandManager->getKeyMappings());
 #endif
 
-
-    // start up if first time !
-//    if (config->firstTime)
-        commandManager->invokeDirectly (CommandIDs::appAbout, false);
+   // beautiful annoying splash icon in your face
+   commandManager->invokeDirectly (CommandIDs::appAbout, false);
 
     // register as listener to transport
     getFilter()->getTransport()->addChangeListener (this);
@@ -124,13 +122,22 @@ HostFilterComponent::HostFilterComponent (HostFilterBase* const ownerFilter_)
         delete savedPluginList;
     }
 
+    // add internal VST plugins
+    const File deadMansPedalFile (ApplicationProperties::getInstance()->getUserSettings()->getFile().getSiblingFile ("RecentlyCrashedPluginsList"));
+#if JUCE_MAC
+    File internalPluginFolder = File::getSpecialLocation(File::currentApplicationFile).getChildFile("./Contents/Resources/Plugins"); // nicely hidden inside bundle on mac os x
+#else
+    File internalPluginFolder = File::getSpecialLocation(File::currentApplicationFile).getChildFile("../Plugins"); // plugin folder alongside app on other platforms.. for now
+#endif
+    VSTPluginFormat vst;
+    PluginDirectoryScanner internalPluginScanner(knownPluginList, vst, FileSearchPath(internalPluginFolder.getFullPathName()), false, deadMansPedalFile);
+    while (internalPluginScanner.scanNextFile(true)) {
+       // keep looking
+    }    
+
     knownPluginList.addChangeListener (this);
     pluginSortMethod = (KnownPluginList::SortMethod) ApplicationProperties::getInstance()->getUserSettings()
                             ->getIntValue (T("pluginSortMethod"), KnownPluginList::sortByManufacturer);
-
-//#if JUCE_MAC                            
-//   setMacMainMenu(this, 0);
-//#endif 
 }
 
 //==============================================================================
@@ -1037,6 +1044,7 @@ bool HostFilterComponent::perform (const InvocationInfo& info)
         }
     case CommandIDs::appExit:
         {
+            deleteAndZero(PluginListWindow::currentPluginListWindow);
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
         }
