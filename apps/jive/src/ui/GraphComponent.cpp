@@ -477,7 +477,7 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
 
     if (node != inputs && node != outputs)
     {
-        menu.addItem (3, "Remove " + plugin->getName());
+        menu.addItem (3, "Remove " + plugin->getName() + String(" \"") + plugin->getInstanceName() + String("\""));
         addFirstSeparator = true;
     }
 
@@ -511,6 +511,8 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
     if (outputLinks > 0)
         menu.addItem (10, "Disconnect outputs");
 
+   menu.addItem (11, String("Rename \"") + plugin->getInstanceName() + String("\""));
+   
     const int result = menu.show();
     switch (result)
     {
@@ -573,6 +575,17 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
     case 10: // Disconnect outputs
         node->breakOutputLinks();
         break;
+    case 11: // Rename instance
+    {
+      TextEditor instanceName(String("renamePluginInstance"));
+      instanceName.setSize(400, 30);
+      instanceName.setText(plugin->getInstanceName());
+      DialogWindow::showModalDialog(String("Rename " + plugin->getInstanceName()), &instanceName, node, Colours::yellow, true);
+      String newName = instanceName.getText();
+      if (newName.isNotEmpty())
+         setNodeDisplayName(plugin, node, newName);
+    }
+      break;
     default:
         break;
     }
@@ -608,7 +621,7 @@ void GraphComponent::connectorPopupMenuSelected (GraphConnectorComponent* connec
             
             String itemString;
             itemString << "Unwire " 
-                       << linkedPlugin->getName () 
+                       << linkedPlugin->getInstanceName () 
                        << " (";
 
             switch (conn->getType ()) {
@@ -704,7 +717,7 @@ void GraphComponent::graphChanged ()
     for (int i = 0; i < audioGraph->getNodeCount (); i++)
     {
         BasePlugin* plugin = (BasePlugin*) audioGraph->getData (i);
-        printf ("%s > ", (const char*) plugin->getName());
+        printf ("%s > ", (const char*) plugin->getInstanceName());
     }
     printf ("\n");
 
@@ -731,7 +744,7 @@ void GraphComponent::graphChanged ()
     for (int i = 0; i < audioGraph->getNodeCount (); i++)
     {
         BasePlugin* plugin = (BasePlugin*) audioGraph->getData (i);
-        printf ("%s > ", (const char*) plugin->getName());
+        printf ("%s > ", (const char*) plugin->getInstanceName());
     }
     printf ("\n");
 
@@ -954,6 +967,43 @@ int GraphComponent::getPluginsCount () const
     return nodes.size ();
 }
 
+void GraphComponent::setNodeDisplayName(BasePlugin* plugin, GraphNodeComponent* node, const String& newName)
+{
+   plugin->setInstanceName(newName);
+   node->setText(newName);
+
+   int w = plugin->getIntValue (PROP_GRAPHWSIZE, defaultNodeWidth);
+   int h = plugin->getIntValue (PROP_GRAPHHSIZE, defaultNodeHeight);
+   int numIns = plugin->getNumInputs () + plugin->getNumMidiInputs ();
+   int numOuts = plugin->getNumOutputs () + plugin->getNumMidiOutputs ();
+
+   if (leftToRight)
+   {
+      h = jmax (h, (jmax (numIns, numOuts) + 1) * 16);
+
+      const int textHeight = currentFont.getStringWidth (plugin->getInstanceName());
+      h = jmax (h, 16 + jmin (textHeight, 300));
+   }
+   else
+   {
+      w = jmax (w, (jmax (numIns, numOuts) + 1) * 16);
+
+      const int textWidth = currentFont.getStringWidth (plugin->getInstanceName());
+      w = jmax (w, 16 + jmin (textWidth, 300));
+   }
+
+   int wSize = w;
+   if (wSize < 0) wSize = defaultNodeWidth;
+   int hSize = h;
+   if (hSize < 0) hSize = defaultNodeHeight;
+   String pluginTooltip = plugin->getInstanceName ();
+   node->setTooltip (pluginTooltip);
+   plugin->setValue (PROP_GRAPHWSIZE, wSize);
+   plugin->setValue (PROP_GRAPHHSIZE, hSize);
+   node->setSize (wSize, hSize);
+
+}
+
 //==============================================================================
 bool GraphComponent::createPluginNode (BasePlugin* plugin)
 {
@@ -968,7 +1018,7 @@ bool GraphComponent::createPluginNode (BasePlugin* plugin)
         // set common data
         component->setUserData (plugin);
         component->setUniqueID (plugin->getUniqueHash());
-        component->setText (plugin->getName ());
+        component->setText (plugin->getInstanceName ());
         component->setLeftToRight (leftToRight);
         component->setNodeColour (Colour::fromString (plugin->getValue (PROP_GRAPHCOLOUR, T("0xff808080"))));
 
@@ -979,68 +1029,46 @@ bool GraphComponent::createPluginNode (BasePlugin* plugin)
         // TODO - if (maxPortCount * portWidth > defaultNodeWidth) ...
         int pluginType = plugin->getType();
 
-        int w = defaultNodeWidth, h = defaultNodeHeight;
-        int numIns = plugin->getNumInputs () + plugin->getNumMidiInputs ();
-        int numOuts = plugin->getNumOutputs () + plugin->getNumMidiOutputs ();
+      setNodeDisplayName(plugin, component, plugin->getInstanceName());
 
-        if (leftToRight)
-        {
-            h = jmax (h, (jmax (numIns, numOuts) + 1) * 16);
-
-            const int textHeight = currentFont.getStringWidth (plugin->getName());
-            h = jmax (h, 16 + jmin (textHeight, 300));
-        }
-        else
-        {
-            w = jmax (w, (jmax (numIns, numOuts) + 1) * 16);
-
-            const int textWidth = currentFont.getStringWidth (plugin->getName());
-            w = jmax (w, 16 + jmin (textWidth, 300));
-        }
-        
         int wasLocked = plugin->getIntValue (PROP_GRAPHLOCKED, -1);
         if (wasLocked < 0)  wasLocked = 0;
         int wasSelected = plugin->getIntValue (PROP_GRAPHSELECTED, 0);
         int xPos = plugin->getIntValue (PROP_GRAPHXPOS, -1);
         int yPos = plugin->getIntValue (PROP_GRAPHYPOS, -1);
-        int wSize = plugin->getIntValue (PROP_GRAPHWSIZE, w);
-        if (wSize < 0) wSize = defaultNodeWidth;
-        int hSize = plugin->getIntValue (PROP_GRAPHHSIZE, h);
-        if (hSize < 0) hSize = defaultNodeHeight;
-        String pluginTooltip = plugin->getName ();
+        int wSize = plugin->getIntValue (PROP_GRAPHWSIZE, defaultNodeWidth);
+        int hSize = plugin->getIntValue (PROP_GRAPHHSIZE, defaultNodeHeight);
 
         // input plugin
         if (pluginType == JOST_PLUGINTYPE_INPUT)
         {
             inputs = component;
-            if (xPos < 0)       xPos = leftToRight ? 2 : (getWidth () - w) / 2;
-            if (yPos < 0)       yPos = leftToRight ? (getHeight() - h) / 2 : 2;
+            if (xPos < 0)       xPos = leftToRight ? 2 : (getWidth () - wSize) / 2;
+            if (yPos < 0)       yPos = leftToRight ? (getHeight() - hSize) / 2 : 2;
         }
         // output plugin
         else if (pluginType == JOST_PLUGINTYPE_OUTPUT)
         {
             outputs = component;
-            if (xPos < 0)       xPos = leftToRight ? getWidth () - w - 2 : (getWidth () - w) / 2;
-            if (yPos < 0)       yPos = leftToRight ? (getHeight() - h) / 2 : getHeight() - h - 2;
+            if (xPos < 0)       xPos = leftToRight ? getWidth () - wSize - 2 : (getWidth () - wSize) / 2;
+            if (yPos < 0)       yPos = leftToRight ? (getHeight() - hSize) / 2 : getHeight() - hSize - 2;
         }
         // generic plugin
         else
         {
             if (xPos < 0)       xPos = getBounds().getCentreX();
             if (yPos < 0)       yPos = getBounds().getCentreY();
-            pluginTooltip = plugin->getFile ().getFullPathName ();
+//            pluginTooltip = plugin->getFile ().getFullPathName ();
         }
 
-        component->setBounds (xPos, yPos, wSize, hSize);
+//        component->setBounds (xPos, yPos, wSize, hSize);
+      component->setTopLeftPosition (xPos, yPos);
         component->setLocked (wasLocked);
-        component->setTooltip (pluginTooltip);
         component->setVisible (true);
         if (wasSelected) selectedNodes.addToSelection (component);
 
         plugin->setValue (PROP_GRAPHXPOS, xPos);
         plugin->setValue (PROP_GRAPHYPOS, yPos);
-        plugin->setValue (PROP_GRAPHWSIZE, wSize);
-        plugin->setValue (PROP_GRAPHHSIZE, hSize);
 
         // restore audio input / output ports
         if (pluginType != JOST_PLUGINTYPE_INPUT)

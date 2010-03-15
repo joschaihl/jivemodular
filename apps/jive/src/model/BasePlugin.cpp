@@ -65,12 +65,23 @@ BasePlugin::~BasePlugin ()
 {
 }
 
+String BasePlugin::getInstanceName()
+{
+   return getValue(PROP_GRAPHNAME, getName ());
+}
+
+void BasePlugin::setInstanceName(const String& instanceName)
+{
+   setValue(PROP_GRAPHNAME, instanceName);
+}
+
 //==============================================================================
 void BasePlugin::savePropertiesToXml (XmlElement* xml)
 {
     xml->setAttribute (PROP_GRAPHSELECTED,           getIntValue (PROP_GRAPHSELECTED, 0));
     xml->setAttribute (PROP_GRAPHLOCKED,             getIntValue (PROP_GRAPHLOCKED, 0));
     xml->setAttribute (PROP_GRAPHCOLOUR,             getValue (PROP_GRAPHCOLOUR, T("0xff808080")));
+    xml->setAttribute (PROP_GRAPHNAME,               getInstanceName());
     xml->setAttribute (PROP_GRAPHXPOS,               getIntValue (PROP_GRAPHXPOS, -1));
     xml->setAttribute (PROP_GRAPHYPOS,               getIntValue (PROP_GRAPHYPOS, -1));
     xml->setAttribute (PROP_GRAPHWSIZE,              getIntValue (PROP_GRAPHWSIZE, -1));
@@ -125,6 +136,7 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
     setValue (PROP_GRAPHSELECTED,                    xml->getIntAttribute (PROP_GRAPHSELECTED, 0));
     setValue (PROP_GRAPHLOCKED,                      xml->getIntAttribute (PROP_GRAPHLOCKED, 0));
     setValue (PROP_GRAPHCOLOUR,                      xml->getStringAttribute (PROP_GRAPHCOLOUR, T("0xff808080")));
+    setInstanceName (xml->getStringAttribute (PROP_GRAPHNAME, getInstanceName()));
     setValue (PROP_GRAPHXPOS,                        xml->getIntAttribute (PROP_GRAPHXPOS, -1));
     setValue (PROP_GRAPHYPOS,                        xml->getIntAttribute (PROP_GRAPHYPOS, -1));
     setValue (PROP_GRAPHWSIZE,                       xml->getIntAttribute (PROP_GRAPHWSIZE, 50));

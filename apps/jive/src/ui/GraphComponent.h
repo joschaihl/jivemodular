@@ -182,6 +182,9 @@ protected:
 //                                          const int connectorType,
                                           const bool createConnection);
 
+   // sets the node display name and takes care of resizing it as appropriate
+   void setNodeDisplayName(BasePlugin* plugin, GraphNodeComponent* node, const String& newName);
+
     GraphNodeComponent* findNodeByUserData (void* data);
 
     bool createPluginNode (BasePlugin* plugin);
