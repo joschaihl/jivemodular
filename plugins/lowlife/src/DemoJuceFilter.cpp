@@ -45,7 +45,7 @@ DemoJuceFilter::DemoJuceFilter()
 {
     gain = 0.5f;
     lastUIWidth = 400;
-    lastUIHeight = 140;
+    lastUIHeight = 300;
 }
 
 DemoJuceFilter::~DemoJuceFilter()

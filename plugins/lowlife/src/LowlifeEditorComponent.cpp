@@ -31,7 +31,7 @@ LowlifeSlotEditComponent::LowlifeSlotEditComponent(DemoJuceFilter* filter, int s
    mySlot(slot)
 {
    jassert(filter);
-   addAndMakeVisible(sampleFile = new FilenameComponent("sample", filter->getZoneslotSample(slot), false, false, false, "*.wav", String::empty, "drop it here niggas"));
+   addAndMakeVisible(sampleFile = new FilenameComponent("sample", filter->getZoneslotSample(slot), false, false, false, "*.wav", String::empty, "drop sample here"));
    sampleFile->addListener(this);
 
    addAndMakeVisible(faderSlider = new Slider(T("fader")));
@@ -126,7 +126,7 @@ LowlifeEditorComponent::LowlifeEditorComponent (DemoJuceFilter* const ownerFilte
 
     // add the triangular resizer component for the bottom-right of the UI
     addAndMakeVisible (resizer = new ResizableCornerComponent (this, &resizeLimits));
-   resizeLimits.setSizeLimits (320, 250, 1000, 800);
+   resizeLimits.setSizeLimits (440, 250, 1600, 1200);
 
    addAndMakeVisible(numSlotsSlider = new Slider("numSlots"));
    if (numSlotsSlider)
@@ -151,7 +151,7 @@ LowlifeEditorComponent::LowlifeEditorComponent (DemoJuceFilter* const ownerFilte
     // method.
     ownerFilter->addChangeListener (this);
 
-   setSize(200, 80);
+   setSize(resizeLimits.getMinimumWidth(), resizeLimits.getMinimumHeight());
 }
 
 LowlifeEditorComponent::~LowlifeEditorComponent()
