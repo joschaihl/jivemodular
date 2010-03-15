@@ -67,7 +67,7 @@ WrappedJuceVSTPluginWindow::WrappedJuceVSTPluginWindow (BasePlugin* _plugin, //C
 {
     DBG ("WrappedJuceVSTPluginWindow::WrappedJuceVSTPluginWindow");
 
-   String windowTitle(plugin->getName());
+   String windowTitle(plugin->getInstanceName() + String(" - ") + plugin->getName());
 
    WrappedJucePlugin* vstPlug = dynamic_cast<WrappedJucePlugin*>(plugin);
    if (vstPlug)

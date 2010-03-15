@@ -55,6 +55,7 @@
 #define PROP_GRAPHYPOS                        T("gYpos")
 #define PROP_GRAPHWSIZE                       T("gWsize")
 #define PROP_GRAPHHSIZE                       T("gHsize")
+#define PROP_GRAPHNAME                        T("gInstanceName")
 #define PROP_PLUGPRESETDIR                    T("pPdir")
 #define PROP_MIXERLABEL                       T("mLbl")
 #define PROP_MIXERINDEX                       T("mIdx")
@@ -112,6 +113,9 @@ public:
     virtual void openEditor (void* handle, void* display) {}
     virtual void idleEditor () {}
     virtual void closeEditor () {}
+    
+    String getInstanceName();
+    void setInstanceName(const String&);
     
 //    virtual bool preferGenericEditor() {return prefersGenericEditor;};
 //    virtual void setPreferGenericEditor(bool p) { prefersGenericEditor = p; };
