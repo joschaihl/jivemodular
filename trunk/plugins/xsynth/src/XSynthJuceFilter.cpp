@@ -38,15 +38,53 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new DemoJuceFilter();
 }
 
+double DefaultPatch[] = 
+{
+   0.2, //    { PD_IN,  "OSC1 Pitch",          HD_MAX | HD_LOG, 0.25f,    4.0f,   XPT_LOG,   1.,2.,2. },
+   0.2, //    { PD_IN,  "OSC1 Waveform",       HD_DETENT,       0.0f,     6.0f,   XPT_DETE,  0.,0.,0. },
+   0.3, //    { PD_IN,  "OSC1 Pulse Width",    HD_MID,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.207, //    { PD_IN,  "OSC2 Pitch",          HD_MAX | HD_LOG, 0.25f,    4.0f,   XPT_LOG,   1.,2.,2. },
+   0.5, //    { PD_IN,  "OSC2 Waveform",       HD_DETENT,       0.0f,     6.0f,   XPT_DETE,  0.,0.,0. },
+   0.7, //    { PD_IN,  "OSC2 Pulse Width",    HD_MID,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   1.0, //    { PD_IN,  "Oscillator Sync",     HD_SWITCH,       0.0f,     1.0f,   XPT_ONOFF, 0.,0.,0. },
+   0.45, //    { PD_IN,  "Oscillator Balance",  HD_MIN,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.3, //    { PD_IN,  "LFO Frequency",       HD_MID | HD_LOG, 0.1f,     10.0f,  XPT_LOG,   0.1,10.,2. },
+   0.0, //    { PD_IN,  "LFO Waveform",        HD_DETENT,       0.0f,     5.0f,   XPT_DETE,  0.,0.,0. },
+   0.01, //    { PD_IN,  "LFO Osc Pitch Mod",   HD_MIN,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.3, //    { PD_IN,  "LFO VCF Cutoff Mod",  HD_MIN,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.1, //    { PD_IN,  "EG1 Attack Rate",     HD_HI | HD_LOG,  0.00001f, 0.1f,   XPT_LOG,   0.1,10.,-4. },
+   0.03, //    { PD_IN,  "EG1 Decay Rate",      HD_HI | HD_LOG,  0.00001f, 0.1f,   XPT_LOG,   0.1,10.,-4. },
+   0.6, //    { PD_IN,  "EG1 Sustain Level",   HD_MID,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.05, //    { PD_IN,  "EG1 Release Rate",    HD_HI | HD_LOG,  0.00001f, 0.1f,   XPT_LOG,   0.1,10.,-4. },
+   0.0, //    { PD_IN,  "EG1 Velocity Sens",   HD_MIN,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.3, //    { PD_IN,  "EG1 Osc Pitch Mod",   HD_MIN,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.1, //    { PD_IN,  "EG1 VCF Cutoff Mod",  HD_MIN,          0.0f,     50.0f,  XPT_LIN,   0.,50.,0. },
+   0.001, //    { PD_IN,  "EG2 Attack Rate",     HD_HI | HD_LOG,  0.00001f, 0.1f,   XPT_LOG,   0.1,10.,-4. },
+   0.1, //    { PD_IN,  "EG2 Decay Rate",      HD_HI | HD_LOG,  0.00001f, 0.1f,   XPT_LOG,   0.1,10.,-4. },
+   0.5, //    { PD_IN,  "EG2 Sustain Level",   HD_MID,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.06, //    { PD_IN,  "EG2 Release Rate",    HD_HI | HD_LOG,  0.00001f, 0.1f,   XPT_LOG,   0.1,10.,-4. },
+   0.0, //    { PD_IN,  "EG2 Velocity Sens",   HD_MIN,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.1, //    { PD_IN,  "EG2 Osc Pitch Mod",   HD_MIN,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.3, //    { PD_IN,  "EG2 VCF Cutoff Mod",  HD_MIN,          0.0f,     50.0f,  XPT_LIN,   0.,50.,0. },
+   0.5, //    { PD_IN,  "VCF Cutoff",          HD_MAX,          0.0f,     50.0f,  XPT_LIN,   0.,50.,0. },
+   0.3, //    { PD_IN,  "VCF Resonance",       HD_LOW,          0.0f,     1.995f, XPT_LIN,   0.,1.995,0. },
+   0.5, //    { PD_IN,  "VCF Mode",            HD_DETENT,       0.0f,     2.0f,   XPT_VCF,   0.,0.,0. },
+   0.1, //    { PD_IN,  "Glide Rate",          HD_MIN | HD_LOG, 0.002f,   1.0f,   XPT_LOG,   1.,0.002,1. },  // -FIX- this needs to be adjusted for different cx rates!
+   0.75, //    { PD_IN,  "Volume",              HD_LOW,          0.0f,     1.0f,   XPT_LIN,   0.,1.,0. },
+   0.499, //    { PD_IN,  "Tuning",              HD_440,          415.3f,   466.2f, XPT_LIN,   415.3,466.2,0. },
+   0.8, //    { PD_IN,  "Mono Mode",           HD_DETENT,       0.0f,     3.0f, XPT_DETE,   0.,0.,0. },
+   0.8, //    { PD_IN,  "Glide Mode",          HD_DETENT,       0.0f,     4.0f,   XPT_DETE,  0.,0.,0. },
+};
+
 //==============================================================================
 DemoJuceFilter::DemoJuceFilter()
 :
-    ptrPlug (0),
-    ladspa (0),
-    plugin (0),
-    emptyBuffer (1,32),
-    samplingRate (44100.0f),
-	current_patch_num(0)
+   current_patch_num(0),
+   ptrPlug (0),
+   ladspa (0),
+   plugin (0),
+   emptyBuffer (1,32),
+   samplingRate (44100.0f)
 {
     gain = 1.0f;
     lastUIWidth = 400;
@@ -104,7 +142,7 @@ DemoJuceFilter::DemoJuceFilter()
 		{
 			for (int i = 0; i < pars.size (); i++)
             {
-//               params[i] = rand() / static_cast<float>(RAND_MAX);
+            setParameter(i, DefaultPatch[i]);
 				ladspa->connect_port (plugin, pars [i], &normalized[i]);
             }
 			for (int i = 0; i < ins.size (); i++)
