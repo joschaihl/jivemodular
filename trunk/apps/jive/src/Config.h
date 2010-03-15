@@ -40,9 +40,13 @@
 */
 
 // config files paths
-#define JOST_CONFIG_DIRECTORY               T(".jost")
-#define JOST_CONFIG_FILENAME                T("default")
-#define JOST_CONFIG_EXTENSION               T("conf")
+#if JUCE_MAC
+#define JOST_CONFIG_DIRECTORY               T("~/Library/Application Support/Jive")
+#else // JUCE_MAC
+#define JOST_CONFIG_DIRECTORY               T("~")
+#endif // JUCE_MAC
+#define JOST_CONFIG_FILENAME                T("JiveSettings")
+#define JOST_CONFIG_EXTENSION               T("xml")
 #define JOST_COLOR_SCHEME_PATH              T("~/.jost/colourscheme.conf")
 #define JOST_BOOKMARK_PATH                  T("~/.jost/bookmarks.conf")
 

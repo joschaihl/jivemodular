@@ -48,12 +48,12 @@ void Config::open ()
 {
     ApplicationProperties* appProperties = ApplicationProperties::getInstance(); 
 
-//    appProperties->setStorageParameters (JOST_CONFIG_FILENAME,
-//                                         JOST_CONFIG_EXTENSION,
-//                                         JOST_CONFIG_DIRECTORY,
-    appProperties->setStorageParameters ("JostConfig",
-                                         "xml",
-                                         "~/",
+    appProperties->setStorageParameters (JOST_CONFIG_FILENAME,
+                                         JOST_CONFIG_EXTENSION,
+                                         JOST_CONFIG_DIRECTORY,
+//    appProperties->setStorageParameters ("JostConfig",
+//                                         "xml",
+//                                         "~/",
                                          2000,
                                          PropertiesFile::ignoreCaseOfKeyNames
                                          | PropertiesFile::storeAsXML);    
