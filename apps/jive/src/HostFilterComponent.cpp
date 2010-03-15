@@ -125,7 +125,7 @@ HostFilterComponent::HostFilterComponent (HostFilterBase* const ownerFilter_)
     // add internal VST plugins
     const File deadMansPedalFile (ApplicationProperties::getInstance()->getUserSettings()->getFile().getSiblingFile ("RecentlyCrashedPluginsList"));
 #if JUCE_MAC
-    File internalPluginFolder = File::getSpecialLocation(File::currentApplicationFile).getChildFile("./Contents/Resources/Plugins"); // nicely hidden inside bundle on mac os x
+    File internalPluginFolder = File::getSpecialLocation(File::currentApplicationFile).getChildFile("./Contents/PlugIns"); // nicely hidden inside bundle on mac os x
 #else
     File internalPluginFolder = File::getSpecialLocation(File::currentApplicationFile).getChildFile("../Plugins"); // plugin folder alongside app on other platforms.. for now
 #endif
