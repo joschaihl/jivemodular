@@ -72,7 +72,7 @@ public:
         jostMainWindowName << " (DEBUG)";
 #endif
 
-        AudioPluginFormatManager::getInstance()->addDefaultFormats();
+      AudioPluginFormatManager::getInstance()->addFormat(new VSTPluginFormat()); // for now we just support VST, keep things simple
 
         // create the window
         window = new StandaloneFilterWindow (jostMainWindowName,
