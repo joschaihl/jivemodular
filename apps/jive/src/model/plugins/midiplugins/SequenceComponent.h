@@ -32,8 +32,8 @@
 #include "../../../Config.h"
 #include "../../../HostFilterComponent.h"
 #include "MidiSequencePlugin.h"
-#include "../../../ui/plugins/PluginEditorComponent.h"
-#include "ui/plugins/ParamSlider.h"
+#include "ui/plugins/PluginEditorComponent.h"
+#include "ui/utility/JiveParamSlider.h"
 
 class NoteEditComponent;
 class AutomationEditComponent;

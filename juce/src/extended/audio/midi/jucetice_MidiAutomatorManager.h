@@ -95,7 +95,12 @@ public:
 
     //==============================================================================
     /** This is used inside a mouseDown of a corresponding Component */
-    void handleMidiPopupMenu (const MouseEvent& e);
+    void handleMidiPopupMenu(const MouseEvent& e);
+
+    // Client code can use generateMidiPopupMenu and processMidiPopupMenu to add custom items to the menu.
+    // Added items must have ids between 3-1000.
+    PopupMenu generateMidiPopupMenu();
+    bool processMidiPopupMenu(int menuSelection);
 
     //==============================================================================
     /** Handle a midi message coming in */
