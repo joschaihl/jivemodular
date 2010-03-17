@@ -31,68 +31,6 @@ BEGIN_JUCE_NAMESPACE
 
 #include "jucetice_MidiAutomatorManager.h"
 
-class MidiBindingEditorContent : public Component, public ComboBoxListener
-{
-public:
-   MidiBindingEditorContent()
-   {
-      addAndMakeVisible(noteOnOrOff = new ComboBox("noteOnOrOff"));
-      noteOnOrOff->addItem("Note on", 1);
-      noteOnOrOff->addItem("Note off", 2);
-      addAndMakeVisible(incrDirection = new ComboBox("incrDirection")); 
-      incrDirection->addItem("Increase", 1);
-      incrDirection->addItem("Decrease", -1);
-      incrDirection->addItem("Bidi", 2);
-      addAndMakeVisible(incrMax = new Slider("incrMax")); 
-      incrMax->setSliderStyle(Slider::IncDecButtons);
-      addAndMakeVisible(incrAmount = new ComboBox("incrAmount")); 
-      incrAmount->addItem("1 (toggle)", 1);
-      incrAmount->addItem("1/2", 2);
-      incrAmount->addItem("1/3", 3);
-      incrAmount->addItem("1/4", 4);
-      incrAmount->addItem("1/5", 5);
-      incrAmount->addItem("1/8", 8);
-      incrAmount->addItem("1/16", 16);
-      incrAmount->addItem("1/32", 32);
-      incrAmount->addItem("1/127", 127);
-      incrAmount->addListener(this);
-
-      setSize(400, 200);
-   }
-   
-   ~MidiBindingEditorContent()
-   {
-      deleteAllChildren();
-   }
-   
-   virtual void comboBoxChanged (ComboBox* slider)
-   {
-      if (slider == incrAmount)
-      {
-         int realMax = incrAmount->getSelectedId();
-         incrMax->setRange(1, realMax, 1);
-         if (realMax < incrMax->getValue())
-            incrMax->setValue(realMax);
-      }
-   }
-
-   void resized() 
-   {
-      int h = getHeight() / 4;
-      int w = getWidth();
-      noteOnOrOff->setBounds(0, 0, w, h);
-      incrDirection->setBounds(0, h, w, h);
-      incrAmount->setBounds(0, 2*h, w, h);
-      incrMax->setBounds(0, 3*h, w, h);
-   }
-   
-
-   ComboBox* noteOnOrOff;
-   ComboBox* incrDirection;
-   ComboBox* incrAmount;
-   Slider* incrMax;
-};
-
 //==============================================================================
 MidiAutomatable::MidiAutomatable()
 : 
@@ -189,85 +127,79 @@ float MidiAutomatable::transferFunctionInvertedLinear (int ccValue)
 }
 #endif
 
-void MidiAutomatable::handleMidiPopupMenu (const MouseEvent& e)
+PopupMenu MidiAutomatable::generateMidiPopupMenu()
 {
-    PopupMenu menu, ccSubMenu, noteSubMenu;
-    
-    const int controllerNumber = getControllerNumber ();
-    const int noteNumber = getNoteNumber ();
+   PopupMenu menu, ccSubMenu, noteSubMenu;
 
-    for (int i = 0; i < 128; i++)
-    {
-         ccSubMenu.addItem (i + 1000,
-                            "CC# " + String(i) + " " + MidiMessage::getControllerName (i),
-                            true,
-                            controllerNumber == i);
-         noteSubMenu.addItem (i + 2000,
-                            "Note# " + String(i) + " " + MidiMessage::getMidiNoteName (i, true, true, 4),
-                            true,
-                            noteNumber == i);
-    }
-    
-    if (controllerNumber != -1)
-        menu.addItem (-1, "Assigned to CC# " + String (controllerNumber), false);
-    else if (noteNumber != -1)
-        menu.addItem (-1, "Assigned to Note# " + String (noteNumber), false);
-    else
-        menu.addItem (-1, "Not assigned", false);
-    menu.addSeparator ();
+   const int controllerNumber = getControllerNumber ();
+   const int noteNumber = getNoteNumber ();
 
-    menu.addItem (1, "Midi Learn");
-    menu.addSubMenu ("Set CC", ccSubMenu);
-    menu.addSubMenu ("Set Note", noteSubMenu);
-    menu.addItem (2, "Reset", (controllerNumber != -1) || (noteNumber != -1 ));
-    menu.addItem (3, "Edit", (noteNumber != -1));
-    
-    int result = menu.showAt (e.getScreenX(), e.getScreenY());
+   for (int i = 0; i < 128; i++)
+   {
+      ccSubMenu.addItem (i + 1000,
+                         "CC# " + String(i) + " " + MidiMessage::getControllerName (i),
+                         true,
+                         controllerNumber == i);
+      noteSubMenu.addItem (i + 2000,
+                         "Note# " + String(i) + " " + MidiMessage::getMidiNoteName (i, true, true, 4),
+                         true,
+                         noteNumber == i);
+   }
+
+   if (controllerNumber != -1)
+      menu.addItem (-1, "Assigned to CC# " + String (controllerNumber), false);
+   else if (noteNumber != -1)
+      menu.addItem (-1, "Assigned to Note# " + String (noteNumber), false);
+   else
+      menu.addItem (-1, "Not assigned", false);
+   menu.addSeparator ();
+
+   menu.addItem (1, "Midi Learn");
+   menu.addSubMenu ("Set CC", ccSubMenu);
+   menu.addSubMenu ("Set Note", noteSubMenu);
+   menu.addItem (2, "Reset", (controllerNumber != -1) || (noteNumber != -1 ));
+
+   return menu;
+}
+
+bool MidiAutomatable::processMidiPopupMenu(int result)
+{
+   bool weHandledIt = false;
     switch (result)
     {
     case 1:
         activateLearning ();
+        weHandledIt = true;
         break;
     case 2:
         setControllerNumber (-1);
         setNoteNumber (-1);
+        weHandledIt = true;
         break;
-   case 3:
-   {
-      if (getNoteNumber() != -1)
+
+   default:
+      if (result >= 1000 && result < 1128)
       {
-         MidiBindingEditorContent dialogStuff;
-         int incr = round(1.0 / fabs(incrAmount));
-         int imax = incrMax / fabs(incrAmount);//round(1.0 / fabs(incrMax));
-         dialogStuff.incrAmount->setSelectedId(incr, false);
-         dialogStuff.noteOnOrOff->setSelectedId(noteOn ? 1 : 2);
-         int dir = 1;
-         if (bidirectional) dir = 2;
-         else if (incrAmount < 0) dir = -1;
-         dialogStuff.incrDirection->setSelectedId(dir);
-         dialogStuff.incrMax->setValue(imax);
-         
-         DialogWindow::showModalDialog(String("Edit Note Binding"), &dialogStuff, 0, Colours::brown, true);
-         
-         incrAmount = 1.0 / dialogStuff.incrAmount->getSelectedId();
-         incrMax = incrAmount * dialogStuff.incrMax->getValue();
-         noteOn = (1 == dialogStuff.noteOnOrOff->getSelectedId());
-         bidirectional = (2 == dialogStuff.incrDirection->getSelectedId() && incrAmount < 1.0);
-         if (dialogStuff.incrDirection->getSelectedId() == -1)
-            incrAmount = -incrAmount;
-         
-         // ensure midi manag knows about note on / off
-         if (midiAutomatorManager)
-            midiAutomatorManager->registerMidiAutomatable(this);
+         setControllerNumber (result - 1000);
+         weHandledIt = true;
+      }
+      else if (result >= 2000 && result < 2128)
+      {
+         setNoteNumber (result - 2000);
+         weHandledIt = true;
       }
    }
-   break;
-    default:
-        if (result >= 1000 && result < 1128)
-            setControllerNumber (result - 1000);
-        else if (result >= 2000 && result < 2128)
-            setNoteNumber (result - 2000);
-    }
+
+   return weHandledIt;
+}
+
+void MidiAutomatable::handleMidiPopupMenu(const MouseEvent& e)
+{
+    PopupMenu menu = generateMidiPopupMenu();
+    
+    int result = menu.showAt (e.getScreenX(), e.getScreenY());
+    
+    processMidiPopupMenu(result);
 }
 
 float MidiAutomatable::applyNoteIncrement(float val)

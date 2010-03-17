@@ -25,7 +25,7 @@
 
 #include "StandardHeader.h"
 #include "GenericJuceVSTEditor.h"
-#include "ParamSlider.h"
+#include "ui/utility/JiveParamSlider.h"
 
 
 //==============================================================================

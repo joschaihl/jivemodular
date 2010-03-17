@@ -55,6 +55,7 @@
 		933AE835103AD3B40037B7FE /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 933AE831103AD3B40037B7FE /* AudioUnit.framework */; };
 		933AE836103AD3B40037B7FE /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 933AE832103AD3B40037B7FE /* CoreAudio.framework */; };
 		933AE837103AD3B40037B7FE /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 933AE833103AD3B40037B7FE /* CoreMIDI.framework */; };
+		938766B21150B22B004AA104 /* JiveParamSlider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 938766B01150B22B004AA104 /* JiveParamSlider.cpp */; };
 		938A4BEB105B6F46004B18E8 /* dssi_alsa_compat.c in Sources */ = {isa = PBXBuildFile; fileRef = 938A4BEA105B6F46004B18E8 /* dssi_alsa_compat.c */; };
 		938AD0FA103A4ECC00DFCCCF /* Commands.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 938AD076103A4ECC00DFCCCF /* Commands.cpp */; };
 		938AD0FB103A4ECC00DFCCCF /* Config.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 938AD078103A4ECC00DFCCCF /* Config.cpp */; };
@@ -227,6 +228,8 @@
 		933AE831103AD3B40037B7FE /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
 		933AE832103AD3B40037B7FE /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
 		933AE833103AD3B40037B7FE /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = /System/Library/Frameworks/CoreMIDI.framework; sourceTree = "<absolute>"; };
+		938766B01150B22B004AA104 /* JiveParamSlider.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JiveParamSlider.cpp; sourceTree = "<group>"; };
+		938766B11150B22B004AA104 /* JiveParamSlider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JiveParamSlider.h; sourceTree = "<group>"; };
 		938A4BEA105B6F46004B18E8 /* dssi_alsa_compat.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = dssi_alsa_compat.c; path = "../../../../juce/src/extended/dependancies/libdssialsacompat-1.0.8a/dssi_alsa_compat.c"; sourceTree = SOURCE_ROOT; };
 		938AD076103A4ECC00DFCCCF /* Commands.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = Commands.cpp; sourceTree = "<group>"; };
 		938AD077103A4ECC00DFCCCF /* Commands.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = Commands.h; sourceTree = "<group>"; };
@@ -696,6 +699,8 @@
 			isa = PBXGroup;
 			children = (
 				938AD0EE103A4ECC00DFCCCF /* AudioBufferDisplay.h */,
+				938766B01150B22B004AA104 /* JiveParamSlider.cpp */,
+				938766B11150B22B004AA104 /* JiveParamSlider.h */,
 			);
 			path = utility;
 			sourceTree = "<group>";
@@ -918,6 +923,7 @@
 				9324B489112369E7001437D2 /* GenericJuceVSTEditor.cpp in Sources */,
 				93B0FA5F112CEE8E003C3402 /* PatternMatrixEditor.cpp in Sources */,
 				93B0FA60112CEE8E003C3402 /* PatternMatrixPlugin.cpp in Sources */,
+				938766B21150B22B004AA104 /* JiveParamSlider.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
