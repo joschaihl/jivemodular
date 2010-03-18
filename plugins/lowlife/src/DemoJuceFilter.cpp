@@ -46,6 +46,8 @@ DemoJuceFilter::DemoJuceFilter()
     gain = 0.5f;
     lastUIWidth = 400;
     lastUIHeight = 300;
+    
+    getHProgramRef().ply_mode = 2;
 }
 
 DemoJuceFilter::~DemoJuceFilter()
@@ -66,7 +68,7 @@ const int DemoJuceFilter::MaxFader = 3;
 const int DemoJuceFilter::MinTune = 0;
 const int DemoJuceFilter::MaxTune = 100;
 const int DemoJuceFilter::MinPolyMode = 0;
-const int DemoJuceFilter::MaxPolyMode = 32;
+const int DemoJuceFilter::MaxPolyMode = 2;
 
 float DemoJuceFilter::getNormedParam(int slot, int paramId)
 {
@@ -283,11 +285,17 @@ int DemoJuceFilter::getPolyMode()
    HIGHLIFE_PROGRAM* pz = getHProgram();
    if (pz)
       polymode = pz->ply_mode;
+   if (polymode < MinPolyMode || polymode > MaxPolyMode)
+      polymode = MaxPolyMode;
+
    return polymode;
 }
 
 void DemoJuceFilter::setPolyMode(int poly)
 {
+   if (poly < MinPolyMode || poly > MaxPolyMode)
+      poly = MaxPolyMode;
+
    HIGHLIFE_PROGRAM* pz = getHProgram();
    if (pz)
       pz->ply_mode = poly;
@@ -397,7 +405,7 @@ bool DemoJuceFilter::producesMidi() const
 void DemoJuceFilter::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // do your pre-playback setup stuff here..
-    
+
 //   File hardcodedSampleFile("/Volumes/Stuf/Archive/Audio Samples/DVD1 - samples & others' stems/my samples/OleSchoolShit/E - Ole School - So I Suggest -- Bitch.wav");
 //    
 //   int programZero = 0;
