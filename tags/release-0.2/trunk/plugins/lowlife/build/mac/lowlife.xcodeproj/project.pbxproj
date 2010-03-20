@@ -1,0 +1,967 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		843792AC0EFBF14B002A2725 /* DemoJuceFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 843792A40EFBF14B002A2725 /* DemoJuceFilter.cpp */; };
+		843792B00EFBF14B002A2725 /* juce_LibrarySource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 843792A80EFBF14B002A2725 /* juce_LibrarySource.mm */; };
+		8437956F0EFBF323002A2725 /* AudioUnit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843795640EFBF323002A2725 /* AudioUnit.framework */; };
+		843795700EFBF323002A2725 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843795650EFBF323002A2725 /* Cocoa.framework */; };
+		843795710EFBF323002A2725 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843795660EFBF323002A2725 /* OpenGL.framework */; };
+		843795720EFBF323002A2725 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843795670EFBF323002A2725 /* IOKit.framework */; };
+		843795730EFBF323002A2725 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843795680EFBF323002A2725 /* Carbon.framework */; };
+		843795740EFBF323002A2725 /* CoreMIDI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 843795690EFBF323002A2725 /* CoreMIDI.framework */; };
+		843795750EFBF323002A2725 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8437956A0EFBF323002A2725 /* CoreAudio.framework */; };
+		843795760EFBF323002A2725 /* DiscRecording.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8437956B0EFBF323002A2725 /* DiscRecording.framework */; };
+		843795770EFBF323002A2725 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8437956C0EFBF323002A2725 /* QTKit.framework */; };
+		843795780EFBF323002A2725 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8437956D0EFBF323002A2725 /* WebKit.framework */; };
+		84978759103561A60020003B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84978758103561A60020003B /* AudioToolbox.framework */; };
+		9353B9BB114CF65500769E30 /* juce_VST_Wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9353B9B9114CF65500769E30 /* juce_VST_Wrapper.cpp */; };
+		9353B9BC114CF65500769E30 /* juce_VST_Wrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9353B9BA114CF65500769E30 /* juce_VST_Wrapper.mm */; };
+		93CA487511250A7400F9BB2C /* fluid_conv.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47D311250A7400F9BB2C /* fluid_conv.c */; };
+		93CA487611250A7400F9BB2C /* fluid_defsfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47D511250A7400F9BB2C /* fluid_defsfont.c */; };
+		93CA487711250A7400F9BB2C /* fluid_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47D711250A7400F9BB2C /* fluid_io.c */; };
+		93CA487811250A7400F9BB2C /* fluid_list.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47D911250A7400F9BB2C /* fluid_list.c */; };
+		93CA487911250A7400F9BB2C /* fluid_sys.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47DC11250A7400F9BB2C /* fluid_sys.c */; };
+		93CA487A11250A7400F9BB2C /* allpass.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47E411250A7400F9BB2C /* allpass.cpp */; };
+		93CA487B11250A7400F9BB2C /* comb.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47E611250A7400F9BB2C /* comb.cpp */; };
+		93CA487C11250A7400F9BB2C /* revmodel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47E811250A7400F9BB2C /* revmodel.cpp */; };
+		93CA487D11250A7400F9BB2C /* Highlife.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47EC11250A7400F9BB2C /* Highlife.cpp */; };
+		93CA487E11250A7400F9BB2C /* HighLifeAkp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47EE11250A7400F9BB2C /* HighLifeAkp.cpp */; };
+		93CA487F11250A7400F9BB2C /* HighLifeCriticalSection.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47EF11250A7400F9BB2C /* HighLifeCriticalSection.cpp */; };
+		93CA488011250A7400F9BB2C /* HighLifeDls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47F011250A7400F9BB2C /* HighLifeDls.cpp */; };
+		93CA488211250A7400F9BB2C /* HighLifeEnvelope.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47F311250A7400F9BB2C /* HighLifeEnvelope.cpp */; };
+		93CA488311250A7400F9BB2C /* HighLifeFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47F511250A7400F9BB2C /* HighLifeFilter.cpp */; };
+		93CA488411250A7400F9BB2C /* HighLifeGig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47F811250A7400F9BB2C /* HighLifeGig.cpp */; };
+		93CA488511250A7400F9BB2C /* HighLifeGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47F911250A7400F9BB2C /* HighLifeGui.cpp */; };
+		93CA488611250A7400F9BB2C /* HighLifeGuiMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47FA11250A7400F9BB2C /* HighLifeGuiMenu.cpp */; };
+		93CA488711250A7400F9BB2C /* HighLifeGuiPaint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47FC11250A7400F9BB2C /* HighLifeGuiPaint.cpp */; };
+		93CA488811250A7400F9BB2C /* HighLifeLfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47FD11250A7400F9BB2C /* HighLifeLfo.cpp */; };
+		93CA488911250A7400F9BB2C /* HighLifeMp3.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47FF11250A7400F9BB2C /* HighLifeMp3.cpp */; };
+		93CA488B11250A7400F9BB2C /* HighLifeParameters.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480111250A7400F9BB2C /* HighLifeParameters.cpp */; };
+		93CA488C11250A7400F9BB2C /* HighLifePlug.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480211250A7400F9BB2C /* HighLifePlug.cpp */; };
+		93CA488D11250A7400F9BB2C /* HighLifeRaw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480311250A7400F9BB2C /* HighLifeRaw.cpp */; };
+		93CA488E11250A7400F9BB2C /* HighLifeRiffWave.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480411250A7400F9BB2C /* HighLifeRiffWave.cpp */; };
+		93CA488F11250A7400F9BB2C /* HighLifeSampleEdit.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480611250A7400F9BB2C /* HighLifeSampleEdit.cpp */; };
+		93CA489011250A7400F9BB2C /* HighLifeSf2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480711250A7400F9BB2C /* HighLifeSf2.cpp */; };
+		93CA489111250A7400F9BB2C /* HighLifeSfz.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480811250A7400F9BB2C /* HighLifeSfz.cpp */; };
+		93CA489211250A7400F9BB2C /* HighLifeTool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480911250A7400F9BB2C /* HighLifeTool.cpp */; };
+		93CA489311250A7400F9BB2C /* HighLifeVoice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480A11250A7400F9BB2C /* HighLifeVoice.cpp */; };
+		93CA489411250A7400F9BB2C /* HighLifeVstHost.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480C11250A7400F9BB2C /* HighLifeVstHost.cpp */; };
+		93CA489511250A7400F9BB2C /* HighLifeWav.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480D11250A7400F9BB2C /* HighLifeWav.cpp */; };
+		93CA489611250A7400F9BB2C /* DLS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA480F11250A7400F9BB2C /* DLS.cpp */; };
+		93CA489711250A7400F9BB2C /* gig.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA481111250A7400F9BB2C /* gig.cpp */; };
+		93CA489811250A7400F9BB2C /* RIFF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93CA481411250A7400F9BB2C /* RIFF.cpp */; };
+		93CA489911250A7400F9BB2C /* common.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA481A11250A7400F9BB2C /* common.c */; };
+		93CA489A11250A7400F9BB2C /* dct64_i386.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA481B11250A7400F9BB2C /* dct64_i386.c */; };
+		93CA489B11250A7400F9BB2C /* decode_i386.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA481C11250A7400F9BB2C /* decode_i386.c */; };
+		93CA489D11250A7400F9BB2C /* layer2.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA482011250A7400F9BB2C /* layer2.c */; };
+		93CA489E11250A7400F9BB2C /* layer3.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA482111250A7400F9BB2C /* layer3.c */; };
+		93CA489F11250A7400F9BB2C /* tabinit.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA482411250A7400F9BB2C /* tabinit.c */; };
+		93CA4D2B11260B2700F9BB2C /* LowlifeEditorComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 843792A20EFBF14B002A2725 /* LowlifeEditorComponent.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		8473149510663A94001B84CC /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 8473148E10663A94001B84CC /* PluginLibrary.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = B65B09B30860FB0800FE2E6A;
+			remoteInfo = "Plugin Library";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		3EEA126B089847F5002C6BFC /* CAVectorUnit.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CAVectorUnit.cpp; sourceTree = "<group>"; };
+		3EEA126C089847F5002C6BFC /* CAVectorUnit.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CAVectorUnit.h; sourceTree = "<group>"; };
+		3EEA126D089847F5002C6BFC /* CAVectorUnitTypes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CAVectorUnitTypes.h; sourceTree = "<group>"; };
+		8412B0321048273000072EA3 /* CADebugMacros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CADebugMacros.h; sourceTree = "<group>"; };
+		843792A20EFBF14B002A2725 /* LowlifeEditorComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = LowlifeEditorComponent.cpp; path = ../../src/LowlifeEditorComponent.cpp; sourceTree = SOURCE_ROOT; };
+		843792A30EFBF14B002A2725 /* LowlifeEditorComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = LowlifeEditorComponent.h; path = ../../src/LowlifeEditorComponent.h; sourceTree = SOURCE_ROOT; };
+		843792A40EFBF14B002A2725 /* DemoJuceFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = DemoJuceFilter.cpp; path = ../../src/DemoJuceFilter.cpp; sourceTree = SOURCE_ROOT; };
+		843792A50EFBF14B002A2725 /* DemoJuceFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DemoJuceFilter.h; path = ../../src/DemoJuceFilter.h; sourceTree = SOURCE_ROOT; };
+		843792A60EFBF14B002A2725 /* includes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = includes.h; path = ../../src/includes.h; sourceTree = SOURCE_ROOT; };
+		843792A70EFBF14B002A2725 /* juce_AppConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = juce_AppConfig.h; path = ../../src/juce_AppConfig.h; sourceTree = SOURCE_ROOT; };
+		843792A80EFBF14B002A2725 /* juce_LibrarySource.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; name = juce_LibrarySource.mm; path = ../../src/juce_LibrarySource.mm; sourceTree = SOURCE_ROOT; };
+		843792A90EFBF14B002A2725 /* JucePluginCharacteristics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = JucePluginCharacteristics.h; path = ../../src/JucePluginCharacteristics.h; sourceTree = SOURCE_ROOT; };
+		843795640EFBF323002A2725 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = /System/Library/Frameworks/AudioUnit.framework; sourceTree = "<absolute>"; };
+		843795650EFBF323002A2725 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
+		843795660EFBF323002A2725 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
+		843795670EFBF323002A2725 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = /System/Library/Frameworks/IOKit.framework; sourceTree = "<absolute>"; };
+		843795680EFBF323002A2725 /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = /System/Library/Frameworks/Carbon.framework; sourceTree = "<absolute>"; };
+		843795690EFBF323002A2725 /* CoreMIDI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMIDI.framework; path = /System/Library/Frameworks/CoreMIDI.framework; sourceTree = "<absolute>"; };
+		8437956A0EFBF323002A2725 /* CoreAudio.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreAudio.framework; path = /System/Library/Frameworks/CoreAudio.framework; sourceTree = "<absolute>"; };
+		8437956B0EFBF323002A2725 /* DiscRecording.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = DiscRecording.framework; path = /System/Library/Frameworks/DiscRecording.framework; sourceTree = "<absolute>"; };
+		8437956C0EFBF323002A2725 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
+		8437956D0EFBF323002A2725 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		8437965F0EFBF357002A2725 /* AUMIDIBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AUMIDIBase.cpp; sourceTree = "<group>"; };
+		843796600EFBF357002A2725 /* AUMIDIBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AUMIDIBase.h; sourceTree = "<group>"; };
+		843796610EFBF357002A2725 /* AUMIDIEffectBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AUMIDIEffectBase.cpp; sourceTree = "<group>"; };
+		843796620EFBF357002A2725 /* AUMIDIEffectBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AUMIDIEffectBase.h; sourceTree = "<group>"; };
+		843796630EFBF357002A2725 /* AUOutputBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AUOutputBase.cpp; sourceTree = "<group>"; };
+		843796640EFBF357002A2725 /* AUOutputBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AUOutputBase.h; sourceTree = "<group>"; };
+		843796670EFBF357002A2725 /* MusicDeviceBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MusicDeviceBase.cpp; sourceTree = "<group>"; };
+		843796680EFBF357002A2725 /* MusicDeviceBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MusicDeviceBase.h; sourceTree = "<group>"; };
+		8473148E10663A94001B84CC /* PluginLibrary.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = PluginLibrary.xcodeproj; path = /Users/jules/SDKs/PT_80_SDK/AlturaPorts/TDMPlugIns/PlugInLibrary/MacBuild/PluginLibrary.xcodeproj; sourceTree = "<absolute>"; };
+		84978758103561A60020003B /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		84D3AB5E0FCC744600EA8080 /* AUCarbonViewBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AUCarbonViewBase.cpp; path = AUCarbonViewBase/AUCarbonViewBase.cpp; sourceTree = "<group>"; };
+		84D3AB620FCC749100EA8080 /* AUCarbonViewBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AUCarbonViewBase.h; path = AUCarbonViewBase/AUCarbonViewBase.h; sourceTree = "<group>"; };
+		84D3AB650FCC74B300EA8080 /* CarbonEventHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CarbonEventHandler.cpp; path = AUCarbonViewBase/CarbonEventHandler.cpp; sourceTree = "<group>"; };
+		84D3AB660FCC74B300EA8080 /* CarbonEventHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CarbonEventHandler.h; path = AUCarbonViewBase/CarbonEventHandler.h; sourceTree = "<group>"; };
+		84D3AB6A0FCC74DA00EA8080 /* AUCarbonViewControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AUCarbonViewControl.cpp; path = AUCarbonViewBase/AUCarbonViewControl.cpp; sourceTree = "<group>"; };
+		84D3AB6B0FCC74DA00EA8080 /* AUCarbonViewControl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AUCarbonViewControl.h; path = AUCarbonViewBase/AUCarbonViewControl.h; sourceTree = "<group>"; };
+		84D3AB6F0FCC74F400EA8080 /* AUCarbonViewDispatch.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = AUCarbonViewDispatch.cpp; path = AUCarbonViewBase/AUCarbonViewDispatch.cpp; sourceTree = "<group>"; };
+		84D3AB730FCC759700EA8080 /* AUViewLocalizedStringKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AUViewLocalizedStringKeys.h; path = AUViewBase/AUViewLocalizedStringKeys.h; sourceTree = "<group>"; };
+		8BA05A7F072073D200365D66 /* AUBase.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AUBase.cpp; sourceTree = "<group>"; };
+		8BA05A80072073D200365D66 /* AUBase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUBase.h; sourceTree = "<group>"; };
+		8BA05A81072073D200365D66 /* AUDispatch.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AUDispatch.cpp; sourceTree = "<group>"; };
+		8BA05A82072073D200365D66 /* AUDispatch.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUDispatch.h; sourceTree = "<group>"; };
+		8BA05A83072073D200365D66 /* AUInputElement.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AUInputElement.cpp; sourceTree = "<group>"; };
+		8BA05A84072073D200365D66 /* AUInputElement.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUInputElement.h; sourceTree = "<group>"; };
+		8BA05A85072073D200365D66 /* AUOutputElement.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AUOutputElement.cpp; sourceTree = "<group>"; };
+		8BA05A86072073D200365D66 /* AUOutputElement.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUOutputElement.h; sourceTree = "<group>"; };
+		8BA05A87072073D200365D66 /* AUResources.r */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.rez; path = AUResources.r; sourceTree = "<group>"; };
+		8BA05A88072073D200365D66 /* AUScopeElement.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AUScopeElement.cpp; sourceTree = "<group>"; };
+		8BA05A89072073D200365D66 /* AUScopeElement.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUScopeElement.h; sourceTree = "<group>"; };
+		8BA05A8A072073D200365D66 /* ComponentBase.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = ComponentBase.cpp; sourceTree = "<group>"; };
+		8BA05A8B072073D200365D66 /* ComponentBase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = ComponentBase.h; sourceTree = "<group>"; };
+		8BA05A9A072073D200365D66 /* AUEffectBase.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AUEffectBase.cpp; sourceTree = "<group>"; };
+		8BA05A9B072073D200365D66 /* AUEffectBase.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUEffectBase.h; sourceTree = "<group>"; };
+		8BA05AA7072073D200365D66 /* AUBuffer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AUBuffer.cpp; sourceTree = "<group>"; };
+		8BA05AA8072073D200365D66 /* AUBuffer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUBuffer.h; sourceTree = "<group>"; };
+		8BA05AA9072073D200365D66 /* AUDebugDispatcher.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = AUDebugDispatcher.cpp; sourceTree = "<group>"; };
+		8BA05AAA072073D200365D66 /* AUDebugDispatcher.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUDebugDispatcher.h; sourceTree = "<group>"; };
+		8BA05AAB072073D200365D66 /* AUInputFormatConverter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUInputFormatConverter.h; sourceTree = "<group>"; };
+		8BA05AAC072073D200365D66 /* AUSilentTimeout.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUSilentTimeout.h; sourceTree = "<group>"; };
+		8BA05AAD072073D200365D66 /* AUTimestampGenerator.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = AUTimestampGenerator.h; sourceTree = "<group>"; };
+		8BA05ADF0720742100365D66 /* CAAudioChannelLayout.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CAAudioChannelLayout.cpp; sourceTree = "<group>"; };
+		8BA05AE00720742100365D66 /* CAAudioChannelLayout.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CAAudioChannelLayout.h; sourceTree = "<group>"; };
+		8BA05AE10720742100365D66 /* CAMutex.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CAMutex.cpp; sourceTree = "<group>"; };
+		8BA05AE20720742100365D66 /* CAMutex.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CAMutex.h; sourceTree = "<group>"; };
+		8BA05AE30720742100365D66 /* CAStreamBasicDescription.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CAStreamBasicDescription.cpp; sourceTree = "<group>"; };
+		8BA05AE40720742100365D66 /* CAStreamBasicDescription.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CAStreamBasicDescription.h; sourceTree = "<group>"; };
+		8BA05B050720754400365D66 /* CAAUParameter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = CAAUParameter.cpp; sourceTree = "<group>"; };
+		8BA05B060720754400365D66 /* CAAUParameter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = CAAUParameter.h; sourceTree = "<group>"; };
+		8D01CCD10486CAD60068D4B7 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		8D01CCD20486CAD60068D4B7 /* JiveLowlife.vst */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JiveLowlife.vst; sourceTree = BUILT_PRODUCTS_DIR; };
+		9353B9B9114CF65500769E30 /* juce_VST_Wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = juce_VST_Wrapper.cpp; path = "../../../../juce/extras/audio plugins/wrapper/VST/juce_VST_Wrapper.cpp"; sourceTree = SOURCE_ROOT; };
+		9353B9BA114CF65500769E30 /* juce_VST_Wrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = juce_VST_Wrapper.mm; path = "../../../../juce/extras/audio plugins/wrapper/VST/juce_VST_Wrapper.mm"; sourceTree = SOURCE_ROOT; };
+		93CA47C311250A7400F9BB2C /* audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio.h; sourceTree = "<group>"; };
+		93CA47C411250A7400F9BB2C /* event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = event.h; sourceTree = "<group>"; };
+		93CA47C511250A7400F9BB2C /* fluidsynth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fluidsynth.h; sourceTree = "<group>"; };
+		93CA47C611250A7400F9BB2C /* gen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gen.h; sourceTree = "<group>"; };
+		93CA47C711250A7400F9BB2C /* log.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = log.h; sourceTree = "<group>"; };
+		93CA47C811250A7400F9BB2C /* midi.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = midi.h; sourceTree = "<group>"; };
+		93CA47C911250A7400F9BB2C /* misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = misc.h; sourceTree = "<group>"; };
+		93CA47CA11250A7400F9BB2C /* mod.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mod.h; sourceTree = "<group>"; };
+		93CA47CB11250A7400F9BB2C /* ramsfont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ramsfont.h; sourceTree = "<group>"; };
+		93CA47CC11250A7400F9BB2C /* seq.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = seq.h; sourceTree = "<group>"; };
+		93CA47CD11250A7400F9BB2C /* seqbind.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = seqbind.h; sourceTree = "<group>"; };
+		93CA47CE11250A7400F9BB2C /* settings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = settings.h; sourceTree = "<group>"; };
+		93CA47CF11250A7400F9BB2C /* sfont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sfont.h; sourceTree = "<group>"; };
+		93CA47D011250A7400F9BB2C /* shell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shell.h; sourceTree = "<group>"; };
+		93CA47D211250A7400F9BB2C /* config.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		93CA47D311250A7400F9BB2C /* fluid_conv.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fluid_conv.c; sourceTree = "<group>"; };
+		93CA47D411250A7400F9BB2C /* fluid_conv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fluid_conv.h; sourceTree = "<group>"; };
+		93CA47D511250A7400F9BB2C /* fluid_defsfont.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fluid_defsfont.c; sourceTree = "<group>"; };
+		93CA47D611250A7400F9BB2C /* fluid_defsfont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fluid_defsfont.h; sourceTree = "<group>"; };
+		93CA47D711250A7400F9BB2C /* fluid_io.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fluid_io.c; sourceTree = "<group>"; };
+		93CA47D811250A7400F9BB2C /* fluid_io.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fluid_io.h; sourceTree = "<group>"; };
+		93CA47D911250A7400F9BB2C /* fluid_list.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fluid_list.c; sourceTree = "<group>"; };
+		93CA47DA11250A7400F9BB2C /* fluid_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fluid_list.h; sourceTree = "<group>"; };
+		93CA47DB11250A7400F9BB2C /* fluid_sfont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fluid_sfont.h; sourceTree = "<group>"; };
+		93CA47DC11250A7400F9BB2C /* fluid_sys.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fluid_sys.c; sourceTree = "<group>"; };
+		93CA47DD11250A7400F9BB2C /* fluid_sys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fluid_sys.h; sourceTree = "<group>"; };
+		93CA47DE11250A7400F9BB2C /* fluidsynth_priv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fluidsynth_priv.h; sourceTree = "<group>"; };
+		93CA47DF11250A7400F9BB2C /* synth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = synth.h; sourceTree = "<group>"; };
+		93CA47E011250A7400F9BB2C /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
+		93CA47E111250A7400F9BB2C /* version.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = version.h; sourceTree = "<group>"; };
+		93CA47E211250A7400F9BB2C /* voice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = voice.h; sourceTree = "<group>"; };
+		93CA47E411250A7400F9BB2C /* allpass.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = allpass.cpp; sourceTree = "<group>"; };
+		93CA47E511250A7400F9BB2C /* allpass.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = allpass.hpp; sourceTree = "<group>"; };
+		93CA47E611250A7400F9BB2C /* comb.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = comb.cpp; sourceTree = "<group>"; };
+		93CA47E711250A7400F9BB2C /* comb.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = comb.hpp; sourceTree = "<group>"; };
+		93CA47E811250A7400F9BB2C /* revmodel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = revmodel.cpp; sourceTree = "<group>"; };
+		93CA47E911250A7400F9BB2C /* revmodel.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = revmodel.hpp; sourceTree = "<group>"; };
+		93CA47EA11250A7400F9BB2C /* tuning.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tuning.h; sourceTree = "<group>"; };
+		93CA47EC11250A7400F9BB2C /* Highlife.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Highlife.cpp; sourceTree = "<group>"; };
+		93CA47ED11250A7400F9BB2C /* Highlife.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Highlife.h; sourceTree = "<group>"; };
+		93CA47EE11250A7400F9BB2C /* HighLifeAkp.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeAkp.cpp; sourceTree = "<group>"; };
+		93CA47EF11250A7400F9BB2C /* HighLifeCriticalSection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeCriticalSection.cpp; sourceTree = "<group>"; };
+		93CA47F011250A7400F9BB2C /* HighLifeDls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeDls.cpp; sourceTree = "<group>"; };
+		93CA47F111250A7400F9BB2C /* HighLifeEditor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeEditor.cpp; sourceTree = "<group>"; };
+		93CA47F211250A7400F9BB2C /* HighLifeEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighLifeEditor.h; sourceTree = "<group>"; };
+		93CA47F311250A7400F9BB2C /* HighLifeEnvelope.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeEnvelope.cpp; sourceTree = "<group>"; };
+		93CA47F411250A7400F9BB2C /* HighLifeEnvelope.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighLifeEnvelope.h; sourceTree = "<group>"; };
+		93CA47F511250A7400F9BB2C /* HighLifeFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeFilter.cpp; sourceTree = "<group>"; };
+		93CA47F611250A7400F9BB2C /* HighLifeFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighLifeFilter.h; sourceTree = "<group>"; };
+		93CA47F711250A7400F9BB2C /* HighLifeFx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighLifeFx.h; sourceTree = "<group>"; };
+		93CA47F811250A7400F9BB2C /* HighLifeGig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeGig.cpp; sourceTree = "<group>"; };
+		93CA47F911250A7400F9BB2C /* HighLifeGui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeGui.cpp; sourceTree = "<group>"; };
+		93CA47FA11250A7400F9BB2C /* HighLifeGuiMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeGuiMenu.cpp; sourceTree = "<group>"; };
+		93CA47FB11250A7400F9BB2C /* HighLifeGuiMenu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighLifeGuiMenu.h; sourceTree = "<group>"; };
+		93CA47FC11250A7400F9BB2C /* HighLifeGuiPaint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeGuiPaint.cpp; sourceTree = "<group>"; };
+		93CA47FD11250A7400F9BB2C /* HighLifeLfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeLfo.cpp; sourceTree = "<group>"; };
+		93CA47FE11250A7400F9BB2C /* HighLifeLfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighLifeLfo.h; sourceTree = "<group>"; };
+		93CA47FF11250A7400F9BB2C /* HighLifeMp3.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeMp3.cpp; sourceTree = "<group>"; };
+		93CA480011250A7400F9BB2C /* HighLifeOgg.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeOgg.cpp; sourceTree = "<group>"; };
+		93CA480111250A7400F9BB2C /* HighLifeParameters.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeParameters.cpp; sourceTree = "<group>"; };
+		93CA480211250A7400F9BB2C /* HighLifePlug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifePlug.cpp; sourceTree = "<group>"; };
+		93CA480311250A7400F9BB2C /* HighLifeRaw.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeRaw.cpp; sourceTree = "<group>"; };
+		93CA480411250A7400F9BB2C /* HighLifeRiffWave.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeRiffWave.cpp; sourceTree = "<group>"; };
+		93CA480511250A7400F9BB2C /* HighLifeRiffWave.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighLifeRiffWave.h; sourceTree = "<group>"; };
+		93CA480611250A7400F9BB2C /* HighLifeSampleEdit.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeSampleEdit.cpp; sourceTree = "<group>"; };
+		93CA480711250A7400F9BB2C /* HighLifeSf2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeSf2.cpp; sourceTree = "<group>"; };
+		93CA480811250A7400F9BB2C /* HighLifeSfz.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeSfz.cpp; sourceTree = "<group>"; };
+		93CA480911250A7400F9BB2C /* HighLifeTool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeTool.cpp; sourceTree = "<group>"; };
+		93CA480A11250A7400F9BB2C /* HighLifeVoice.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeVoice.cpp; sourceTree = "<group>"; };
+		93CA480B11250A7400F9BB2C /* HighLifeVoice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HighLifeVoice.h; sourceTree = "<group>"; };
+		93CA480C11250A7400F9BB2C /* HighLifeVstHost.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeVstHost.cpp; sourceTree = "<group>"; };
+		93CA480D11250A7400F9BB2C /* HighLifeWav.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HighLifeWav.cpp; sourceTree = "<group>"; };
+		93CA480F11250A7400F9BB2C /* DLS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DLS.cpp; sourceTree = "<group>"; };
+		93CA481011250A7400F9BB2C /* DLS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DLS.h; sourceTree = "<group>"; };
+		93CA481111250A7400F9BB2C /* gig.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gig.cpp; sourceTree = "<group>"; };
+		93CA481211250A7400F9BB2C /* gig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gig.h; sourceTree = "<group>"; };
+		93CA481311250A7400F9BB2C /* helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = helper.h; sourceTree = "<group>"; };
+		93CA481411250A7400F9BB2C /* RIFF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RIFF.cpp; sourceTree = "<group>"; };
+		93CA481511250A7400F9BB2C /* RIFF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIFF.h; sourceTree = "<group>"; };
+		93CA481711250A7400F9BB2C /* jxdef.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jxdef.h; sourceTree = "<group>"; };
+		93CA481811250A7400F9BB2C /* jxstream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jxstream.h; sourceTree = "<group>"; };
+		93CA481A11250A7400F9BB2C /* common.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = common.c; sourceTree = "<group>"; };
+		93CA481B11250A7400F9BB2C /* dct64_i386.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = dct64_i386.c; sourceTree = "<group>"; };
+		93CA481C11250A7400F9BB2C /* decode_i386.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = decode_i386.c; sourceTree = "<group>"; };
+		93CA481D11250A7400F9BB2C /* huffman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = huffman.h; sourceTree = "<group>"; };
+		93CA481E11250A7400F9BB2C /* interface.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = interface.c; sourceTree = "<group>"; };
+		93CA481F11250A7400F9BB2C /* l2tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = l2tables.h; sourceTree = "<group>"; };
+		93CA482011250A7400F9BB2C /* layer2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = layer2.c; sourceTree = "<group>"; };
+		93CA482111250A7400F9BB2C /* layer3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = layer3.c; sourceTree = "<group>"; };
+		93CA482211250A7400F9BB2C /* mpg123.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mpg123.h; sourceTree = "<group>"; };
+		93CA482311250A7400F9BB2C /* mpglib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mpglib.h; sourceTree = "<group>"; };
+		93CA482411250A7400F9BB2C /* tabinit.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = tabinit.c; sourceTree = "<group>"; };
+		93CA482711250A7400F9BB2C /* config_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = config_types.h; sourceTree = "<group>"; };
+		93CA482811250A7400F9BB2C /* ogg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ogg.h; sourceTree = "<group>"; };
+		93CA482911250A7400F9BB2C /* os_types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = os_types.h; sourceTree = "<group>"; };
+		93CA482B11250A7400F9BB2C /* bitwise.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = bitwise.c; sourceTree = "<group>"; };
+		93CA482C11250A7400F9BB2C /* framing.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = framing.c; sourceTree = "<group>"; };
+		93CA487211250A7400F9BB2C /* codec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = codec.h; sourceTree = "<group>"; };
+		93CA487311250A7400F9BB2C /* vorbisenc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vorbisenc.h; sourceTree = "<group>"; };
+		93CA487411250A7400F9BB2C /* vorbisfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = vorbisfile.h; sourceTree = "<group>"; };
+		93CA48BC11250B0000F9BB2C /* StandardHeader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = StandardHeader.h; path = ../../src/StandardHeader.h; sourceTree = SOURCE_ROOT; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		8D01CCCD0486CAD60068D4B7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				8437956F0EFBF323002A2725 /* AudioUnit.framework in Frameworks */,
+				843795700EFBF323002A2725 /* Cocoa.framework in Frameworks */,
+				843795710EFBF323002A2725 /* OpenGL.framework in Frameworks */,
+				843795720EFBF323002A2725 /* IOKit.framework in Frameworks */,
+				843795730EFBF323002A2725 /* Carbon.framework in Frameworks */,
+				843795740EFBF323002A2725 /* CoreMIDI.framework in Frameworks */,
+				843795750EFBF323002A2725 /* CoreAudio.framework in Frameworks */,
+				843795760EFBF323002A2725 /* DiscRecording.framework in Frameworks */,
+				843795770EFBF323002A2725 /* QTKit.framework in Frameworks */,
+				843795780EFBF323002A2725 /* WebKit.framework in Frameworks */,
+				84978759103561A60020003B /* AudioToolbox.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		089C166AFE841209C02AAC07 /* JuceDemoPlugin */ = {
+			isa = PBXGroup;
+			children = (
+				08FB77ADFE841716C02AAC07 /* Source */,
+				089C167CFE841241C02AAC07 /* Resources */,
+				089C1671FE841209C02AAC07 /* External Frameworks and Libraries */,
+				19C28FB4FE9D528D11CA2CBB /* Products */,
+			);
+			name = JuceDemoPlugin;
+			sourceTree = "<group>";
+		};
+		089C1671FE841209C02AAC07 /* External Frameworks and Libraries */ = {
+			isa = PBXGroup;
+			children = (
+				8473148E10663A94001B84CC /* PluginLibrary.xcodeproj */,
+				843795640EFBF323002A2725 /* AudioUnit.framework */,
+				84978758103561A60020003B /* AudioToolbox.framework */,
+				843795650EFBF323002A2725 /* Cocoa.framework */,
+				843795660EFBF323002A2725 /* OpenGL.framework */,
+				843795670EFBF323002A2725 /* IOKit.framework */,
+				843795680EFBF323002A2725 /* Carbon.framework */,
+				843795690EFBF323002A2725 /* CoreMIDI.framework */,
+				8437956A0EFBF323002A2725 /* CoreAudio.framework */,
+				8437956B0EFBF323002A2725 /* DiscRecording.framework */,
+				8437956C0EFBF323002A2725 /* QTKit.framework */,
+				8437956D0EFBF323002A2725 /* WebKit.framework */,
+			);
+			name = "External Frameworks and Libraries";
+			sourceTree = "<group>";
+		};
+		089C167CFE841241C02AAC07 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				8D01CCD10486CAD60068D4B7 /* Info.plist */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+		};
+		08FB77ADFE841716C02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				8437929D0EFBF08E002A2725 /* Filter */,
+				93CA47C0112509F900F9BB2C /* highlife */,
+				8437929E0EFBF098002A2725 /* Wrapper Code */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		19C28FB4FE9D528D11CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8D01CCD20486CAD60068D4B7 /* JiveLowlife.vst */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		8437929D0EFBF08E002A2725 /* Filter */ = {
+			isa = PBXGroup;
+			children = (
+				843792A20EFBF14B002A2725 /* LowlifeEditorComponent.cpp */,
+				843792A30EFBF14B002A2725 /* LowlifeEditorComponent.h */,
+				843792A40EFBF14B002A2725 /* DemoJuceFilter.cpp */,
+				843792A50EFBF14B002A2725 /* DemoJuceFilter.h */,
+				843792A60EFBF14B002A2725 /* includes.h */,
+				93CA48BC11250B0000F9BB2C /* StandardHeader.h */,
+				843792A70EFBF14B002A2725 /* juce_AppConfig.h */,
+				843792A80EFBF14B002A2725 /* juce_LibrarySource.mm */,
+				843792A90EFBF14B002A2725 /* JucePluginCharacteristics.h */,
+			);
+			name = Filter;
+			sourceTree = "<group>";
+		};
+		8437929E0EFBF098002A2725 /* Wrapper Code */ = {
+			isa = PBXGroup;
+			children = (
+				8437967C0EFBF5C6002A2725 /* Juce VST Wrapper */,
+				8BA05AEB0720742700365D66 /* PublicUtility */,
+				8BA05A7D072073D200365D66 /* AUPublic */,
+			);
+			name = "Wrapper Code";
+			sourceTree = "<group>";
+		};
+		8437967C0EFBF5C6002A2725 /* Juce VST Wrapper */ = {
+			isa = PBXGroup;
+			children = (
+				9353B9B9114CF65500769E30 /* juce_VST_Wrapper.cpp */,
+				9353B9BA114CF65500769E30 /* juce_VST_Wrapper.mm */,
+			);
+			name = "Juce VST Wrapper";
+			sourceTree = "<group>";
+		};
+		8473148F10663A94001B84CC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8473149610663A94001B84CC /* libPluginLibrary.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		84D3AB5D0FCC741E00EA8080 /* AUCarbonViewBase */ = {
+			isa = PBXGroup;
+			children = (
+				84D3AB6F0FCC74F400EA8080 /* AUCarbonViewDispatch.cpp */,
+				84D3AB6A0FCC74DA00EA8080 /* AUCarbonViewControl.cpp */,
+				84D3AB6B0FCC74DA00EA8080 /* AUCarbonViewControl.h */,
+				84D3AB650FCC74B300EA8080 /* CarbonEventHandler.cpp */,
+				84D3AB660FCC74B300EA8080 /* CarbonEventHandler.h */,
+				84D3AB5E0FCC744600EA8080 /* AUCarbonViewBase.cpp */,
+				84D3AB620FCC749100EA8080 /* AUCarbonViewBase.h */,
+			);
+			name = AUCarbonViewBase;
+			sourceTree = "<group>";
+		};
+		84D3AB720FCC758200EA8080 /* AUViewBase */ = {
+			isa = PBXGroup;
+			children = (
+				84D3AB730FCC759700EA8080 /* AUViewLocalizedStringKeys.h */,
+			);
+			name = AUViewBase;
+			sourceTree = "<group>";
+		};
+		8BA05A7D072073D200365D66 /* AUPublic */ = {
+			isa = PBXGroup;
+			children = (
+				84D3AB720FCC758200EA8080 /* AUViewBase */,
+				84D3AB5D0FCC741E00EA8080 /* AUCarbonViewBase */,
+				8BA05A7E072073D200365D66 /* AUBase */,
+				8BA05A99072073D200365D66 /* OtherBases */,
+				8BA05AA6072073D200365D66 /* Utility */,
+			);
+			name = AUPublic;
+			path = Extras/CoreAudio/AudioUnits/AUPublic;
+			sourceTree = DEVELOPER_DIR;
+		};
+		8BA05A7E072073D200365D66 /* AUBase */ = {
+			isa = PBXGroup;
+			children = (
+				8BA05A7F072073D200365D66 /* AUBase.cpp */,
+				8BA05A80072073D200365D66 /* AUBase.h */,
+				8BA05A81072073D200365D66 /* AUDispatch.cpp */,
+				8BA05A82072073D200365D66 /* AUDispatch.h */,
+				8BA05A83072073D200365D66 /* AUInputElement.cpp */,
+				8BA05A84072073D200365D66 /* AUInputElement.h */,
+				8BA05A85072073D200365D66 /* AUOutputElement.cpp */,
+				8BA05A86072073D200365D66 /* AUOutputElement.h */,
+				8BA05A87072073D200365D66 /* AUResources.r */,
+				8BA05A88072073D200365D66 /* AUScopeElement.cpp */,
+				8BA05A89072073D200365D66 /* AUScopeElement.h */,
+				8BA05A8A072073D200365D66 /* ComponentBase.cpp */,
+				8BA05A8B072073D200365D66 /* ComponentBase.h */,
+			);
+			path = AUBase;
+			sourceTree = "<group>";
+		};
+		8BA05A99072073D200365D66 /* OtherBases */ = {
+			isa = PBXGroup;
+			children = (
+				8437965F0EFBF357002A2725 /* AUMIDIBase.cpp */,
+				843796600EFBF357002A2725 /* AUMIDIBase.h */,
+				843796610EFBF357002A2725 /* AUMIDIEffectBase.cpp */,
+				843796620EFBF357002A2725 /* AUMIDIEffectBase.h */,
+				843796630EFBF357002A2725 /* AUOutputBase.cpp */,
+				843796640EFBF357002A2725 /* AUOutputBase.h */,
+				843796670EFBF357002A2725 /* MusicDeviceBase.cpp */,
+				843796680EFBF357002A2725 /* MusicDeviceBase.h */,
+				8BA05A9A072073D200365D66 /* AUEffectBase.cpp */,
+				8BA05A9B072073D200365D66 /* AUEffectBase.h */,
+			);
+			path = OtherBases;
+			sourceTree = "<group>";
+		};
+		8BA05AA6072073D200365D66 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				8BA05AA7072073D200365D66 /* AUBuffer.cpp */,
+				8BA05AA8072073D200365D66 /* AUBuffer.h */,
+				8BA05AA9072073D200365D66 /* AUDebugDispatcher.cpp */,
+				8BA05AAA072073D200365D66 /* AUDebugDispatcher.h */,
+				8BA05AAB072073D200365D66 /* AUInputFormatConverter.h */,
+				8BA05AAC072073D200365D66 /* AUSilentTimeout.h */,
+				8BA05AAD072073D200365D66 /* AUTimestampGenerator.h */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		8BA05AEB0720742700365D66 /* PublicUtility */ = {
+			isa = PBXGroup;
+			children = (
+				8412B0321048273000072EA3 /* CADebugMacros.h */,
+				8BA05B050720754400365D66 /* CAAUParameter.cpp */,
+				8BA05B060720754400365D66 /* CAAUParameter.h */,
+				8BA05ADF0720742100365D66 /* CAAudioChannelLayout.cpp */,
+				8BA05AE00720742100365D66 /* CAAudioChannelLayout.h */,
+				8BA05AE10720742100365D66 /* CAMutex.cpp */,
+				8BA05AE20720742100365D66 /* CAMutex.h */,
+				8BA05AE30720742100365D66 /* CAStreamBasicDescription.cpp */,
+				8BA05AE40720742100365D66 /* CAStreamBasicDescription.h */,
+				3EEA126D089847F5002C6BFC /* CAVectorUnitTypes.h */,
+				3EEA126B089847F5002C6BFC /* CAVectorUnit.cpp */,
+				3EEA126C089847F5002C6BFC /* CAVectorUnit.h */,
+			);
+			name = PublicUtility;
+			path = Extras/CoreAudio/PublicUtility;
+			sourceTree = DEVELOPER_DIR;
+		};
+		93CA47C0112509F900F9BB2C /* highlife */ = {
+			isa = PBXGroup;
+			children = (
+				93CA47C211250A7400F9BB2C /* FluidSynth */,
+				93CA47E311250A7400F9BB2C /* Freeverb */,
+				93CA47EB11250A7400F9BB2C /* Highlife */,
+				93CA480E11250A7400F9BB2C /* LibGig */,
+				93CA481611250A7400F9BB2C /* MemStream */,
+				93CA481911250A7400F9BB2C /* Mpglib */,
+				93CA482511250A7400F9BB2C /* Ogg */,
+				93CA482D11250A7400F9BB2C /* Vorbis */,
+			);
+			name = highlife;
+			sourceTree = "<group>";
+		};
+		93CA47C211250A7400F9BB2C /* FluidSynth */ = {
+			isa = PBXGroup;
+			children = (
+				93CA47C311250A7400F9BB2C /* audio.h */,
+				93CA47C411250A7400F9BB2C /* event.h */,
+				93CA47C511250A7400F9BB2C /* fluidsynth.h */,
+				93CA47C611250A7400F9BB2C /* gen.h */,
+				93CA47C711250A7400F9BB2C /* log.h */,
+				93CA47C811250A7400F9BB2C /* midi.h */,
+				93CA47C911250A7400F9BB2C /* misc.h */,
+				93CA47CA11250A7400F9BB2C /* mod.h */,
+				93CA47CB11250A7400F9BB2C /* ramsfont.h */,
+				93CA47CC11250A7400F9BB2C /* seq.h */,
+				93CA47CD11250A7400F9BB2C /* seqbind.h */,
+				93CA47CE11250A7400F9BB2C /* settings.h */,
+				93CA47CF11250A7400F9BB2C /* sfont.h */,
+				93CA47D011250A7400F9BB2C /* shell.h */,
+				93CA47D111250A7400F9BB2C /* src */,
+				93CA47DF11250A7400F9BB2C /* synth.h */,
+				93CA47E011250A7400F9BB2C /* types.h */,
+				93CA47E111250A7400F9BB2C /* version.h */,
+				93CA47E211250A7400F9BB2C /* voice.h */,
+			);
+			name = FluidSynth;
+			path = ../../src/highlife/FluidSynth;
+			sourceTree = SOURCE_ROOT;
+		};
+		93CA47D111250A7400F9BB2C /* src */ = {
+			isa = PBXGroup;
+			children = (
+				93CA47D211250A7400F9BB2C /* config.h */,
+				93CA47D311250A7400F9BB2C /* fluid_conv.c */,
+				93CA47D411250A7400F9BB2C /* fluid_conv.h */,
+				93CA47D511250A7400F9BB2C /* fluid_defsfont.c */,
+				93CA47D611250A7400F9BB2C /* fluid_defsfont.h */,
+				93CA47D711250A7400F9BB2C /* fluid_io.c */,
+				93CA47D811250A7400F9BB2C /* fluid_io.h */,
+				93CA47D911250A7400F9BB2C /* fluid_list.c */,
+				93CA47DA11250A7400F9BB2C /* fluid_list.h */,
+				93CA47DB11250A7400F9BB2C /* fluid_sfont.h */,
+				93CA47DC11250A7400F9BB2C /* fluid_sys.c */,
+				93CA47DD11250A7400F9BB2C /* fluid_sys.h */,
+				93CA47DE11250A7400F9BB2C /* fluidsynth_priv.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		93CA47E311250A7400F9BB2C /* Freeverb */ = {
+			isa = PBXGroup;
+			children = (
+				93CA47E411250A7400F9BB2C /* allpass.cpp */,
+				93CA47E511250A7400F9BB2C /* allpass.hpp */,
+				93CA47E611250A7400F9BB2C /* comb.cpp */,
+				93CA47E711250A7400F9BB2C /* comb.hpp */,
+				93CA47E811250A7400F9BB2C /* revmodel.cpp */,
+				93CA47E911250A7400F9BB2C /* revmodel.hpp */,
+				93CA47EA11250A7400F9BB2C /* tuning.h */,
+			);
+			name = Freeverb;
+			path = ../../src/highlife/Freeverb;
+			sourceTree = SOURCE_ROOT;
+		};
+		93CA47EB11250A7400F9BB2C /* Highlife */ = {
+			isa = PBXGroup;
+			children = (
+				93CA47EC11250A7400F9BB2C /* Highlife.cpp */,
+				93CA47ED11250A7400F9BB2C /* Highlife.h */,
+				93CA47EE11250A7400F9BB2C /* HighLifeAkp.cpp */,
+				93CA47EF11250A7400F9BB2C /* HighLifeCriticalSection.cpp */,
+				93CA47F011250A7400F9BB2C /* HighLifeDls.cpp */,
+				93CA47F111250A7400F9BB2C /* HighLifeEditor.cpp */,
+				93CA47F211250A7400F9BB2C /* HighLifeEditor.h */,
+				93CA47F311250A7400F9BB2C /* HighLifeEnvelope.cpp */,
+				93CA47F411250A7400F9BB2C /* HighLifeEnvelope.h */,
+				93CA47F511250A7400F9BB2C /* HighLifeFilter.cpp */,
+				93CA47F611250A7400F9BB2C /* HighLifeFilter.h */,
+				93CA47F711250A7400F9BB2C /* HighLifeFx.h */,
+				93CA47F811250A7400F9BB2C /* HighLifeGig.cpp */,
+				93CA47F911250A7400F9BB2C /* HighLifeGui.cpp */,
+				93CA47FA11250A7400F9BB2C /* HighLifeGuiMenu.cpp */,
+				93CA47FB11250A7400F9BB2C /* HighLifeGuiMenu.h */,
+				93CA47FC11250A7400F9BB2C /* HighLifeGuiPaint.cpp */,
+				93CA47FD11250A7400F9BB2C /* HighLifeLfo.cpp */,
+				93CA47FE11250A7400F9BB2C /* HighLifeLfo.h */,
+				93CA47FF11250A7400F9BB2C /* HighLifeMp3.cpp */,
+				93CA480011250A7400F9BB2C /* HighLifeOgg.cpp */,
+				93CA480111250A7400F9BB2C /* HighLifeParameters.cpp */,
+				93CA480211250A7400F9BB2C /* HighLifePlug.cpp */,
+				93CA480311250A7400F9BB2C /* HighLifeRaw.cpp */,
+				93CA480411250A7400F9BB2C /* HighLifeRiffWave.cpp */,
+				93CA480511250A7400F9BB2C /* HighLifeRiffWave.h */,
+				93CA480611250A7400F9BB2C /* HighLifeSampleEdit.cpp */,
+				93CA480711250A7400F9BB2C /* HighLifeSf2.cpp */,
+				93CA480811250A7400F9BB2C /* HighLifeSfz.cpp */,
+				93CA480911250A7400F9BB2C /* HighLifeTool.cpp */,
+				93CA480A11250A7400F9BB2C /* HighLifeVoice.cpp */,
+				93CA480B11250A7400F9BB2C /* HighLifeVoice.h */,
+				93CA480C11250A7400F9BB2C /* HighLifeVstHost.cpp */,
+				93CA480D11250A7400F9BB2C /* HighLifeWav.cpp */,
+			);
+			name = Highlife;
+			path = ../../src/highlife/Highlife;
+			sourceTree = SOURCE_ROOT;
+		};
+		93CA480E11250A7400F9BB2C /* LibGig */ = {
+			isa = PBXGroup;
+			children = (
+				93CA480F11250A7400F9BB2C /* DLS.cpp */,
+				93CA481011250A7400F9BB2C /* DLS.h */,
+				93CA481111250A7400F9BB2C /* gig.cpp */,
+				93CA481211250A7400F9BB2C /* gig.h */,
+				93CA481311250A7400F9BB2C /* helper.h */,
+				93CA481411250A7400F9BB2C /* RIFF.cpp */,
+				93CA481511250A7400F9BB2C /* RIFF.h */,
+			);
+			name = LibGig;
+			path = ../../src/highlife/LibGig;
+			sourceTree = SOURCE_ROOT;
+		};
+		93CA481611250A7400F9BB2C /* MemStream */ = {
+			isa = PBXGroup;
+			children = (
+				93CA481711250A7400F9BB2C /* jxdef.h */,
+				93CA481811250A7400F9BB2C /* jxstream.h */,
+			);
+			name = MemStream;
+			path = ../../src/highlife/MemStream;
+			sourceTree = SOURCE_ROOT;
+		};
+		93CA481911250A7400F9BB2C /* Mpglib */ = {
+			isa = PBXGroup;
+			children = (
+				93CA481A11250A7400F9BB2C /* common.c */,
+				93CA481B11250A7400F9BB2C /* dct64_i386.c */,
+				93CA481C11250A7400F9BB2C /* decode_i386.c */,
+				93CA481D11250A7400F9BB2C /* huffman.h */,
+				93CA481E11250A7400F9BB2C /* interface.c */,
+				93CA481F11250A7400F9BB2C /* l2tables.h */,
+				93CA482011250A7400F9BB2C /* layer2.c */,
+				93CA482111250A7400F9BB2C /* layer3.c */,
+				93CA482211250A7400F9BB2C /* mpg123.h */,
+				93CA482311250A7400F9BB2C /* mpglib.h */,
+				93CA482411250A7400F9BB2C /* tabinit.c */,
+			);
+			name = Mpglib;
+			path = ../../src/highlife/Mpglib;
+			sourceTree = SOURCE_ROOT;
+		};
+		93CA482511250A7400F9BB2C /* Ogg */ = {
+			isa = PBXGroup;
+			children = (
+				93CA482611250A7400F9BB2C /* ogg */,
+				93CA482A11250A7400F9BB2C /* src */,
+			);
+			name = Ogg;
+			path = ../../src/highlife/Ogg;
+			sourceTree = SOURCE_ROOT;
+		};
+		93CA482611250A7400F9BB2C /* ogg */ = {
+			isa = PBXGroup;
+			children = (
+				93CA482711250A7400F9BB2C /* config_types.h */,
+				93CA482811250A7400F9BB2C /* ogg.h */,
+				93CA482911250A7400F9BB2C /* os_types.h */,
+			);
+			path = ogg;
+			sourceTree = "<group>";
+		};
+		93CA482A11250A7400F9BB2C /* src */ = {
+			isa = PBXGroup;
+			children = (
+				93CA482B11250A7400F9BB2C /* bitwise.c */,
+				93CA482C11250A7400F9BB2C /* framing.c */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		93CA482D11250A7400F9BB2C /* Vorbis */ = {
+			isa = PBXGroup;
+			children = (
+				93CA487111250A7400F9BB2C /* vorbis */,
+			);
+			name = Vorbis;
+			path = ../../src/highlife/Vorbis;
+			sourceTree = SOURCE_ROOT;
+		};
+		93CA487111250A7400F9BB2C /* vorbis */ = {
+			isa = PBXGroup;
+			children = (
+				93CA487211250A7400F9BB2C /* codec.h */,
+				93CA487311250A7400F9BB2C /* vorbisenc.h */,
+				93CA487411250A7400F9BB2C /* vorbisfile.h */,
+			);
+			path = vorbis;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		8D01CCC60486CAD60068D4B7 /* JiveLowlife */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3E4BA243089833B7007656EC /* Build configuration list for PBXNativeTarget "JiveLowlife" */;
+			buildPhases = (
+				8D01CCC90486CAD60068D4B7 /* Resources */,
+				8D01CCCB0486CAD60068D4B7 /* Sources */,
+				8D01CCCD0486CAD60068D4B7 /* Frameworks */,
+				8D01CCCF0486CAD60068D4B7 /* Rez */,
+				847A7D6510694C5500DD8999 /* Copy Inside App Bundle */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JiveLowlife;
+			productInstallPath = "$(HOME)/Library/Bundles";
+			productName = JuceDemoPlugin;
+			productReference = 8D01CCD20486CAD60068D4B7 /* JiveLowlife.vst */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		089C1669FE841209C02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 3E4BA247089833B7007656EC /* Build configuration list for PBXProject "lowlife" */;
+			compatibilityVersion = "Xcode 3.1";
+			hasScannedForEncodings = 1;
+			mainGroup = 089C166AFE841209C02AAC07 /* JuceDemoPlugin */;
+			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 8473148F10663A94001B84CC /* Products */;
+					ProjectRef = 8473148E10663A94001B84CC /* PluginLibrary.xcodeproj */;
+				},
+			);
+			projectRoot = "";
+			targets = (
+				8D01CCC60486CAD60068D4B7 /* JiveLowlife */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXReferenceProxy section */
+		8473149610663A94001B84CC /* libPluginLibrary.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libPluginLibrary.a;
+			remoteRef = 8473149510663A94001B84CC /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+/* End PBXReferenceProxy section */
+
+/* Begin PBXResourcesBuildPhase section */
+		8D01CCC90486CAD60068D4B7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXRezBuildPhase section */
+		8D01CCCF0486CAD60068D4B7 /* Rez */ = {
+			isa = PBXRezBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXRezBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		847A7D6510694C5500DD8999 /* Copy Inside App Bundle */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 12;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Inside App Bundle";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "# Purpose: copy newly built VST bundle into Jive app bundle.\n# For debug, the plugin will be soft-linked instead to simplify build/debug cycle.\n\nif [ $ACTION=build ] ; then \n\n\tsourceVSTBundle=$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME\n\n\tif [ \"$CONFIGURATION\" = \"Debug\" ]; then\n\t   destinationFolder=../../../../apps/jive/build/macosx/Build~~/Debug/Jive.app/Contents/PlugIns/\n\n\t   ditto \"$sourceVSTBundle\" \"$destinationFolder/$FULL_PRODUCT_NAME\"\n\t   rm -rf \"$destinationFolder/$FULL_PRODUCT_NAME\"\n\t   ln -s \"$sourceVSTBundle\" \"$destinationFolder\"\n\telse\n\t   destinationFolder=../../../../apps/jive/build/macosx/Build~~/Release/Jive.app/Contents/PlugIns/\n\n\t   ditto \"$sourceVSTBundle\" \"$destinationFolder/$FULL_PRODUCT_NAME\"\n\tfi\n\nfi\n\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		8D01CCCB0486CAD60068D4B7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				843792AC0EFBF14B002A2725 /* DemoJuceFilter.cpp in Sources */,
+				843792B00EFBF14B002A2725 /* juce_LibrarySource.mm in Sources */,
+				93CA487511250A7400F9BB2C /* fluid_conv.c in Sources */,
+				93CA487611250A7400F9BB2C /* fluid_defsfont.c in Sources */,
+				93CA487711250A7400F9BB2C /* fluid_io.c in Sources */,
+				93CA487811250A7400F9BB2C /* fluid_list.c in Sources */,
+				93CA487911250A7400F9BB2C /* fluid_sys.c in Sources */,
+				93CA487A11250A7400F9BB2C /* allpass.cpp in Sources */,
+				93CA487B11250A7400F9BB2C /* comb.cpp in Sources */,
+				93CA487C11250A7400F9BB2C /* revmodel.cpp in Sources */,
+				93CA487D11250A7400F9BB2C /* Highlife.cpp in Sources */,
+				93CA487E11250A7400F9BB2C /* HighLifeAkp.cpp in Sources */,
+				93CA487F11250A7400F9BB2C /* HighLifeCriticalSection.cpp in Sources */,
+				93CA488011250A7400F9BB2C /* HighLifeDls.cpp in Sources */,
+				93CA488211250A7400F9BB2C /* HighLifeEnvelope.cpp in Sources */,
+				93CA488311250A7400F9BB2C /* HighLifeFilter.cpp in Sources */,
+				93CA488411250A7400F9BB2C /* HighLifeGig.cpp in Sources */,
+				93CA488511250A7400F9BB2C /* HighLifeGui.cpp in Sources */,
+				93CA488611250A7400F9BB2C /* HighLifeGuiMenu.cpp in Sources */,
+				93CA488711250A7400F9BB2C /* HighLifeGuiPaint.cpp in Sources */,
+				93CA488811250A7400F9BB2C /* HighLifeLfo.cpp in Sources */,
+				93CA488911250A7400F9BB2C /* HighLifeMp3.cpp in Sources */,
+				93CA488B11250A7400F9BB2C /* HighLifeParameters.cpp in Sources */,
+				93CA488C11250A7400F9BB2C /* HighLifePlug.cpp in Sources */,
+				93CA488D11250A7400F9BB2C /* HighLifeRaw.cpp in Sources */,
+				93CA488E11250A7400F9BB2C /* HighLifeRiffWave.cpp in Sources */,
+				93CA488F11250A7400F9BB2C /* HighLifeSampleEdit.cpp in Sources */,
+				93CA489011250A7400F9BB2C /* HighLifeSf2.cpp in Sources */,
+				93CA489111250A7400F9BB2C /* HighLifeSfz.cpp in Sources */,
+				93CA489211250A7400F9BB2C /* HighLifeTool.cpp in Sources */,
+				93CA489311250A7400F9BB2C /* HighLifeVoice.cpp in Sources */,
+				93CA489411250A7400F9BB2C /* HighLifeVstHost.cpp in Sources */,
+				93CA489511250A7400F9BB2C /* HighLifeWav.cpp in Sources */,
+				93CA489611250A7400F9BB2C /* DLS.cpp in Sources */,
+				93CA489711250A7400F9BB2C /* gig.cpp in Sources */,
+				93CA489811250A7400F9BB2C /* RIFF.cpp in Sources */,
+				93CA489911250A7400F9BB2C /* common.c in Sources */,
+				93CA489A11250A7400F9BB2C /* dct64_i386.c in Sources */,
+				93CA489B11250A7400F9BB2C /* decode_i386.c in Sources */,
+				93CA489D11250A7400F9BB2C /* layer2.c in Sources */,
+				93CA489E11250A7400F9BB2C /* layer3.c in Sources */,
+				93CA489F11250A7400F9BB2C /* tabinit.c in Sources */,
+				93CA4D2B11260B2700F9BB2C /* LowlifeEditorComponent.cpp in Sources */,
+				9353B9BB114CF65500769E30 /* juce_VST_Wrapper.cpp in Sources */,
+				9353B9BC114CF65500769E30 /* juce_VST_Wrapper.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		3E4BA244089833B7007656EC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../../../juce\"",
+					"~/SDKs/vstsdk2.4",
+					"$(HEADER_SEARCH_PATHS)",
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/Components/";
+				LIBRARY_STYLE = Bundle;
+				MACOSX_DEPLOYMENT_TARGET = 10.4;
+				OTHER_LDFLAGS = "-bundle";
+				OTHER_REZFLAGS = "-d ppc_$ppc -d i386_$i386 -d ppc64_$ppc64 -d x86_64_$x86_64 -I /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Versions/A/Headers -I \"$(DEVELOPER_DIR)/Extras/CoreAudio/AudioUnits/AUPublic/AUBase\"";
+				PRODUCT_NAME = JiveLowlife;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = vst;
+			};
+			name = Debug;
+		};
+		3E4BA245089833B7007656EC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../../../juce\"",
+					"~/SDKs/vstsdk2.4",
+					"$(HEADER_SEARCH_PATHS)",
+				);
+				INFOPLIST_FILE = Info.plist;
+				INSTALL_PATH = "$(HOME)/Library/Audio/Plug-Ins/Components/";
+				LIBRARY_STYLE = Bundle;
+				OTHER_LDFLAGS = "-bundle";
+				OTHER_REZFLAGS = "-d ppc_$ppc -d i386_$i386 -d ppc64_$ppc64 -d x86_64_$x86_64 -I /System/Library/Frameworks/CoreServices.framework/Frameworks/CarbonCore.framework/Versions/A/Headers -I \"$(DEVELOPER_DIR)/Extras/CoreAudio/AudioUnits/AUPublic/AUBase\"";
+				PRODUCT_NAME = JiveLowlife;
+				WARNING_CFLAGS = (
+					"-Wmost",
+					"-Wno-four-char-constants",
+					"-Wno-unknown-pragmas",
+				);
+				WRAPPER_EXTENSION = vst;
+			};
+			name = Release;
+		};
+		3E4BA248089833B7007656EC /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"JUCE_NAMESPACE=juce_JiveLowlifePluginNamespace",
+					"JUCE_ObjCExtraSuffix=juce_JiveLowlifeObjCSuffix",
+				);
+				GCC_VERSION = 4.0;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../src/highlife/Vorbis\"",
+					"\"$(SRCROOT)/../../src/highlife\"",
+					"\"$(SRCROOT)/../../../../gitjuce_tip\"",
+				);
+				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_PREPROCESS = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx10.5;
+			};
+			name = Debug;
+		};
+		3E4BA249089833B7007656EC /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				GCC_C_LANGUAGE_STANDARD = c99;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					NDEBUG,
+					"JUCE_NAMESPACE=juce_JiveLowlifePluginNamespace",
+					"JUCE_ObjCExtraSuffix=juce_JiveLowlifeObjCSuffix",
+				);
+				GCC_VERSION = 4.0;
+				GENERATE_PKGINFO_FILE = YES;
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../src/highlife/Vorbis\"",
+					"\"$(SRCROOT)/../../src/highlife\"",
+					"\"$(SRCROOT)/../../../../gitjuce_tip\"",
+				);
+				INFOPLIST_PREPROCESS = YES;
+				SDKROOT = macosx10.5;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		3E4BA243089833B7007656EC /* Build configuration list for PBXNativeTarget "JiveLowlife" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3E4BA244089833B7007656EC /* Debug */,
+				3E4BA245089833B7007656EC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		3E4BA247089833B7007656EC /* Build configuration list for PBXProject "lowlife" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3E4BA248089833B7007656EC /* Debug */,
+				3E4BA249089833B7007656EC /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 089C1669FE841209C02AAC07 /* Project object */;
+}
