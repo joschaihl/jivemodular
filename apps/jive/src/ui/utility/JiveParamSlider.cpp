@@ -9,6 +9,7 @@ public:
       addAndMakeVisible(noteOnOrOff = new ComboBox("noteOnOrOff"));
       noteOnOrOff->addItem("Note on", 1);
       noteOnOrOff->addItem("Note off", 2);
+      noteOnOrOff->addItem("Held", 3);
       addAndMakeVisible(incrDirection = new ComboBox("incrDirection")); 
       incrDirection->addItem("Increase", 1);
       incrDirection->addItem("Decrease", -1);
@@ -65,15 +66,10 @@ public:
 
 void ParamSlider::mouseDown(const MouseEvent& e)
 {
-//      Slider::mouseDown(e);
-//
-//      if (e.mods.isRightButtonDown())
-//         managedParam->handleMidiPopupMenu(e);
    if (managedParam && e.mods.isRightButtonDown ())
    {
       PopupMenu menu = managedParam->generateMidiPopupMenu();
 
-      // TODO move this into Jive code
       menu.addItem (3, "Edit", (managedParam->getNoteNumber() != -1));
 
       int result = menu.showAt (e.getScreenX(), e.getScreenY());
@@ -89,7 +85,7 @@ void ParamSlider::mouseDown(const MouseEvent& e)
             int incr = round(1.0 / fabs(incrAmount));
             int imax = managedParam->getIncrMax() / fabs(incrAmount);//round(1.0 / fabs(incrMax));
             dialogStuff.incrAmount->setSelectedId(incr, false);
-            dialogStuff.noteOnOrOff->setSelectedId(managedParam->isNoteOn() ? 1 : 2);
+            dialogStuff.noteOnOrOff->setSelectedId(managedParam->getNoteMode() + 1);
             int dir = 1;
             if (managedParam->isBidirectional()) dir = 2;
             else if (incrAmount < 0) dir = -1;
@@ -100,14 +96,10 @@ void ParamSlider::mouseDown(const MouseEvent& e)
             
             incrAmount = 1.0 / dialogStuff.incrAmount->getSelectedId();
             managedParam->setIncrMax(incrAmount * dialogStuff.incrMax->getValue());
-            managedParam->setNoteOn(1 == dialogStuff.noteOnOrOff->getSelectedId());
+            managedParam->setNoteMode(dialogStuff.noteOnOrOff->getSelectedId() - 1);
             managedParam->setBidirectional(2 == dialogStuff.incrDirection->getSelectedId() && incrAmount < 1.0);
             if (dialogStuff.incrDirection->getSelectedId() == -1)
                managedParam->setIncrAmount(-incrAmount);
-//            
-//            // ensure midi manag knows about note on / off
-//            if (managedParam->midiAutomatorManager)
-//               managedParam->midiAutomatorManager->registerMidiAutomatable(this);
          }      
       }
    }
