@@ -36,7 +36,7 @@
 #define MIDIBINDING_NOTE_ATTRIB              T("noteNum")
 #define MIDIBINDING_INCR_ATTRIB              T("incrementAmount")
 #define MIDIBINDING_BIDIRECTIONAL_ATTRIB              T("bidirectional")
-#define MIDIBINDING_NOTEOFF_ATTRIB              T("isNoteOff")
+#define MIDIBINDING_NOTEMODE_ATTRIB              T("noteMode")
 
 //==============================================================================
 int32 BasePlugin::globalUniqueCounter = 1;
@@ -122,7 +122,7 @@ void BasePlugin::savePropertiesToXml (XmlElement* xml)
             binding->setAttribute(MIDIBINDING_NOTE_ATTRIB, note);
             binding->setAttribute(MIDIBINDING_INCR_ATTRIB, param->getIncrAmount());
             binding->setAttribute(MIDIBINDING_BIDIRECTIONAL_ATTRIB, param->isBidirectional());
-            binding->setAttribute(MIDIBINDING_NOTEOFF_ATTRIB, !param->isNoteOn());
+            binding->setAttribute(MIDIBINDING_NOTEMODE_ATTRIB, param->getNoteMode());
             bindingsElement->addChildElement(binding);
    }
 
@@ -180,7 +180,7 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
                   param->setNoteNumber(note);
                   param->setIncrAmount(bindingElement->getDoubleAttribute(MIDIBINDING_INCR_ATTRIB, 1));
                   param->setBidirectional(bindingElement->getBoolAttribute(MIDIBINDING_BIDIRECTIONAL_ATTRIB, false));
-                  param->setNoteOn(!bindingElement->getBoolAttribute(MIDIBINDING_NOTEOFF_ATTRIB, true));
+                  param->setNoteMode(bindingElement->getIntAttribute(MIDIBINDING_NOTEMODE_ATTRIB, true));
    }
 }
          }
