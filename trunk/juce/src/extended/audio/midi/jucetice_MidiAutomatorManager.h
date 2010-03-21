@@ -67,11 +67,18 @@ public:
     /** It actually start midi learning */
     void activateLearning ();
 
+   enum NoteBindingMode
+   {
+      NoteOff = 0, // bound to note-off only
+      NoteOn = 1, // bound to note-on only
+      NoteHeld = 2, // parameter is 1.0 when note is down, otherwise 0.0
+   };
+
     //==============================================================================
     /** Returns the actual controller number */
-    int getControllerNumber () const                  { return controllerNumber; }
-    int getNoteNumber () const                  { return noteNumber; }
-    bool isNoteOn() { return noteOn; };
+    int getControllerNumber () const                  { return controllerNumber; };
+    int getNoteNumber () const                  { return noteNumber; };
+    NoteBindingMode getNoteMode() { return noteOn; };
     float getIncrAmount() { return incrAmount; };
     float getIncrMax() { return incrMax; };
     bool isBidirectional() { return bidirectional; };
@@ -79,7 +86,7 @@ public:
     /** Set a new controller number */
     void setControllerNumber (const int control);
     void setNoteNumber (const int note);
-    void setNoteOn(bool noteOn_) { noteOn = noteOn_; };
+    void setNoteMode(int noteOnMode);
     void setIncrAmount(float incrAmount_) { incrAmount = incrAmount_; };
     void setIncrMax(float incrMax_) { incrMax = incrMax_; };
     void setBidirectional(bool bidirectional_) { bidirectional = bidirectional_; };
@@ -110,11 +117,11 @@ public:
 
 protected:
 
-    friend class MidiAutomatorManager;
+   friend class MidiAutomatorManager;
 
-    int controllerNumber;
+   int controllerNumber;
    int noteNumber;
-   bool noteOn;
+   NoteBindingMode noteOn;
    float incrAmount;
    float incrMax;
    bool bidirectional;

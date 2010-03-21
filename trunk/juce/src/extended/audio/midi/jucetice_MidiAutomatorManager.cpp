@@ -36,7 +36,7 @@ MidiAutomatable::MidiAutomatable()
 : 
   controllerNumber (-1),
   noteNumber(-1),
-  noteOn(true),
+  noteOn(NoteOn),
   incrAmount(1.0),
   incrMax(1.0),
   bidirectional(false),
@@ -91,6 +91,18 @@ void MidiAutomatable::setNoteNumber (const int note)
             midiAutomatorManager->registerMidiAutomatable (this);    
     }
 }
+
+void MidiAutomatable::setNoteMode(int noteOnMode) 
+{ 
+   if (noteOnMode < NoteOff || noteOnMode > NoteHeld) 
+      noteOnMode = NoteOn; 
+
+   noteOn = static_cast<NoteBindingMode>(noteOnMode); 
+
+   if (midiAutomatorManager)
+      midiAutomatorManager->registerMidiAutomatable (this);    
+};
+
 
 #if 0
 void MidiAutomatable::setTransferFunction (MidiTransferFunction newFunction)
@@ -259,29 +271,29 @@ MidiAutomatorManager::~MidiAutomatorManager ()
 //==============================================================================
 void MidiAutomatorManager::registerMidiAutomatable (MidiAutomatable* object)
 {
-    object->setMidiAutomatorManager (this);
+   object->setMidiAutomatorManager (this);
 
    removeMidiAutomatable(object);
-        
-    if (object->getControllerNumber () != -1)
-    {
-        VoidArray* array = controllers.getUnchecked (object->getControllerNumber ());
-        
-        array->add (object);
-    }
-    else if (object->getNoteNumber () != -1)
-    {
-      if (object->isNoteOn())
+
+   if (object->getControllerNumber () != -1)
+   {
+      VoidArray* array = controllers.getUnchecked (object->getControllerNumber ());
+
+      array->add (object);
+   }
+   else if (object->getNoteNumber () != -1)
+   {
+      if (object->getNoteMode() == MidiAutomatable::NoteHeld || object->getNoteMode() == MidiAutomatable::NoteOn)
       {
-        VoidArray* array = notes.getUnchecked (object->getNoteNumber ());      
-        array->add (object);
-}
-      else
-      {
-        VoidArray* array = noteOffs.getUnchecked (object->getNoteNumber ());      
-        array->add (object);
+         VoidArray* array = notes.getUnchecked (object->getNoteNumber ());      
+         array->add (object);
       }
-    }
+      if (object->getNoteMode() == MidiAutomatable::NoteHeld || object->getNoteMode() == MidiAutomatable::NoteOff)
+      {
+         VoidArray* array = noteOffs.getUnchecked (object->getNoteNumber ());      
+         array->add (object);
+      }
+   }
 }
 
 //==============================================================================
@@ -297,17 +309,11 @@ void MidiAutomatorManager::removeMidiAutomatable (MidiAutomatable* object)
         VoidArray* arrayNoteOff = noteOffs.getUnchecked (i);
         
         if (array->contains (object))
-        {
             array->removeValue (object);
-        }
         if (arrayNote->contains (object))
-        {
             arrayNote->removeValue (object);
-    }
         if (arrayNoteOff->contains (object))
-        {
             arrayNoteOff->removeValue (object);
-}
     }
 }
 

@@ -266,18 +266,24 @@ void AudioParameter::handleAsyncUpdate ()
 //==============================================================================
 bool AudioParameter::handleMidiMessage (const MidiMessage& message)
 {
-    // TODO - handle parameters changes by midi notes and not only cc.
-
    if (message.isController())
-    plugin->setParameter (index, message.getControllerValue () * float_MidiScaler);
+      plugin->setParameter (index, message.getControllerValue () * float_MidiScaler);
    else if (message.isNoteOnOrOff())
    {
       float cur = plugin->getParameter(index);
-      cur = MidiAutomatable::applyNoteIncrement(cur);
+      if (getNoteMode() == MidiAutomatable::NoteHeld)
+      {
+         if (message.isNoteOn())
+            cur = 1.0;
+         else
+            cur = 0.0;
+      }
+      else 
+         cur = MidiAutomatable::applyNoteIncrement(cur);
       plugin->setParameter(index, cur);
    }
 
-    return true;
+   return true;
 }
 
 //==============================================================================
