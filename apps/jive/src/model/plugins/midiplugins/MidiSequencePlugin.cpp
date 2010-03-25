@@ -289,6 +289,9 @@ void MidiSequencePlugin::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mi
    if (midiBuffer)
       midiAutomatorManager.handleMidiMessageBuffer(*midiBuffer);
 
+   if (1 && midiBuffer) // block input midi from passing through - at the moment input midi is expected to be for controlling the sequencer; in future may want to record it
+      midiBuffer->clear();
+
    MidiSequencePluginBase::processBlock(buffer, midiMessages);
 
 	MidiMessageSequence sourceMidi = *midiSequence;
