@@ -512,6 +512,7 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
         menu.addItem (10, "Disconnect outputs");
 
    menu.addItem (11, String("Rename \"") + plugin->getInstanceName() + String("\""));
+   menu.addItem (12, "Render stem", true, plugin->getBoolValue(PROP_RENDERSTEM, false)); // only allow changing this if stems aren't rendering right now (i.e. files aren't opened)
    
     const int result = menu.show();
     switch (result)
@@ -523,6 +524,9 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
         }
     case 2: // set preferred editor
       plugin->setValue(PROP_WINDOWPREFERGENERIC, !plugin->getBoolValue(PROP_WINDOWPREFERGENERIC, false));
+      break;
+    case 12: // set stem render option
+      plugin->setValue(PROP_RENDERSTEM, !plugin->getBoolValue(PROP_RENDERSTEM, false));
       break;
     case 3: // Close
         {

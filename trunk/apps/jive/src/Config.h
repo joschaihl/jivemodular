@@ -208,6 +208,9 @@ public:
     /** Recent preset directory */
     File lastPresetDirectory;
 
+    /** Recent stem render directory */
+    File lastStemsDirectory;
+
     /** Audio properties */
     bool externalTempoSync;
     bool externalTempoMaster;

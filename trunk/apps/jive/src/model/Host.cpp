@@ -39,7 +39,9 @@ Host::Host (HostFilterBase* owner_,
     currentPlugin (0),
     audioGraph (0),
     sampleRate (44100.0),
-    samplesPerBlock (512)
+    samplesPerBlock (512),
+    renderingStems(false),
+    stemRenderNumber(0)
 {
     DBG ("Host::Host");
 
@@ -265,6 +267,42 @@ void Host::releaseResources()
     transport->releaseResources ();
 }
 
+
+void Host::toggleStemRendering()
+{
+   renderingStems = !renderingStems;
+   if (renderingStems)
+   {
+      // start rendering, set it up
+      for (int j = 0; j < audioGraph->getNodeCount (); j++)
+      {
+         ProcessingNode* node = audioGraph->getNode (j);
+         currentPlugin = (BasePlugin*) node->getData ();
+
+         if (! currentPlugin || !currentPlugin->getBoolValue(PROP_RENDERSTEM, false))
+             continue;
+             
+         currentPlugin->openStemFile(String(stemRenderNumber), sampleRate);
+      }
+   }
+   else 
+   {
+      // stop rendering, close files
+      for (int j = 0; j < audioGraph->getNodeCount (); j++)
+      {
+         ProcessingNode* node = audioGraph->getNode (j);
+         currentPlugin = (BasePlugin*) node->getData ();
+
+         if (! currentPlugin)
+             continue;
+             
+         currentPlugin->closeStemFile();
+      }
+      
+      stemRenderNumber++; // update unique number so easy to work record/stop/record/stop etc, data keeps accumulating
+   }
+}
+
 //==============================================================================
 void Host::processBlock (AudioSampleBuffer& buffer,
                          MidiBuffer& midiMessages)
@@ -329,6 +367,12 @@ void Host::processBlock (AudioSampleBuffer& buffer,
                     outBuffers = 0;            
                 }
 #endif
+
+               if (renderingStems && currentPlugin->getBoolValue(PROP_RENDERSTEM, false))
+               {
+                  currentPlugin->renderBlock(*outBuffers);
+               }
+            
             }
 
             if (outBuffers)

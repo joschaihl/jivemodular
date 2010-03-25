@@ -206,6 +206,9 @@ public:
     /** Deserialize host from an Xml element */
     void loadFromXml (XmlElement* element);
 
+   void toggleStemRendering();
+   bool isStemRenderingActive(int& renderNumber) {renderNumber = stemRenderNumber;return renderingStems;};
+   
 private:
 
     //==============================================================================
@@ -234,6 +237,9 @@ private:
 
     double sampleRate;
     int samplesPerBlock;
+
+   bool renderingStems;
+   int stemRenderNumber;
 
     Host (const Host&);
     const Host& operator= (const Host&);
