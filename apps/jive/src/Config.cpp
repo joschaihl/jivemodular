@@ -129,6 +129,9 @@ void Config::read ()
     lastPresetDirectory = File (config->getValue (T("last_preset_directory"),
                                                   File::getCurrentWorkingDirectory().getFullPathName()));
 
+    lastStemsDirectory = File (config->getValue (T("last_stems_directory"),
+                                                  File::getCurrentWorkingDirectory().getFullPathName()));
+
     // audio options properties
     externalTempoSync = config->getBoolValue (T("external_tempo_sync"), false);
     externalTempoMaster = config->getBoolValue (T("external_tempo_master"), false);
@@ -169,6 +172,7 @@ void Config::write ()
     config->setValue (T("sessions_files"), recentSessions.toString());
     config->setValue (T("last_session_directory"), lastSessionDirectory.getFullPathName());
     config->setValue (T("last_preset_directory"), lastPresetDirectory.getFullPathName());
+    config->setValue (T("last_stems_directory"), lastStemsDirectory.getFullPathName());
     config->setValue (T("external_tempo_sync"), externalTempoSync);
     config->setValue (T("external_tempo_master"), externalTempoMaster);
     config->setValue (T("auto_connect_inputs"), autoConnectInputs);

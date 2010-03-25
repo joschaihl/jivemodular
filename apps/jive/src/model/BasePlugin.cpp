@@ -49,7 +49,8 @@ BasePlugin::BasePlugin ()
       mutedOutput (false),
       bypassOutput (false),
       outputGain (1.0f),
-      currentOutputGain (1.0f)
+      currentOutputGain (1.0f),
+      stemFileWriter(0)
 {
     keyboardState.reset();
 
@@ -63,6 +64,7 @@ BasePlugin::BasePlugin ()
 
 BasePlugin::~BasePlugin ()
 {
+    closeStemFile();
 }
 
 String BasePlugin::getInstanceName()
@@ -100,6 +102,7 @@ void BasePlugin::savePropertiesToXml (XmlElement* xml)
     xml->setAttribute (PROP_MIXERPEAK,               getIntValue (PROP_MIXERPEAK, 1));
     xml->setAttribute (PROP_MIXERMETERON,            getIntValue (PROP_MIXERMETERON, 1));
     xml->setAttribute (PROP_WINDOWPREFERGENERIC,            getBoolValue (PROP_WINDOWPREFERGENERIC, false));
+    xml->setAttribute (PROP_RENDERSTEM,            getBoolValue (PROP_RENDERSTEM, false));
     XmlElement* bindingsElement = new XmlElement(MIDIBINDINGS_ELEMENT_NAME);
    for (int i=0; i<getNumParameters(); i++)
    {
@@ -155,6 +158,7 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
     setValue (PROP_MIXERPEAK,                        xml->getIntAttribute (PROP_MIXERPEAK, 1));
     setValue (PROP_MIXERMETERON,                     xml->getIntAttribute (PROP_MIXERMETERON, 1));
     setValue (PROP_WINDOWPREFERGENERIC,                     xml->getBoolAttribute (PROP_WINDOWPREFERGENERIC, false));
+    setValue (PROP_RENDERSTEM,                     xml->getBoolAttribute (PROP_RENDERSTEM, false));
     
     XmlElement* bindingsElement = xml->getChildByName(MIDIBINDINGS_ELEMENT_NAME);
     
@@ -172,7 +176,7 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
             {
                if (ccnum >= 0 && ccnum < 128)
             setParameterControllerNumber(paramId, ccnum);
-      }
+            }
             else if (note > 0)
             {
                if (note >= 0 && note < 128)
@@ -181,11 +185,43 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
                   param->setIncrAmount(bindingElement->getDoubleAttribute(MIDIBINDING_INCR_ATTRIB, 1));
                   param->setBidirectional(bindingElement->getBoolAttribute(MIDIBINDING_BIDIRECTIONAL_ATTRIB, false));
                   param->setNoteMode(bindingElement->getIntAttribute(MIDIBINDING_NOTEMODE_ATTRIB, true));
-   }
-}
+               }
+            }
          }
       }
    }
+}
+
+void BasePlugin::openStemFile(String uniquePrefix, int sampleRate)
+{
+   String stemFname(uniquePrefix);
+   stemFname += String("__");
+   stemFname += getInstanceName();
+   stemFname += String(".wav");
+   
+   FileOutputStream* outputStream = new FileOutputStream(
+      File(Config::getInstance ()->lastStemsDirectory).getChildFile(stemFname));
+         
+   StringPairArray metadata;
+   if (getNumOutputs())
+      stemFileWriter = WavAudioFormat().createWriterFor (outputStream,
+                                        sampleRate,
+                                        getNumOutputs(),
+                                        32, // aka floating point, good paranoid format for potentially clippy plugins!
+                                        metadata,
+                                        0);   
+}
+
+void BasePlugin::closeStemFile()
+{
+   delete stemFileWriter;
+   stemFileWriter = 0;
+}
+
+void BasePlugin::renderBlock(AudioSampleBuffer& buffer)
+{
+   if (stemFileWriter)
+      buffer.writeToAudioWriter(stemFileWriter, 0, buffer.getNumSamples());
 }
 
 //==============================================================================

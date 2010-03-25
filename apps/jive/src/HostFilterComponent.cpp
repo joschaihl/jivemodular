@@ -641,6 +641,9 @@ const PopupMenu HostFilterComponent::getMenuForIndex (int menuIndex,
             menu.addCommandItem (commandManager, CommandIDs::audioRecord);
             menu.addCommandItem (commandManager, CommandIDs::audioStop);
             menu.addCommandItem (commandManager, CommandIDs::audioRewind);
+            menu.addSeparator ();
+            menu.addCommandItem (commandManager, CommandIDs::audioStemsStartStop);
+            menu.addCommandItem (commandManager, CommandIDs::audioStemsSetup);
             break;
         }
     case 2: // CommandCategories::about
@@ -723,6 +726,8 @@ void HostFilterComponent::getAllCommands (Array <CommandID>& commands)
                                 CommandIDs::audioRewind,
                                 CommandIDs::audioLoop,
                                 CommandIDs::audioPlayPause,
+                                CommandIDs::audioStemsSetup,
+                                CommandIDs::audioStemsStartStop,
 
                                 CommandIDs::sessionNew,
                                 CommandIDs::sessionLoad,
@@ -836,6 +841,24 @@ void HostFilterComponent::getCommandInfo (const CommandID commandID, Application
         result.setInfo (T("Looping"), T("Loop sequencers"), CommandCategories::audio, 0);
         result.addDefaultKeypress (T('l'), cmd);
         result.setTicked (transport->isLooping());
+        result.setActive (true);
+        break;
+        }
+    //----------------------------------------------------------------------------------------------
+    case CommandIDs::audioStemsStartStop:
+        {
+        int renderNumber = 0;
+        if (getHost()->isStemRenderingActive(renderNumber))
+         result.setInfo (T("Stop rendering stems (" + String(renderNumber) + String(")")), T("Stop rendering stems"), CommandCategories::audio, 0);
+        else
+         result.setInfo (T("Start rendering stems (" + String(renderNumber) + String(")")), T("Start rendering stems"), CommandCategories::audio, 0);
+   
+        result.setActive (true);
+        break;
+        }
+    case CommandIDs::audioStemsSetup:
+        {
+        result.setInfo (T("Setup stem render..."), T("Stem Setup"), CommandCategories::audio, 0);
         result.setActive (true);
         break;
         }
@@ -1018,6 +1041,22 @@ bool HostFilterComponent::perform (const InvocationInfo& info)
                 }
             }
             break;
+        }
+
+    case CommandIDs::audioStemsStartStop:
+        {
+            getHost()->toggleStemRendering();
+            break;
+        }
+    case CommandIDs::audioStemsSetup:
+        {
+            FileChooser myChooser (T("Save rendered stem files to..."),
+                                    Config::getInstance ()->lastStemsDirectory);
+            if (myChooser.browseForDirectory ())
+            {
+                Config::getInstance ()->lastStemsDirectory = myChooser.getResult();
+            }
+            break; 
         }
 
     //----------------------------------------------------------------------------------------------

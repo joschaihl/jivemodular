@@ -63,6 +63,7 @@
 #define PROP_MIXERPEAK                        T("mPeak")
 #define PROP_MIXERMETERON                     T("mMon")
 #define PROP_WINDOWPREFERGENERIC              T("wPreferGeneric")
+#define PROP_RENDERSTEM                       T("renderStem")
 
 class BasePlugin;
 class PluginEditorComponent;
@@ -188,7 +189,11 @@ public:
 
     /** Set the desired mute state */
     void setBypass (const bool bypass)                 { bypassOutput = bypass; }
-
+    
+    void openStemFile(String uniquePrefix, int sampleRate);
+    void closeStemFile();
+    void renderBlock(AudioSampleBuffer& buffer);
+   
 protected:
 
     //==============================================================================
@@ -208,6 +213,9 @@ protected:
     //==============================================================================
     float outputGain, currentOutputGain;
     float outputPan, currentOutputPan;
+
+    //==============================================================================
+   AudioFormatWriter* stemFileWriter;
 };
 
 
