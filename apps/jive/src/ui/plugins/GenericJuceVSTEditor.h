@@ -28,7 +28,7 @@
 
 #include "src/core/juce_StandardHeader.h"
 #include "src/audio/processors/juce_AudioProcessorEditor.h"
-#include "BasePlugin.h"
+#include "model/BasePlugin.h"
 
 //==============================================================================
 /**
