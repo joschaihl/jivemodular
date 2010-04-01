@@ -512,7 +512,7 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
    // bar count slider
    addAndMakeVisible (barLabel = new Label (String::empty, "Bars:"));
    addAndMakeVisible (barSlider = new Slider (String::empty));
-   barSlider->setRange (1, 16, 1);
+   barSlider->setRange (1, 999, 1);
    barSlider->setSliderStyle (Slider::IncDecButtons);
    barSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
    barSlider->setValue (transport->getNumBars (), false);
