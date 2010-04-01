@@ -343,36 +343,24 @@ void PianoGridNote::mouseUp (const MouseEvent& e)
 
 void PianoGridNote::paint (Graphics& g)
 {
-    Colour fillColour = findColour (PianoGrid::noteFillColourId);
-    Colour borderColour = findColour (PianoGrid::noteBorderColourId);
+   Colour fillColour = findColour (PianoGrid::noteFillColourId);
+   Colour borderColour = findColour (PianoGrid::noteBorderColourId);
+   int borderWidth = 1;
 
-    if (isDragging || isResizing)
-    {
-        if (hasBeenSelected) {
-            fillColour = fillColour.darker (0.4f);
-            borderColour = borderColour.darker (0.4f);
-        }
-        else
-        {
-            fillColour = fillColour.brighter (0.4f);
-            borderColour = borderColour.brighter (0.4f);
-        }
-    }
-    else
-    {
-        if (hasBeenSelected) {
-            fillColour = fillColour.brighter (0.4f);
-            borderColour = borderColour.brighter (0.4f);
-        }
-    }
+   if (hasBeenSelected) 
+   {
+      fillColour = fillColour.darker (0.6);
+      borderColour = borderColour.darker ();
+      borderWidth = 2;
+   }
 
-    float alphaStep = 0.2f + velocity * 0.8f;
-    fillColour = fillColour.withAlpha (alphaStep);
-    borderColour = borderColour.withAlpha (alphaStep);
+   float alphaStep = 0.2f + velocity * 0.8f;
+   fillColour = fillColour.withAlpha (alphaStep);
+   borderColour = borderColour.withAlpha (alphaStep);
 
-    g.fillAll (fillColour);
-    g.setColour (borderColour);
-    g.drawRect (0, 0, getWidth(), getHeight());
+   g.fillAll (fillColour);
+   g.setColour (borderColour);
+   g.drawRect (0, 0, getWidth(), getHeight(), borderWidth);
 }
 
 //==============================================================================
