@@ -564,8 +564,8 @@ void PianoGrid::resizeNote (PianoGridNote* note, const float beatNumber, const f
 {
 	PianoGridListener* listener = getListener();
     if (listener && listener->noteResized (note->getNote(),
-                                           note->getBeat(),
-                                           note->getLength()))
+                                           beatNumber,
+                                           newLength))
     {
         float minLength = 0.0001f;
         float maxLength = (numBars * divDenominator) - beatNumber;
