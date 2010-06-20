@@ -29,6 +29,8 @@
 #include "Transport.h"
 #include "../HostFilterBase.h"
 
+// standardise PPQ right here
+#define PPQ_960 960
 
 //==============================================================================
 Transport::Transport (HostFilterBase* owner_)
@@ -473,7 +475,7 @@ void Transport::saveToXml (XmlElement* xml)
     xml->setAttribute (T("bars"), numBars);
     xml->setAttribute (T("numerator"), divDenominator);
     xml->setAttribute (T("denominator"), divDenominator);
-    xml->setAttribute (T("ppq"), 960 /* ppq */);
+    xml->setAttribute (T("ppq"), PPQ_960 /* ppq */);
     xml->setAttribute (T("position"), getPositionAbsolute());
     xml->setAttribute (T("llocator"), getLeftLocator());
     xml->setAttribute (T("rlocator"), getRightLocator());
@@ -497,4 +499,20 @@ void Transport::loadFromXml (XmlElement* xml)
     sendChangeMessage (this);
 }
 
+int Transport::getPPQTicks()
+{
+   return (static_cast<double>(sequencePositionCounter % framesPerBeat) / framesPerBeat) * PPQ_960;
+}
 
+//==============================================================================
+bool Transport::getCurrentPosition (CurrentPositionInfo& result)
+{
+   result.bpm = bpmTempo;
+   result.timeSigNumerator = 4; // hard-coded situation here!
+   result.timeSigDenominator = divDenominator;
+   result.ppqPosition = getPositionInBeats();
+
+   result.isPlaying = playing;
+
+   return true;
+}

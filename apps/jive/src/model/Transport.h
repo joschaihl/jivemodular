@@ -49,7 +49,7 @@
     Also, it is used in the HostCallback to provide VstTimeInfo to vst plugins
     that ask for it.
 */
-class Transport : public ChangeBroadcaster
+class Transport : public ChangeBroadcaster, public AudioPlayHead
 {
 public:
 
@@ -204,10 +204,15 @@ public:
     float getPositionAbsolute () const               { return sequencePositionCounter / (float) sequenceDurationFrames; }
 
 	double getPositionInBeats()                      { return static_cast<double>(sequencePositionCounter) / framesPerBeat; }
-	
+	int getPPQTicks(); // returns the tick position within the beat, i.e. mod 960 at 960 ticks per beat
+   
     //==============================================================================
     void loadFromXml (XmlElement* xml);
     void saveToXml (XmlElement* xml);
+
+   //==============================================================================
+   // AudioPlayHead implementation
+   virtual bool getCurrentPosition (CurrentPositionInfo& result);
 
 private:
 
