@@ -195,11 +195,11 @@ void MainToolbarTimeDisplay::updateTimeDisplay ()
 
     if (framesPerBeat > 0 && denominator != 0)
     {
-        int ticks = (positionFrame % framesPerBeat) / 100;
+        int ticksInPpq = t->getPPQTicks();
         int beat = 1 + (positionFrame / framesPerBeat) % denominator;
         int bars = 1 + (positionFrame / framesPerBeat) / denominator;
 
-        digitalDisplay->setText (String::formatted(T("%03d:%03d:%03d"), bars, beat, ticks), false);
+        digitalDisplay->setText (String::formatted(T("%03d:%03d:%03d"), bars, beat, ticksInPpq), false);
     }
     else
     {

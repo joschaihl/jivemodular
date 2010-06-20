@@ -27,6 +27,7 @@
 */
 
 #include "WrappedJucePlugin.h"
+#include "HostFilterBase.h"
 
 //==============================================================================
 WrappedJucePlugin::WrappedJucePlugin (PluginDescription* desc)
@@ -242,9 +243,12 @@ bool WrappedJucePlugin::acceptsMidi () const
 //==============================================================================
 void WrappedJucePlugin::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    DBG ("WrappedJucePlugin::prepareToPlay");
-    if (instance)
+   DBG ("WrappedJucePlugin::prepareToPlay");
+   if (instance)
+   {
       instance->prepareToPlay(sampleRate, samplesPerBlock);
+      instance->setPlayHead(getParentHost()->getTransport());
+   }
 }
 
 void WrappedJucePlugin::releaseResources()
