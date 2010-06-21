@@ -1,9 +1,10 @@
+#include "../../../../apps/jive/src/JiveVersionInfo.h"
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
 	<key>CFBundleGetInfoString</key>
-	<string>Jive v0.2.2</string>
+	<string>Jive_VersionGetInfoString</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>English</string>
 	<key>CFBundleExecutable</key>
