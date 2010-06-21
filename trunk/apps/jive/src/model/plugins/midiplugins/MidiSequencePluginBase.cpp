@@ -88,7 +88,7 @@ void MidiSequencePluginBase::processBlock (AudioSampleBuffer& buffer,
 
         const int nextBlockFrameNumber = frameCounter + blockSize;
 
-std::cerr << (String("frameCounter is ") + String(frameCounter) + String(" nextBlockFrameNumber is ") + String(nextBlockFrameNumber)).toUTF8() << std::endl;
+//std::cerr << (String("frameCounter is ") + String(frameCounter) + String(" nextBlockFrameNumber is ") + String(nextBlockFrameNumber)).toUTF8() << std::endl;
         
 		const int seqIndex = getLoopRepeatIndex();
 		const double beatCount = getLoopBeatPosition();
