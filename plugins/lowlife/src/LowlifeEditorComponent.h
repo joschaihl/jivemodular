@@ -29,7 +29,7 @@
 #include "DemoJuceFilter.h"
 
 // a component for editing a single slot
-class LowlifeSlotEditComponent : public Component, public SliderListener, public FilenameComponentListener
+class LowlifeSlotEditComponent : public Component, public SliderListener, public FilenameComponentListener, public ButtonListener
 {
 public:
    LowlifeSlotEditComponent(DemoJuceFilter* filter, int slot);
@@ -38,12 +38,14 @@ public:
    void updateParametersFromFilter();
    void sliderValueChanged (Slider* sl);
    void filenameComponentChanged(FilenameComponent* filec);
+   void buttonClicked(Button* button);
    void resized();
 
 FilenameComponent* sampleFile;
+ToggleButton* syncButton;
+Slider* syncTicksSlider;
 Slider* faderSlider;
-Slider* keyMinSlider;
-Slider* keyMaxSlider;
+Slider* keySlider;
 Slider* tuneSlider;
 
 DemoJuceFilter* myFilter;
@@ -98,12 +100,8 @@ public:
 
 private:
     //==============================================================================
-//    Slider* gainSlider;
-//    MidiKeyboardComponent* midiKeyboard;
-//    Label* infoLabel;
     ResizableCornerComponent* resizer;
     ComponentBoundsConstrainer resizeLimits;
-//    TooltipWindow tooltipWindow;
    Array<LowlifeSlotEditComponent*> slotEditors; // these are child compopnents, so we don't need to own them directly here
 
    Slider* numSlotsSlider;

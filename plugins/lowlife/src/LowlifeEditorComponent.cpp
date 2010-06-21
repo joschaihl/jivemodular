@@ -27,6 +27,12 @@
 #include "LowlifeEditorComponent.h"
 LowlifeSlotEditComponent::LowlifeSlotEditComponent(DemoJuceFilter* filter, int slot)
 :
+   sampleFile(0),
+   syncButton(0),
+   syncTicksSlider(0),
+   faderSlider(0),
+   keySlider(0),
+   tuneSlider(0),
    myFilter(filter),
    mySlot(slot)
 {
@@ -39,15 +45,20 @@ LowlifeSlotEditComponent::LowlifeSlotEditComponent(DemoJuceFilter* filter, int s
    faderSlider->setRange (DemoJuceFilter::MinFader, DemoJuceFilter::MaxFader, 1.);
    faderSlider->setTooltip (T("attenuates this slot"));
 
-   addAndMakeVisible(keyMinSlider = new Slider(T("keyMin")));
-   keyMinSlider->addListener (this);
-   keyMinSlider->setRange (DemoJuceFilter::MinKey, DemoJuceFilter::MaxKey, 1.);
-   keyMinSlider->setTooltip (T("lowest possible key"));
+   addAndMakeVisible(syncButton = new ToggleButton(T("Tempo Sync")));
+   syncButton->addButtonListener (this);
 
-   addAndMakeVisible(keyMaxSlider = new Slider(T("keyMax")));
-   keyMaxSlider->addListener (this);
-   keyMaxSlider->setRange (DemoJuceFilter::MinKey, DemoJuceFilter::MaxKey, 1.);
-   keyMaxSlider->setTooltip (T("highest key"));
+   addAndMakeVisible(syncTicksSlider = new Slider(T("Sync ticks")));
+   syncTicksSlider->setSliderStyle(Slider::IncDecButtons);
+   syncTicksSlider->addListener (this);
+   syncTicksSlider->setRange (1, 128, 1.);
+   syncTicksSlider->setTooltip (T("Number of ticks in sample"));
+
+   addAndMakeVisible(keySlider = new Slider(T("key")));
+   keySlider->setSliderStyle(Slider::ThreeValueHorizontal);
+   keySlider->addListener (this);
+   keySlider->setRange (DemoJuceFilter::MinKey, DemoJuceFilter::MaxKey, 1.);
+   keySlider->setTooltip (T("midi key min/centre/max"));
 
    addAndMakeVisible(tuneSlider = new Slider(T("tuning")));
    tuneSlider->addListener (this);
@@ -62,16 +73,22 @@ LowlifeSlotEditComponent::~LowlifeSlotEditComponent()
 
 void LowlifeSlotEditComponent::resized()
 {
+   float numRowsOfThings = 5.0;
+
    int h = getHeight();
    int w = getWidth();
    int walf = w/2;
-   h = h / 4.0;
+   h = h / numRowsOfThings;
    int curh = 0;
 
    sampleFile->setBounds(0, curh, w, h);
-   
-   keyMinSlider->setBounds(0, curh+=h, walf, h);
-   keyMaxSlider->setBounds(walf, curh, walf, h);
+
+   curh+=h;
+
+   syncButton->setBounds(0, curh, walf, h);
+   syncTicksSlider->setBounds(walf, curh, walf, h);
+      
+   keySlider->setBounds(0, curh+=h, w, h);
 
    tuneSlider->setBounds(0, curh+=h, w, h);
    faderSlider->setBounds(0, curh+=h, w, h);
@@ -82,11 +99,13 @@ void LowlifeSlotEditComponent::updateParametersFromFilter()
    if (myFilter)
    {
       sampleFile->setCurrentFile(myFilter->getZoneslotSample(mySlot), true, false);
-      //polyModeCombo->setSelectedId(myFilter->getZoneslotPolyMode(mySlot) + 1, false);
-      faderSlider->setValue(myFilter->getZoneslotFader(mySlot), false);
+      syncButton->setToggleState(myFilter->getZoneslotBPMSync(mySlot), false);
+      syncTicksSlider->setValue(myFilter->getZoneslotSyncTicks(mySlot), false);
+      keySlider->setMinValue(myFilter->getZoneslotKeyMin(mySlot), false);
+      keySlider->setValue(myFilter->getZoneslotKeyCentre(mySlot), false);
+      keySlider->setMaxValue(myFilter->getZoneslotKeyMax(mySlot), false);
       tuneSlider->setValue(myFilter->getZoneslotTuneFactor(mySlot), false);
-      keyMinSlider->setValue(myFilter->getZoneslotKeyMin(mySlot), false);
-      keyMaxSlider->setValue(myFilter->getZoneslotKeyMax(mySlot), false);
+      faderSlider->setValue(myFilter->getZoneslotFader(mySlot), false);
    }
 }
 
@@ -94,14 +113,21 @@ void LowlifeSlotEditComponent::sliderValueChanged(Slider* sl)
 {
    if (myFilter)
    {
-      if (sl == faderSlider) 
-         myFilter->setZoneslotFader(mySlot, sl->getValue());
-      if (sl == tuneSlider) 
+      if (sl == syncTicksSlider)
+         myFilter->setZoneslotSyncTicks(mySlot, sl->getValue());
+      
+      else if (sl == keySlider) 
+      {
+         myFilter->setZoneslotKeyMin(mySlot, sl->getMinValue());
+         myFilter->setZoneslotKeyCentre(mySlot, sl->getValue());
+         myFilter->setZoneslotKeyMax(mySlot, sl->getMaxValue());
+      }
+
+      else if (sl == tuneSlider) 
          myFilter->setZoneslotTuneFactor(mySlot, sl->getValue());
-      if (sl == keyMinSlider) 
-         myFilter->setZoneslotKeyMin(mySlot, sl->getValue());
-      if (sl == keyMaxSlider) 
-         myFilter->setZoneslotKeyMax(mySlot, sl->getValue());
+
+      else if (sl == faderSlider) 
+         myFilter->setZoneslotFader(mySlot, sl->getValue());
    }
 }
 
@@ -112,6 +138,12 @@ void LowlifeSlotEditComponent::filenameComponentChanged(FilenameComponent* filec
       if (filec == sampleFile) 
          myFilter->setZoneslotSample(mySlot, filec->getCurrentFile());
    }
+}
+
+void LowlifeSlotEditComponent::buttonClicked(Button* button)
+{
+   if (button == syncButton)
+      myFilter->setZoneslotBPMSync(mySlot, syncButton->getToggleState());
 }
 
 //==============================================================================
@@ -137,7 +169,7 @@ LowlifeEditorComponent::LowlifeEditorComponent (DemoJuceFilter* const ownerFilte
       numSlotsSlider->addListener(this);
    }
    
-      addAndMakeVisible(polyModeCombo = new ComboBox(T("polymode")));
+   addAndMakeVisible(polyModeCombo = new ComboBox(T("polymode")));
    if (polyModeCombo)
    {
       polyModeCombo->addListener (this);
@@ -170,7 +202,6 @@ void LowlifeEditorComponent::paint (Graphics& g)
 
 void LowlifeEditorComponent::resized()
 {
-//    DemoJuceFilter* const filter = getFilter();
    LowlifeSlotEditComponent* tmp;
    if (slotEditors.size() > 0)
    {
@@ -261,7 +292,7 @@ void LowlifeEditorComponent::updateParametersFromFilter()
       
       
    if (numSlotsSlider)
-    numSlotsSlider->setValue(slots, false);
+      numSlotsSlider->setValue(slots, false);
    if (polyModeCombo)
-    polyModeCombo->setSelectedId(filter->getPolyMode() + 1, false);
+      polyModeCombo->setSelectedId(filter->getPolyMode() + 1, false);
 }

@@ -29,11 +29,8 @@
 #include "Highlife.h"
 
 //==============================================================================
-/**
-    A simple plugin filter that just applies a gain change to the audio
-    passing through it.
-
-*/
+// A wrapper Juce filter that calls through to a Highlife instance to do processing, 
+// and exposes a few of highlife's parameters.
 class DemoJuceFilter  : public AudioProcessor,
                         public ChangeBroadcaster
 {
@@ -73,10 +70,7 @@ public:
 
     //==============================================================================
     int getNumPrograms()                                        { return 0; }
-    int getCurrentProgram()                                     
-    { 
-      return 0; 
-      }
+    int getCurrentProgram()                                     { return 0; }
     void setCurrentProgram (int index)                          { }
     const String getProgramName (int index)                     { return String::empty; }
     void changeProgramName (int index, const String& newName)   { }
@@ -84,7 +78,6 @@ public:
     //==============================================================================
     void getStateInformation (MemoryBlock& destData);
     void setStateInformation (const void* data, int sizeInBytes);
-
 
     //==============================================================================
     // These properties are public so that our editor component can access them
@@ -109,35 +102,42 @@ public:
     void setPolyMode(int m);
 
     enum Parameters {
-//       PolyMode = 0,
        KeyLow = 0,
+       KeyCentre,
        KeyHigh,
        Tune,
-       Fader
+       Fader,
+       BPMSync,
+       SyncTicks
     };
-    enum { paramsPerSlot = 4 };
-    // woops, this should be an array
-    static const int MinKey;
-    static const int MaxKey;
-    static const int MinFader;
-    static const int MaxFader;
-    static const int MinTune;
-    static const int MaxTune;
+   enum { paramsPerSlot = 7 }; 
+   static const int MinKey;
+   static const int MaxKey;
+   static const int MinFader;
+   static const int MaxFader;
+   static const int MinTune;
+   static const int MaxTune;
    static const int MinPolyMode;
    static const int MaxPolyMode;
-    
+   static const int MinSyncTicks;
+   static const int MaxSyncTicks;
+
     File getZoneslotSample(int slot);
     void setZoneslotSample(int slot, const File sampleFile);
     int getZoneslotFader(int slot);
     void setZoneslotFader(int slot, int level);
-//    int getZoneslotPolyMode(int slot);
-//    void setZoneslotPolyMode(int slot, int poly);
     int getZoneslotKeyMin(int slot);
     void setZoneslotKeyMin(int slot, int keymin);
+    int getZoneslotKeyCentre(int slot);
+    void setZoneslotKeyCentre(int slot, int keymin);
     int getZoneslotKeyMax(int slot);
     void setZoneslotKeyMax(int slot, int keymin);
     int getZoneslotTuneFactor(int slot);
     void setZoneslotTuneFactor(int slot, int fac);
+    bool getZoneslotBPMSync(int slot);
+    void setZoneslotBPMSync(int slot, bool fac);
+    int getZoneslotSyncTicks(int slot);
+    void setZoneslotSyncTicks(int slot, int tic);
 
 private:
    HIGHLIFE_PROGRAM& getHProgramRef(int zoneslot = 0) // don't care baout zoneslot anymore!!
@@ -159,12 +159,9 @@ private:
    }
    
 private:
-    // this is our gain - the UI and the host can access this by getting/setting
-    // parameter 0.
     float gain;
     
     CHighLife highlifeInstance;
-    //int zoneslotCount; // the number of HIGHLIFE_PROGRAMs in use, each containing a single zone
 };
 
 #endif
