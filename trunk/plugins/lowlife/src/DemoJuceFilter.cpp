@@ -29,10 +29,6 @@
 #include "LowlifeEditorComponent.h"
 
 //==============================================================================
-/**
-    This function must be implemented to create a new instance of your
-    plugin object.
-*/
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new DemoJuceFilter();
@@ -40,10 +36,7 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 //==============================================================================
 DemoJuceFilter::DemoJuceFilter()
-//:
-//   zoneslotCount(0)
 {
-    gain = 0.5f;
     lastUIWidth = 400;
     lastUIHeight = 300;
     
@@ -60,7 +53,6 @@ const String DemoJuceFilter::getName() const
     return JucePlugin_Name;
 }
 
-//const int paramsPerSlot = 5; // fader, tune, key min/max, polymode
 const int DemoJuceFilter::MinKey = 0;
 const int DemoJuceFilter::MaxKey = 127;
 const int DemoJuceFilter::MinFader = -60;
@@ -69,17 +61,19 @@ const int DemoJuceFilter::MinTune = 0;
 const int DemoJuceFilter::MaxTune = 100;
 const int DemoJuceFilter::MinPolyMode = 0;
 const int DemoJuceFilter::MaxPolyMode = 2;
+const int DemoJuceFilter::MinSyncTicks = 0;
+const int DemoJuceFilter::MaxSyncTicks = 999; // ticks are 16th notes
 
 float DemoJuceFilter::getNormedParam(int slot, int paramId)
 {
    float paramVal = 0;
    switch (paramId) 
    {
-//      case PolyMode:
-//         paramVal = ((getZoneslotPolyMode(slot) - MinPolyMode)+ 1) / static_cast<float>(1 + MaxPolyMode - MinPolyMode);
-//         break;
       case KeyLow:
          paramVal = ((getZoneslotKeyMin(slot) - MinKey) +1) / static_cast<float>(1 + MaxKey - MinKey);
+         break;
+      case KeyCentre:
+         paramVal = ((getZoneslotKeyCentre(slot) - MinKey) +1) / static_cast<float>(1 + MaxKey - MinKey);
          break;
       case KeyHigh:
          paramVal = ((getZoneslotKeyMax(slot) - MinKey) + 1) / static_cast<float>(1 + MaxKey - MinKey);
@@ -90,6 +84,12 @@ float DemoJuceFilter::getNormedParam(int slot, int paramId)
       case Fader:
          paramVal = (getZoneslotFader(slot) - MinFader) / static_cast<float>(MaxFader - MinFader);
          break;
+      case BPMSync:
+         paramVal = (getZoneslotBPMSync(slot) > 0.5);
+         break;
+      case SyncTicks:
+         paramVal = (getZoneslotSyncTicks(slot) - MinSyncTicks) / static_cast<float>(MaxSyncTicks - MinSyncTicks);
+         break;
    }
    return paramVal;
 }
@@ -98,11 +98,11 @@ void DemoJuceFilter::setNormedParam(int slot, int paramId, float val)
 {
    switch (paramId) 
    {
-//      case PolyMode:
-//         setZoneslotPolyMode(slot, (val * (1 + MaxPolyMode - MinPolyMode)) + MinPolyMode);
-//         break;
       case KeyLow:
          setZoneslotKeyMin(slot, (val * (1 + MaxKey - MinKey)) + MinKey);
+         break;
+      case KeyCentre:
+         setZoneslotKeyCentre(slot, (val * (1 + MaxKey - MinKey)) + MinKey);
          break;
       case KeyHigh:
          setZoneslotKeyMax(slot, (val * (1 + MaxKey - MinKey)) + MinKey);
@@ -113,6 +113,12 @@ void DemoJuceFilter::setNormedParam(int slot, int paramId, float val)
       case Fader:
          setZoneslotFader(slot, (val * (MaxFader - MinFader)) + MinFader);
          break;
+      case BPMSync:
+         setZoneslotBPMSync(slot, (val > 0.5));
+         break;
+      case SyncTicks:
+         setZoneslotSyncTicks(slot, (val * (MaxSyncTicks - MinSyncTicks)) + MinSyncTicks);
+         break;
       default:
          break;
    }
@@ -121,10 +127,8 @@ void DemoJuceFilter::setNormedParam(int slot, int paramId, float val)
 
 int DemoJuceFilter::getNumParameters()
 {
-   int numParams = 0; // num params is dynamic! num slots * params per slot
+   int numParams = 0;
    
-   // might bring back a global gain at some point, maybe not...
-//   numParams = getNumZoneslots() * paramsPerSlot;
    numParams = getMaxZoneslots() * paramsPerSlot;
    
    return numParams;
@@ -145,17 +149,6 @@ void DemoJuceFilter::setParameter (int index, float newValue)
 
    setNormedParam(slotOfConcern, paramOfInterest, newValue);
 
-//    if (index == 0)
-//    {
-//        if (gain != newValue)
-//        {
-//            gain = newValue;
-//
-//            // if this is changing the gain, broadcast a change message which
-//            // our editor will pick up.
-//            sendChangeMessage (this);
-//        }
-//    }
    sendChangeMessage(this);
 }
 
@@ -168,11 +161,11 @@ const String DemoJuceFilter::getParameterName (int index)
 
    switch (paramOfInterest)
    {
-//      case PolyMode:
-//         slotName += String("Poly mode");
-//      break;
       case KeyLow:
          slotName += String("Low key");
+      break;
+      case KeyCentre:
+         slotName += String("Base/centre key");
       break;
       case KeyHigh:
          slotName += String("High key");
@@ -182,6 +175,12 @@ const String DemoJuceFilter::getParameterName (int index)
       break;
       case Tune:
          slotName += String("Tuniness");
+      break;
+      case BPMSync:
+         slotName += String("BPM Sync");
+      break;
+      case SyncTicks:
+         slotName += String("Sample length in 16ths (for BPM sync)");
       break;
    }
 
@@ -195,11 +194,11 @@ const String DemoJuceFilter::getParameterText (int index)
    String paramVal;
    switch (paramOfInterest) 
    {
-//      case PolyMode:
-//         paramVal = String(getZoneslotPolyMode(slot));
-//         break;
       case KeyLow:
          paramVal = String(getZoneslotKeyMin(slot));
+         break;
+      case KeyCentre:
+         paramVal = String(getZoneslotKeyCentre(slot));
          break;
       case KeyHigh:
          paramVal = String(getZoneslotKeyMax(slot));
@@ -210,6 +209,12 @@ const String DemoJuceFilter::getParameterText (int index)
       case Fader:
          paramVal = String(getZoneslotFader(slot));
          break;
+      case BPMSync:
+         paramVal = String(getZoneslotBPMSync(slot));
+         break;
+      case SyncTicks:
+         paramVal = String(getZoneslotSyncTicks(slot));
+         break;
    }
 
     return paramVal;
@@ -218,9 +223,6 @@ const String DemoJuceFilter::getParameterText (int index)
 int DemoJuceFilter::getNumZoneslots()
 {
    int zoneslots = 1;
-   // just one for a while
-//   return 1;
-   //zoneslots = zoneslotCount;
    zoneslots = getHProgramRef().num_zones;
    return zoneslots;
 }
@@ -235,10 +237,7 @@ void DemoJuceFilter::setNumZoneslots(int newslots)
       {
          HIGHLIFE_PROGRAM* pprg = getHProgram(zoneslotCount);
          if (pprg)
-         {
-//            highlifeInstance.tool_init_program(pprg); // zeroes out the prog so we know that it is not in use - i.e. program.num_zones == 0
-            /*pz = */highlifeInstance.tool_alloc_zone(pprg);
-         }
+            highlifeInstance.tool_alloc_zone(pprg);
       }
       sendChangeMessage(this);
    }
@@ -250,10 +249,7 @@ void DemoJuceFilter::setNumZoneslots(int newslots)
          HIGHLIFE_PROGRAM* pprg = getHProgram(zoneslotCount);
          HIGHLIFE_ZONE* pz = getHZone(zoneslotCount);
          if (pprg && pz)
-         {
-//            highlifeInstance.tool_delete_zone(pprg, zoneslotCount);
             highlifeInstance.tool_init_program(pprg); // zeroes out the prog so we know that it is not in use
-         }
       }
       sendChangeMessage(this);
    }
@@ -337,6 +333,23 @@ void DemoJuceFilter::setZoneslotKeyMin(int slot, int keymin)
    sendChangeMessage (this);
 }
 
+int DemoJuceFilter::getZoneslotKeyCentre(int slot)
+{
+   int key = 0;
+   HIGHLIFE_ZONE* pz = getHZone(slot);
+   if (pz)
+      key = pz->midi_root_key;
+   return key;
+}
+
+void DemoJuceFilter::setZoneslotKeyCentre(int slot, int keymin)
+{
+   HIGHLIFE_ZONE* pz = getHZone(slot);
+   if (pz)
+      pz->midi_root_key = keymin;
+   sendChangeMessage (this);
+}
+
 int DemoJuceFilter::getZoneslotKeyMax(int slot)
 {
    int key = 0;
@@ -368,6 +381,40 @@ void DemoJuceFilter::setZoneslotTuneFactor(int slot, int fac)
    HIGHLIFE_ZONE* pz = getHZone(slot);
    if (pz)
       pz->midi_keycents = fac;
+   sendChangeMessage (this);
+}
+
+bool DemoJuceFilter::getZoneslotBPMSync(int slot)
+{
+   bool syn = 0;
+   HIGHLIFE_ZONE* pz = getHZone(slot);
+   if (pz)
+      syn = pz->mp_synchro;
+   return syn;
+}
+
+void DemoJuceFilter::setZoneslotBPMSync(int slot, bool fac)
+{
+   HIGHLIFE_ZONE* pz = getHZone(slot);
+   if (pz)
+      pz->mp_synchro = fac;
+   sendChangeMessage (this);
+}
+
+int DemoJuceFilter::getZoneslotSyncTicks(int slot)
+{
+   int tic = 0;
+   HIGHLIFE_ZONE* pz = getHZone(slot);
+   if (pz)
+      tic = pz->mp_num_ticks;
+   return tic;
+}
+
+void DemoJuceFilter::setZoneslotSyncTicks(int slot, int tic)
+{
+   HIGHLIFE_ZONE* pz = getHZone(slot);
+   if (pz)
+      pz->mp_num_ticks = tic;
    sendChangeMessage (this);
 }
 
@@ -404,27 +451,8 @@ bool DemoJuceFilter::producesMidi() const
 //==============================================================================
 void DemoJuceFilter::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // do your pre-playback setup stuff here..
-
-//   File hardcodedSampleFile("/Volumes/Stuf/Archive/Audio Samples/DVD1 - samples & others' stems/my samples/OleSchoolShit/E - Ole School - So I Suggest -- Bitch.wav");
-//    
-//   int programZero = 0;
-//   // obtain.... a program
-//   HIGHLIFE_PROGRAM* pprg=&highlifeInstance.highlife_program[programZero];
-//   
-//   pprg->ply_mode = 0; // set to monophonic mode - all streamed samples will be monophonic in my sampler (crazy buffer problem avoidance)
-//
-//   // allocate a zone
-//   HIGHLIFE_ZONE* phz=highlifeInstance.tool_alloc_zone(getHProgram());
-//   
-//   // load sample into zone
-//   highlifeInstance.tool_load_sample(phz, hardcodedSampleFile);
-    
-//    for (int i=0; i<getNumZoneslots(); i++)
-//    {
        highlifeInstance.prepareToPlay(sampleRate, samplesPerBlock);
        highlifeInstance.setPlayConfigDetails(0, 1, sampleRate, samplesPerBlock);
-//    }
 }
 
 void DemoJuceFilter::releaseResources()
@@ -436,19 +464,8 @@ void DemoJuceFilter::releaseResources()
 void DemoJuceFilter::processBlock (AudioSampleBuffer& buffer,
                                    MidiBuffer& midiMessages)
 {
-//   buffer.clear(); // put this hecker in the VST support layer I think.
-//   
-//   float mixGain = 1.0 / zoneslotCount; // let the user do the mixing with the faders, rather than being paranoid
-//   AudioSampleBuffer tmp(buffer); 
-//   for (int i=0; i<zoneslotCount; i++)
-//   for (int i=0; i<1; i++)
-//   {
-//      highlifeInstance.user_program = i;//i;
-//      highlifeInstance.setCurrentProgram(i);
-      highlifeInstance.processBlock(buffer, midiMessages);
-//      for (int ch=0; ch<buffer.getNumChannels(); ch++)
-//         buffer.addFrom(ch, 0, tmp, ch, 0, buffer.getNumSamples(), mixGain);
-//   }
+   highlifeInstance.setPlayHead(getPlayHead());
+   highlifeInstance.processBlock(buffer, midiMessages);
 }
 
 //==============================================================================
