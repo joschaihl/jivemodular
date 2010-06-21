@@ -323,6 +323,7 @@
 		93B0FA5C112CEE8E003C3402 /* PatternMatrixEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PatternMatrixEditor.h; path = ../../model/plugins/midiplugins/PatternMatrixEditor.h; sourceTree = "<group>"; };
 		93B0FA5D112CEE8E003C3402 /* PatternMatrixPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = PatternMatrixPlugin.cpp; path = midiplugins/PatternMatrixPlugin.cpp; sourceTree = "<group>"; };
 		93B0FA5E112CEE8E003C3402 /* PatternMatrixPlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PatternMatrixPlugin.h; path = midiplugins/PatternMatrixPlugin.h; sourceTree = "<group>"; };
+		93B194A911CF42BC004E9685 /* JiveVersionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JiveVersionInfo.h; sourceTree = "<group>"; };
 		93BE77B2114C6FE300741452 /* Jive.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = Jive.icns; sourceTree = "<group>"; };
 		93BE77B8114C707400741452 /* JoveJiveJostIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = JoveJiveJostIcon.png; sourceTree = "<group>"; };
 		93BE7802114C792900741452 /* JiveAbout.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = JiveAbout.png; sourceTree = "<group>"; };
@@ -493,9 +494,9 @@
 				938AD07B103A4ECC00DFCCCF /* HostFilterBase.h */,
 				938AD07C103A4ECC00DFCCCF /* HostFilterComponent.cpp */,
 				938AD07D103A4ECC00DFCCCF /* HostFilterComponent.h */,
+				93B194A911CF42BC004E9685 /* JiveVersionInfo.h */,
 				938AD07E103A4ECC00DFCCCF /* JucePluginCharacteristics.h */,
 				938AD07F103A4ECC00DFCCCF /* Main.cpp */,
-				938A4BEA105B6F46004B18E8 /* dssi_alsa_compat.c */,
 				938AD080103A4ECC00DFCCCF /* model */,
 				938AD0A7103A4ECC00DFCCCF /* resources */,
 				938AD0B3103A4ECC00DFCCCF /* ui */,
@@ -510,6 +511,7 @@
 		938AD080103A4ECC00DFCCCF /* model */ = {
 			isa = PBXGroup;
 			children = (
+				938A4BEA105B6F46004B18E8 /* dssi_alsa_compat.c */,
 				938AD081103A4ECC00DFCCCF /* BasePlugin.cpp */,
 				938AD082103A4ECC00DFCCCF /* BasePlugin.h */,
 				938AD083103A4ECC00DFCCCF /* Host.cpp */,
@@ -998,6 +1000,7 @@
 					"\"$(SRCROOT)/../../../../juce/src/extended/dependancies/ladspa_sdk/src\"",
 					"\"$(SRCROOT)/../../../../vst/vstsdk2.4\"",
 				);
+				INFOPLIST_PREPROCESS = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
@@ -1028,6 +1031,7 @@
 					"\"$(SRCROOT)/../../../../juce/src/extended/dependancies/ladspa_sdk/src\"",
 					"\"$(SRCROOT)/../../../../vst/vstsdk2.4\"",
 				);
+				INFOPLIST_PREPROCESS = YES;
 				PREBINDING = NO;
 				SDKROOT = macosx10.5;
 				USER_HEADER_SEARCH_PATHS = "~/SDKs/vstsdk2.4 \"$(SRCROOT)/../../../../apps/jive/src\" \"$(SRCROOT)/../../../../juce\" \"$(SRCROOT)/../../../../juce/extras/audio plugins\"";

@@ -26,6 +26,12 @@
 #ifndef __JUCE_PLUGIN_CHARACTERISTICS_H__
 #define __JUCE_PLUGIN_CHARACTERISTICS_H__
 
+// Common things borrowed from the app that contains us (Jive).
+#include "../../../apps/jive/src/JiveVersionInfo.h"
+#define JucePlugin_Manufacturer             Jive_ManufacturerString
+#define JucePlugin_ManufacturerCode         Jive_ManufacturerCode
+#define JucePlugin_VersionCode              Jive_VersionCode
+#define JucePlugin_VersionString            Jive_VersionString
 
 //==============================================================================
 /*  All of the following settings need to be defined for your plugin.
@@ -59,18 +65,9 @@
 */
 #define JucePlugin_Name                     "Lowlife"
 
-/** The name of your company. (Try to keep this as short as possible)
-*/
-#define JucePlugin_Manufacturer             "Jive"
-
 /** A longer decription of your plugin.
 */
 #define JucePlugin_Desc                     "A basic sampler"
-
-/** A four-character code for your company.
-    Use single quotes - this isn't a string!
-*/
-#define JucePlugin_ManufacturerCode         'Jive'
 
 /** A unique four-character code for your plugin.
     Use single quotes - this isn't a string!
@@ -167,15 +164,6 @@
     Various hosts/platforms may deal with this differently, or ignore it.
 */
 #define JucePlugin_EditorRequiresKeyboardFocus      1
-
-
-//==============================================================================
-/** A version number
-*/
-#define JucePlugin_VersionCode              0x00000100
-
-#define JucePlugin_VersionString            "0.1"
-
 
 //==============================================================================
 /*                                VST settings                                */

@@ -29,6 +29,7 @@
 #ifndef __JUCE_PLUGIN_CHARACTERISTICS_H__
 #define __JUCE_PLUGIN_CHARACTERISTICS_H__
 
+#include "JiveVersionInfo.h"
 
 //==============================================================================
 /*  All of the following settings need to be defined for your plugin.
@@ -67,12 +68,12 @@
 
 /** The name of your company. (Try to keep this as short as possible)
 */
-#define JucePlugin_Manufacturer             "Jive"
+#define JucePlugin_Manufacturer             Jive_ManufacturerCode
 
 /** A four-character code for your company.
     Use single quotes - this isn't a string!
 */
-#define JucePlugin_ManufacturerCode         'Jive'
+#define JucePlugin_ManufacturerCode         Jive_ManufacturerCode
 
 /** A unique four-character code for your plugin.
     Use single quotes - this isn't a string!
@@ -166,9 +167,9 @@
 //==============================================================================
 /** A version number
 */
-#define JucePlugin_VersionCode              0x00000202
+#define JucePlugin_VersionCode              Jive_VersionCode
 
-#define JucePlugin_VersionString            "0.2.2"
+#define JucePlugin_VersionString            Jive_VersionString
 
 
 //==============================================================================
