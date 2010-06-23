@@ -48,7 +48,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="..\..\..\..\juce;C:\Work\Stuff~~\Code\jivenewworkstuff\jive_win32_BUILDS\juce;C:\Work\Stuff~~\Code\jivenewworkstuff\jive_win32_BUILDS\apps\jive\src"
+				AdditionalIncludeDirectories="..\..\..\..\..\apps\jive\src;..\..\..\..\..\juce"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;JUCETICE_USE_AMALGAMA"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -146,7 +146,7 @@
 				Optimization="2"
 				InlineFunctionExpansion="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\..\..\..\juce;C:\Work\Stuff~~\Code\jivenewworkstuff\jive_win32_BUILDS\juce;C:\Work\Stuff~~\Code\jivenewworkstuff\jive_win32_BUILDS\apps\jive\src"
+				AdditionalIncludeDirectories="..\..\..\..\..\apps\jive\src;..\..\..\..\..\juce"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;JUCETICE_USE_AMALGAMA"
 				StringPooling="true"
 				RuntimeLibrary="0"
