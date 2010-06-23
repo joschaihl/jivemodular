@@ -28,7 +28,7 @@
 
 #include "LadspaPlugin.h"
 
-#ifdef JOST_USE_LADSPA
+#if JOST_USE_LADSPA
 
 //==============================================================================
 LadspaPlugin::LadspaPlugin ()

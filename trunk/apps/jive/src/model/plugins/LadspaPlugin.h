@@ -32,7 +32,7 @@
 #include "../BasePlugin.h"
 
 
-#ifdef JOST_USE_LADSPA
+#if JOST_USE_LADSPA
 
 #include <ladspa.h>
 

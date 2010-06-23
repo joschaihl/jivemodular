@@ -272,9 +272,9 @@ void VstPluginExternalEditor::setGuiWindow(MacVSTGUIPositionHelperWindow* newone
 }
 #endif // JUCE_MAC
 
+#if 0
 void VstPluginExternalEditor::showGUI(bool bVisible)
 {
-#if 0
 	if (vstGuiWindow)
     {
 		if (bVisible)
@@ -293,8 +293,8 @@ void VstPluginExternalEditor::showGUI(bool bVisible)
 			plugin->closeEditor ();        
 		}
 	}
-#endif 
 }
+#endif 
 
 VstPluginExternalEditor::~VstPluginExternalEditor ()
 {

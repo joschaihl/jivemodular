@@ -903,8 +903,8 @@ bool AutomationGrid::getRowsColsByMousePosition (const int x, const int y,
 	
 	value = (getHeight() - static_cast<double>(y)) / fullh; // flip upside down
 	
-	value = std::min(value, 1.0);
-	value = std::max(value, 0.0);
+	value = jmin(value, 1.0);
+	value = jmax(value, 0.0);
 
     return returnOK;
 }

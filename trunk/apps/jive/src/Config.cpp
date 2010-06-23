@@ -149,7 +149,8 @@ void Config::read ()
     browserLeft = config->getBoolValue (T("browser_position_left"), false);
     browserLastOpenPage = config->getIntValue (T("browser_last_open_page"), 0);
     lastBrowsedDirectory = File (config->getValue (T("last_browsed_directory"),
-                                                   File ("~/").getFullPathName()));
+		File::getSpecialLocation(File::userHomeDirectory).getFullPathName()));
+//                                                   File ("~/").getFullPathName()));
 
     // tab thickness
     defaultTabThickness = config->getIntValue (T("tab_default_height"), JOST_DEFAULT_TAB_HEIGHT);

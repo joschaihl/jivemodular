@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="JUCE"
 	ProjectGUID="{AE232C11-D91C-4CA1-B24E-8B11A52EFF26}"
 	RootNamespace="JUCE"
@@ -345,139 +345,47 @@
 					Name="application"
 					>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_Application.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								PreprocessorDefinitions=""
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								PreprocessorDefinitions=""
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="DLL Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								PreprocessorDefinitions=""
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="DLL Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								PreprocessorDefinitions=""
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_Application.h"
+						RelativePath="..\..\..\src\application\juce_Application.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_ApplicationCommandID.h"
+						RelativePath="..\..\..\src\application\juce_Application.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_ApplicationCommandInfo.cpp"
+						RelativePath="..\..\..\src\application\juce_ApplicationCommandID.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_ApplicationCommandInfo.h"
+						RelativePath="..\..\..\src\application\juce_ApplicationCommandInfo.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_ApplicationCommandManager.cpp"
+						RelativePath="..\..\..\src\application\juce_ApplicationCommandInfo.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_ApplicationCommandManager.h"
+						RelativePath="..\..\..\src\application\juce_ApplicationCommandManager.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_ApplicationCommandTarget.cpp"
+						RelativePath="..\..\..\src\application\juce_ApplicationCommandManager.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_ApplicationCommandTarget.h"
+						RelativePath="..\..\..\src\application\juce_ApplicationCommandTarget.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_ApplicationProperties.cpp"
+						RelativePath="..\..\..\src\application\juce_ApplicationCommandTarget.h"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_ApplicationProperties.h"
+						RelativePath="..\..\..\src\application\juce_ApplicationProperties.cpp"
 						>
 					</File>
 					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_DeletedAtShutdown.cpp"
-						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								PreprocessorDefinitions=""
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								PreprocessorDefinitions=""
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="DLL Debug|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								PreprocessorDefinitions=""
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-						<FileConfiguration
-							Name="DLL Release|Win32"
-							>
-							<Tool
-								Name="VCCLCompilerTool"
-								PreprocessorDefinitions=""
-								UsePrecompiledHeader="0"
-							/>
-						</FileConfiguration>
-					</File>
-					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_DeletedAtShutdown.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_PropertiesFile.cpp"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_PropertiesFile.h"
-						>
-					</File>
-					<File
-						RelativePath="..\..\..\src\juce_appframework\application\juce_SystemClipboard.h"
+						RelativePath="..\..\..\src\application\juce_ApplicationProperties.h"
 						>
 					</File>
 				</Filter>

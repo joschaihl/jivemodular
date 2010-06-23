@@ -9,4 +9,4 @@
 */
 
 #include "juce_AppConfig.h"
-#include "../../../juce_amalgamated.cpp"
+#include "../../../src/juce_amalgamated_template.cpp"

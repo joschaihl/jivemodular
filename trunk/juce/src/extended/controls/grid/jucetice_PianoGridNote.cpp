@@ -391,8 +391,8 @@ void AutomationEvent::initialize (const int controller_,
 void AutomationEvent::setValue (const double value_)
 {
 	value = value_; 
-	value = std::max(value, 0.0); 
-	value = std::min(value, 1.0);
+	value = jmax(value, 0.0); 
+	value = jmin(value, 1.0);
 }
 
 void AutomationEvent::mouseDown (const MouseEvent& e)

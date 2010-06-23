@@ -23,8 +23,8 @@
   ==============================================================================
 */
 
-#include "WrappedJuceVSTWindow.h"
-#include "WrappedJucePlugin.h"
+#include "ui/plugins/WrappedJuceVSTWindow.h"
+#include "model/plugins/WrappedJucePlugin.h"
 #include "HostFilterComponent.h"
 
 
@@ -89,8 +89,8 @@ WrappedJuceVSTPluginWindow::WrappedJuceVSTPluginWindow (BasePlugin* _plugin, //C
 
    setTopLeftPosition (plugin->getIntValue(PROP_WINDOWXPOS, 50), plugin->getIntValue(PROP_WINDOWYPOS, 50));
 
-   int w = std::max(plugin->getIntValue(PROP_WINDOWWSIZE, 400), 400);
-   int h = std::max(plugin->getIntValue(PROP_WINDOWHSIZE, 240), 240);
+   int w = jmax(plugin->getIntValue(PROP_WINDOWWSIZE, 400), 400);
+   int h = jmax(plugin->getIntValue(PROP_WINDOWHSIZE, 240), 240);
    setSize(w, h);
 
    setVisible (true);

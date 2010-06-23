@@ -31,8 +31,8 @@
 #include "HostFilterBase.h"
 #include "HostFilterComponent.h"
 
-#include "wrapper/Standalone/juce_AudioFilterStreamer.cpp"
-#include "wrapper/Standalone/juce_StandaloneFilterWindow.cpp"
+#include "extras/audio plugins/wrapper/Standalone/juce_AudioFilterStreamer.cpp"
+#include "extras/audio plugins/wrapper/Standalone/juce_StandaloneFilterWindow.cpp"
 
 //==============================================================================
 /** Somewhere in the codebase of your plugin, you need to implement this function
