@@ -4,6 +4,7 @@
 	Version="9.00"
 	Name="jive"
 	ProjectGUID="{3FDA7E37-BC7B-4E95-9F8A-58857E2ACD2C}"
+	RootNamespace="jive"
 	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
@@ -172,7 +173,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile=".\Release/juce_application.exe"
+				OutputFile=".\Release/Jive.exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="../../bin"
