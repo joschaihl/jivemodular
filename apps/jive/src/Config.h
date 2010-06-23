@@ -39,6 +39,9 @@
     These are the MACROS global to the whole application
 */
 
+// todo all the tildes here are inappropriate for windows
+// need to push these macros inside a class and call userHomeDirectory 
+
 // config files paths
 #if JUCE_MAC
 #define JOST_CONFIG_DIRECTORY               T("~/Library/Application Support/Jive")
@@ -142,7 +145,6 @@
 #endif
 
 #ifndef JOST_USE_LADSPA
-#warning someone broke ladspa
  #define JOST_USE_LADSPA                    0
 #endif
 

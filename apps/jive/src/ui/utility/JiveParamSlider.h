@@ -2,7 +2,7 @@
 #ifndef JOST_PARAMSLIDER_H
 #define JOST_PARAMSLIDER_H
 
-#include "src/core/juce_StandardHeader.h"
+#include "Config.h"
 #include "model/BasePlugin.h"
 
 

@@ -60,7 +60,7 @@ int PatternMatrixEditor::quantizeToComboId(double q)
 {
    int cid = 1;
    if (q > 0)
-      cid = round((q / 1.0) + 1);
+      cid = roundToInt((q / 1.0) + 1);
    //else cid = 0;
    return cid;
 }

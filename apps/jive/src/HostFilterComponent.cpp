@@ -30,12 +30,12 @@
 #include "resources/Resources.h"
 
 #ifndef JOST_VST_PLUGIN
-  #include "wrapper/Standalone/juce_AudioFilterStreamer.h"
-  #include "wrapper/Standalone/juce_StandaloneFilterWindow.h"
+  #include "extras/audio plugins/wrapper/Standalone/juce_AudioFilterStreamer.h"
+  #include "extras/audio plugins/wrapper/Standalone/juce_StandaloneFilterWindow.h"
 #endif
 
-#include "WrappedJuceVSTWindow.h"
-#include "WrappedJucePlugin.h"
+#include "ui/plugins/WrappedJuceVSTWindow.h"
+#include "model/plugins/WrappedJucePlugin.h"
 
 
 //==============================================================================
@@ -1092,11 +1092,15 @@ bool HostFilterComponent::perform (const InvocationInfo& info)
 //            Image* splashImage = ImageCache::getFromMemory (Resource::jost_about,
 //                                                            Resource::jost_about_size);
          // todo: move appResourcesFolder() to somewhere everyone can use it
-            File appResourcesFolder(File::getSpecialLocation(File::currentApplicationFile).getChildFile("./Contents/Resources"));
-            File splashImageFile(appResourcesFolder.getChildFile("JiveAbout.png"));
+#if JUCE_MAC
+			File appResourcesFolder(File::getSpecialLocation(File::currentApplicationFile).getChildFile("./Contents/Resources"));
+#else
+			File appResourcesFolder(File::getSpecialLocation(File::currentApplicationFile).getParentDirectory());
+#endif
+			File splashImageFile(appResourcesFolder.getChildFile("JiveAbout.png"));
             Image* splashImage = ImageFileFormat::loadFrom(splashImageFile);
             SplashScreen* splash = new SplashScreen();
-            splash->show (T(JucePlugin_Name), splashImage, 3500, true);
+            splash->show (T(JucePlugin_Name), splashImage, 3500, false);
             break;
         }
 

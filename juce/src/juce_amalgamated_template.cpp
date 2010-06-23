@@ -56,7 +56,7 @@
 #define DONT_SET_USING_JUCE_NAMESPACE 1
 
 //#include "../juce_amalgamated.h"
-#include "src/juce_amalgamated_template.h"
+#include "juce_amalgamated_template.h"
 
 #define NO_DUMMY_DECL
 

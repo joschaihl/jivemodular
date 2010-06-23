@@ -29,6 +29,8 @@
 #include "MidiSequencePlugin.h"
 #include "SequenceComponent.h"
 
+#include <algorithm>
+
 #define NOTE_PREFRAMES     0.001
 #define NOTE_CHANNEL 1
 

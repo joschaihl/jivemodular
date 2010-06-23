@@ -82,7 +82,7 @@ void ParamSlider::mouseDown(const MouseEvent& e)
          {
             MidiBindingEditorContent dialogStuff;
             double incrAmount = managedParam->getIncrAmount();
-            int incr = round(1.0 / fabs(incrAmount));
+            int incr = roundToInt(1.0 / fabs(incrAmount));
             int imax = managedParam->getIncrMax() / fabs(incrAmount);//round(1.0 / fabs(incrMax));
             dialogStuff.incrAmount->setSelectedId(incr, false);
             dialogStuff.noteOnOrOff->setSelectedId(managedParam->getNoteMode() + 1);

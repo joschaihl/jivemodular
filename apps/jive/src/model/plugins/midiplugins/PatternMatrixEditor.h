@@ -3,7 +3,7 @@
 #ifndef JOST_PATTERNMATRIXEDITOR_H
 #define JOST_PATTERNMATRIXEDITOR_H
 
-#include "PluginEditorComponent.h"
+#include "ui/plugins/PluginEditorComponent.h"
 #include "ui/utility/JiveParamSlider.h"
 
 class PatternMatrixPlugin;

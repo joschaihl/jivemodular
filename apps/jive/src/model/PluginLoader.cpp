@@ -27,7 +27,7 @@
 */
 
 #include "PluginLoader.h"
-#include "WrappedJucePlugin.h"
+#include "model/plugins/WrappedJucePlugin.h"
 
 PluginListWindow* PluginListWindow::currentPluginListWindow = 0;
 
@@ -207,6 +207,8 @@ BasePlugin* PluginLoader::getFromTypeID (const int typeID,
     case JOST_PLUGINTYPE_LADSPA:
     case JOST_PLUGINTYPE_DSSI:
         return 0; // need to move on if it is these types
+	case JOST_PLUGINTYPE_WRAPPEDJUCEVST:
+		break; // see below
     default:
         jassertfalse
         // You are trying to instantiate an internal plugin which doesn't exist !

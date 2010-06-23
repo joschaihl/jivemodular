@@ -27,7 +27,7 @@
 */
 
 #ifndef _WIN32
-#include "../../../juce/src/core/juce_PlatformDefs.h" // haszari: added so can use JUCE platform conditionals here instead of raw compiler conditionals
+#include "src/core/juce_PlatformDefs.h" // haszari: added so can use JUCE platform conditionals here instead of raw compiler conditionals
 #endif
 //#define JUCE_ONLY_BUILD_CORE_LIBRARY   1
 //#define JUCE_FORCE_DEBUG  1
@@ -52,8 +52,12 @@
 //#define JUCE_CATCH_UNHANDLED_EXCEPTIONS  1
 #define JUCE_STRINGS_ARE_UNICODE  1
 
-#ifdef JUCE_WIN32
- #define JUCE_ASIO  1
+#ifdef _WIN32
+//#ifdef JUCE_WIN32 // not sure why I am having problems seeing the defn of JUCE_WIN32 but anyway..
+//yay!!;
+// #define JUCE_ASIO  1
+ #define JUCE_DIRECTSOUND 1
+ #define JUCE_WASAPI 1
  #define JUCE_PLUGINHOST_VST  1
  #define JOST_USE_VST 1
 #endif
