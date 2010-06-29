@@ -222,7 +222,8 @@ int WrappedJucePlugin::getNumOutputs () const
 
 int WrappedJucePlugin::getNumMidiInputs () const
 {
-    return acceptsMidi() ? 1 : 0;
+//    return acceptsMidi() ? 1 : 0;
+   return 1; // we always accept midi, so plugin parameters can be automated even if plugin personally does not care for midi
 }
 
 int WrappedJucePlugin::getNumMidiOutputs () const
