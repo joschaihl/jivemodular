@@ -607,7 +607,7 @@ void PianoGrid::removeAllNotes (const bool notifyListeners)
 
 //==============================================================================
 bool PianoGrid::getRowsColsByMousePosition (const int x, const int y,
-                                            int& noteNumber, float& beatNumber)
+                                            int& noteNumber, float& beatNumber, bool disableSnap)
 {
     bool returnOK = false;
 
@@ -616,7 +616,7 @@ bool PianoGrid::getRowsColsByMousePosition (const int x, const int y,
     float snapWidth = barWidth / (float) snapQuantize;
     float beatWidth = barWidth / (float) divDenominator;
 
-    if (snapQuantize == 0)
+    if (disableSnap || (snapQuantize == 0))
         beatNumber = x / beatWidth;
     else
         beatNumber = snapsPerBeat * (int) (x / snapWidth);
@@ -690,7 +690,7 @@ void PianoGrid::mouseDown (const MouseEvent& e)
 {
     if (isAddOrResizeEvent(e))
     {
-        if (getRowsColsByMousePosition (e.x, e.y, draggingRow, draggingColumn))
+        if (getRowsColsByMousePosition (e.x, e.y, draggingRow, draggingColumn, e.mods.isAltDown()))
         {
             draggingNote = new PianoGridNote (this);
             draggingNote->initialize (draggingRow, draggingColumn, defaultNoteLength, 1.0f);
@@ -711,7 +711,7 @@ void PianoGrid::mouseDrag (const MouseEvent& e)
         int newNote = -1;
         float newBeat = -1;
 
-        if (draggingNote != 0 && getRowsColsByMousePosition (e.x, e.y, newNote, newBeat))
+        if (draggingNote != 0 && getRowsColsByMousePosition (e.x, e.y, newNote, newBeat, e.mods.isAltDown()))
         {
             if (newBeat > draggingColumn)
             {
@@ -854,7 +854,7 @@ void AutomationGrid::mouseDown (const MouseEvent& e)
 
     if (isAddOrResizeEvent(e))
     {
-        if (getRowsColsByMousePosition (e.x, e.y, value, beat))
+        if (getRowsColsByMousePosition (e.x, e.y, value, beat, e.mods.isAltDown()))
         {
 			AutomationEvent* draggingNote;
             draggingNote = new AutomationEvent (this);
@@ -884,7 +884,7 @@ void AutomationGrid::mouseUp (const MouseEvent& e)
 
 //==============================================================================
 bool AutomationGrid::getRowsColsByMousePosition (const int x, const int y,
-                                            double& value, double& beatNumber)
+                                            double& value, double& beatNumber, bool disableSnap)
 {
     bool returnOK = true;
 
@@ -893,7 +893,7 @@ bool AutomationGrid::getRowsColsByMousePosition (const int x, const int y,
     float snapWidth = barWidth / (float) snapQuantize;
     float beatWidth = barWidth / (float) divDenominator;
 
-    if (snapQuantize == 0)
+    if (disableSnap || (snapQuantize == 0))
         beatNumber = x / beatWidth;
     else
         //beatNumber = snapsPerBeat * (int)round(x / snapWidth);
