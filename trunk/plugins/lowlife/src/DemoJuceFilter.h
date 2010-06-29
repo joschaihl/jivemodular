@@ -136,8 +136,8 @@ public:
     void setZoneslotTuneFactor(int slot, int fac);
     bool getZoneslotBPMSync(int slot);
     void setZoneslotBPMSync(int slot, bool fac);
-    int getZoneslotSyncTicks(int slot);
-    void setZoneslotSyncTicks(int slot, int tic);
+    double getZoneslotSyncTicks(int slot);
+    void setZoneslotSyncTicks(int slot, double tic);
 
 private:
    HIGHLIFE_PROGRAM& getHProgramRef(int zoneslot = 0) // don't care baout zoneslot anymore!!
