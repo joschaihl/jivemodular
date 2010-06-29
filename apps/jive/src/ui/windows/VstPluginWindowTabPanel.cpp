@@ -97,7 +97,7 @@ void VstPluginWindowTabPanel::currentTabChanged (const int newCurrentTabIndex,
                                                 externalEditor->getPreferredHeight (),
                                                 false);
 #ifdef JUCE_MAC
-				externalEditor->showGUI(true);
+//				externalEditor->showGUI(true);
 #else				
 				plugin->openEditor(window->getWindowHandle (), (void*) 0);
 				externalEditor->resized();
@@ -115,7 +115,7 @@ void VstPluginWindowTabPanel::currentTabChanged (const int newCurrentTabIndex,
                                                 true);
 
 #ifdef JUCE_MAC
-				externalEditor->showGUI(false);
+//				externalEditor->showGUI(false);
 #else				
 				plugin->closeEditor();
 #endif
