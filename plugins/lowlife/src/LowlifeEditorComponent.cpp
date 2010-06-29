@@ -51,8 +51,8 @@ LowlifeSlotEditComponent::LowlifeSlotEditComponent(DemoJuceFilter* filter, int s
    addAndMakeVisible(syncTicksSlider = new Slider(T("Sync ticks")));
    syncTicksSlider->setSliderStyle(Slider::IncDecButtons);
    syncTicksSlider->addListener (this);
-   syncTicksSlider->setRange (1, 128, 1.);
-   syncTicksSlider->setTooltip (T("Number of ticks in sample"));
+   syncTicksSlider->setRange (0.5, 1024, 0.5); // i.e. a max of 1024 beats in a stem/sample, and shortest sample 16th note (half a beat)
+   syncTicksSlider->setTooltip (T("Number of beats in sample"));
 
    addAndMakeVisible(keySlider = new Slider(T("key")));
    keySlider->setSliderStyle(Slider::ThreeValueHorizontal);

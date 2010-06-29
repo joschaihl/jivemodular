@@ -120,7 +120,7 @@ void CHighLife::tool_init_zone(HIGHLIFE_ZONE* pz)
 	pz->mp_gain=0;
 	pz->mp_pan=0;
 	pz->mp_synchro=0;
-	pz->mp_num_ticks=4;
+	pz->mp_num_ticks=0; // 0 means unspecified, allowed to guess
 	
 	// null pointers
 	pz->ppwavedata=NULL;
@@ -412,7 +412,8 @@ void CHighLife::tool_load_sample (HIGHLIFE_ZONE* pz, const File& file)
 #endif
 
 	// analyze and set num ticks (for synchro)
-	pz->mp_num_ticks = tool_get_num_bars (pz->num_samples, pz->sample_rate) * 16;
+   if (pz->mp_num_ticks == 0) // only guess ticks if not already specified
+      pz->mp_num_ticks = tool_get_num_bars (pz->num_samples, pz->sample_rate) * 16;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

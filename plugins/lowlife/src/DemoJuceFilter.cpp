@@ -401,20 +401,20 @@ void DemoJuceFilter::setZoneslotBPMSync(int slot, bool fac)
    sendChangeMessage (this);
 }
 
-int DemoJuceFilter::getZoneslotSyncTicks(int slot)
+double DemoJuceFilter::getZoneslotSyncTicks(int slot)
 {
-   int tic = 0;
+   double tic = 0;
    HIGHLIFE_ZONE* pz = getHZone(slot);
    if (pz)
-      tic = pz->mp_num_ticks;
+      tic = (pz->mp_num_ticks / 2.0); // our ticks are in beats, highlife ticks are 2 per beat
    return tic;
 }
 
-void DemoJuceFilter::setZoneslotSyncTicks(int slot, int tic)
+void DemoJuceFilter::setZoneslotSyncTicks(int slot, double tic)
 {
    HIGHLIFE_ZONE* pz = getHZone(slot);
    if (pz)
-      pz->mp_num_ticks = tic;
+      pz->mp_num_ticks = tic * 2.0; // our ticks are in beats, highlife ticks are 2 per beat
    sendChangeMessage (this);
 }
 
