@@ -251,7 +251,7 @@ public:
 
     //==============================================================================
     bool getRowsColsByMousePosition (const int x, const int y,
-                                     int& noteNumber, float& beatNumber);
+                                     int& noteNumber, float& beatNumber, bool disableSnap = false);
 
     //==============================================================================
     void setNoteLengthInBeats (const float beats)       { defaultNoteLength = beats; }
@@ -318,7 +318,7 @@ public:
     //==============================================================================
 	int getEventDiameter() { return 4; };
 	int getAvailableHeight() { return getHeight() - (2 * getEventDiameter()) - getHeaderHeight(); };
-    bool getRowsColsByMousePosition (const int x, const int y, double& value, double& beatNumber);
+    bool getRowsColsByMousePosition (const int x, const int y, double& value, double& beatNumber, bool disableSnap = false);
 
     //==============================================================================
 	// sets the default parameters for events added by mouse clicks

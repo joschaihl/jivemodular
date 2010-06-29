@@ -111,7 +111,7 @@ void PianoGridNote::continueDragging (const MouseEvent& e)
 
     int newNote = -1;
     float newBeat = -1;
-    if (owner->getRowsColsByMousePosition (getX(), getY(), newNote, newBeat))
+    if (owner->getRowsColsByMousePosition (getX(), getY(), newNote, newBeat, e.mods.isAltDown()))
     {
         if (newNote != note || newBeat != beat)
         {
@@ -139,7 +139,7 @@ void PianoGridNote::continueResizing (const MouseEvent& e)
 {
     int newNote = -1;
     float newBeat = -1;
-    if (owner->getRowsColsByMousePosition (getX() + e.x, getY() + e.y, newNote, newBeat))
+    if (owner->getRowsColsByMousePosition (getX() + e.x, getY() + e.y, newNote, newBeat, e.mods.isAltDown()))
     {
         if (newBeat > beat)
         {
@@ -207,11 +207,14 @@ void PianoGridNote::mouseMove (const MouseEvent& e)
 
 void PianoGridNote::mouseDown (const MouseEvent& e)
 {
-    if (! owner) return;
+   if (! owner) return;
 
-    SelectedItemSet<MidiGridItem*> selection = owner->getLassoSelection ();
-    if (! selection.isSelected (this))
-        owner->selectNote (this, true);
+   SelectedItemSet<MidiGridItem*> selection = owner->getLassoSelection ();
+   if (! selection.isSelected (this))
+   {
+      owner->selectNote (this, true);
+      selection = owner->getLassoSelection();
+   }
 
     if (e.mods.isLeftButtonDown())
     {
@@ -476,7 +479,7 @@ void AutomationEvent::continueDragging (const MouseEvent& e)
 
     double newValue = -1;
     double newBeat = -1;
-    if (owner->getRowsColsByMousePosition (getX(), getY(), newValue, newBeat))
+    if (owner->getRowsColsByMousePosition (getX(), getY(), newValue, newBeat, e.mods.isAltDown()))
     {
         if (newValue != value || newBeat != beat)
         {
