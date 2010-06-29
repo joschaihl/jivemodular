@@ -147,7 +147,6 @@ protected:
 	void* handle; // actually a Carbon WindowRef for the VST GUI overlay.
    
 public:
-    void showGUI(bool bVisible);
 
 #endif
 
