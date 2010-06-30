@@ -52,11 +52,6 @@ public:
     const String getCurrentProgramName ();
 
     //==============================================================================
-    // save/load preset/synth/effect parameters
-    virtual void savePresetToXml (XmlElement* element);
-    virtual void loadPresetFromXml (XmlElement* element);
-
-    //==============================================================================
     bool hasEditor () const;
     bool wantsEditor () const;
     
