@@ -43,6 +43,8 @@
 #include "plugins/ChannelOutputPlugin.h"
 #include "plugins/TrackPlugin.h"
 
+#include "plugins/FaderPlugin.h"
+
 #include "plugins/midiplugins/MidiInputPlugin.h"
 #include "plugins/midiplugins/MidiOutputPlugin.h"
 #include "plugins/midiplugins/MidiSequencePlugin.h"

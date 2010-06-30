@@ -199,6 +199,8 @@ BasePlugin* PluginLoader::getFromTypeID (const int typeID,
         return new DetunerPlugin ();
 	case JOST_PLUGINTYPE_OPPRESSOR:
         return new OppressorPlugin ();
+	case JOST_PLUGINTYPE_UTILITYFADER:
+        return new FaderPlugin ();
 	case JOST_PLUGINTYPE_CHANNEL:
         return new ChannelPlugin (1, base);
 	case JOST_PLUGINTYPE_CHANNELSTEREO:
@@ -272,6 +274,8 @@ BasePlugin* PluginLoader::handlePopupMenu (const bool subChannelPlugin,
     }
 
     {
+	    audioMenu.addItem (JOST_PLUGINTYPE_UTILITYFADER,		"Fader");
+
 #ifdef ENABLE_SUBCHANNELS // off right now!! 
         if (!subChannelPlugin)
         {
