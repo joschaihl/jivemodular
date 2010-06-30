@@ -121,6 +121,7 @@
 		93EE363F1121537D00D1D0B6 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EE36331121537D00D1D0B6 /* OpenGL.framework */; };
 		93EE36401121537D00D1D0B6 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EE36341121537D00D1D0B6 /* QTKit.framework */; };
 		93EE36411121537D00D1D0B6 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EE36351121537D00D1D0B6 /* WebKit.framework */; };
+		D0AADB8811DAB0F700D323AB /* FaderPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D0AADB8611DAB0F700D323AB /* FaderPlugin.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -345,6 +346,8 @@
 		93EE36331121537D00D1D0B6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		93EE36341121537D00D1D0B6 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		93EE36351121537D00D1D0B6 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		D0AADB8611DAB0F700D323AB /* FaderPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = FaderPlugin.cpp; sourceTree = "<group>"; };
+		D0AADB8711DAB0F700D323AB /* FaderPlugin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = FaderPlugin.h; sourceTree = "<group>"; };
 		D0BC2FBD114EF56400CFD216 /* lowlife.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = lowlife.xcodeproj; path = ../../../../plugins/lowlife/build/mac/lowlife.xcodeproj; sourceTree = SOURCE_ROOT; };
 		D0BC2FC3114EF56D00CFD216 /* xsynth.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = xsynth.xcodeproj; path = ../../../../plugins/xsynth/build/mac/xsynth.xcodeproj; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -535,6 +538,8 @@
 				933028B61072A63500FD4BF2 /* AudioSpecMeterPlugin.h */,
 				938AD08C103A4ECC00DFCCCF /* DssiPlugin.cpp */,
 				938AD08D103A4ECC00DFCCCF /* DssiPlugin.h */,
+				D0AADB8611DAB0F700D323AB /* FaderPlugin.cpp */,
+				D0AADB8711DAB0F700D323AB /* FaderPlugin.h */,
 				938AD08E103A4ECC00DFCCCF /* InputPlugin.cpp */,
 				938AD08F103A4ECC00DFCCCF /* InputPlugin.h */,
 				938AD090103A4ECC00DFCCCF /* LadspaPlugin.cpp */,
@@ -926,6 +931,7 @@
 				93B0FA5F112CEE8E003C3402 /* PatternMatrixEditor.cpp in Sources */,
 				93B0FA60112CEE8E003C3402 /* PatternMatrixPlugin.cpp in Sources */,
 				938766B21150B22B004AA104 /* JiveParamSlider.cpp in Sources */,
+				D0AADB8811DAB0F700D323AB /* FaderPlugin.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
