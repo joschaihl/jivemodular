@@ -440,15 +440,8 @@ void GraphComponent::nodeDoubleClicked (GraphNodeComponent* node,
                        || plugin->wantsEditor ()
                        || plugin->isEditorInternal ()))
         {
-            if (owner->isPluginEditorWindowOpen (plugin))
-            {
-                owner->closePluginEditorWindow (plugin);
-            }
-            else
-            {
-                if (plugin->hasEditor() || plugin->wantsEditor ())
-                    owner->openPluginEditorWindow (plugin);
-            }
+            if (plugin->hasEditor() || plugin->wantsEditor ())
+                owner->openPluginEditorWindow (plugin); // brings editor to front if already open
         }
     }
 }
