@@ -992,11 +992,18 @@ bool HostFilterComponent::perform (const InvocationInfo& info)
     //----------------------------------------------------------------------------------------------
     case CommandIDs::sessionNew:
         {
-			closePluginEditorWindows ();
-            getFilter()->getHost ()->closeAllPlugins (true);
+           bool retValue = 
+               AlertWindow::showYesNoCancelBox (AlertWindow::WarningIcon,
+                                             T("Unsaved Changes"),
+                                             T("Are you sure you want to close the current session? You may lose any unsaved changes."));
+            if (retValue)
+            {
+               closePluginEditorWindows ();
+               getFilter()->getHost ()->closeAllPlugins (true);
 
-            clearComponents ();
-            rebuildComponents ();
+               clearComponents ();
+               rebuildComponents ();
+            }
             break;
         }
     
