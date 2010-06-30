@@ -80,10 +80,6 @@ void FaderPlugin::processBlock (AudioSampleBuffer& buffer,
 {
     const int blockSize = buffer.getNumSamples ();    
 
-   // Juce plugins put their input into (passed in) buffer, so we need to copy this out into the Jost inputBuffer
-//   for (int i = 0; i < getNumInputs(); i++)
-//         inputBuffer->copyFrom(i, 0, buffer, i, 0, buffer.getNumSamples());
-
    // Similar for midi input
    MidiBuffer dud;
    MidiBuffer* midiBuffer = &dud;
@@ -98,10 +94,6 @@ void FaderPlugin::processBlock (AudioSampleBuffer& buffer,
       midiAutomatorManager.handleMidiMessageBuffer(*midiBuffer);
    }
    
-   // Juce plugins put their output into (passed in) buffer, so we need to copy this out into the Jost outputBuffer
-//   for (int i = 0; i < getNumOutputs(); i++)
-//         outputBuffer->copyFrom(i, 0, buffer, i, 0, buffer.getNumSamples());
-
    if (inputBuffer && outputBuffer && blockSize)
    {
       // do the plugin work:
@@ -121,6 +113,8 @@ void FaderPlugin::processBlock (AudioSampleBuffer& buffer,
          outputBuffer->addFrom(i, 0, *inputBuffer, i+2, 0, blockSize);
       }
    }
+   
+   prevFaderPosition = faderPosition;
 }
 
 //==============================================================================
@@ -191,17 +185,5 @@ const String FaderPlugin::getCurrentProgramName ()
 bool FaderPlugin::wantsEditor () const
 {
     return true;
-}
-
-
-//==============================================================================
-void FaderPlugin::savePresetToXml(XmlElement* element)
-{
-   // to do!
-}
-
-void FaderPlugin::loadPresetFromXml(XmlElement* element)
-{
-   // to do!
 }
 
