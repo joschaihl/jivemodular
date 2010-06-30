@@ -267,9 +267,9 @@ void WrappedJucePlugin::processBlock (AudioSampleBuffer& buffer,
 
     if (instance)
     {
-      // Juce plugins put their input into (passed in) buffer, so we need to copy this out into the Jost inputBuffer
+      // Juce plugins put their input into (passed in) buffer, so we need to copy this out from the Jost inputBuffer
       for (int i = 0; i < getNumInputs(); i++)
-            inputBuffer->copyFrom(i, 0, buffer, i, 0, buffer.getNumSamples());
+            buffer.copyFrom(i, 0, *inputBuffer, i, 0, buffer.getNumSamples());
 
       // Similar for midi input
       MidiBuffer dud;
