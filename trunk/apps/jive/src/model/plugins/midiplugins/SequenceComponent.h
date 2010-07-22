@@ -105,6 +105,8 @@ protected:
 
    Transport* transport;
 
+   Slider* channelNumSlider;
+
    ToggleButton* enabledButton;
    ParamSlider* ccEnabledSlider;
    Slider* partPatternNumSlider;
