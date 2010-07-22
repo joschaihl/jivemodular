@@ -201,9 +201,9 @@ public:
     int getPositionInFrames () const                 { return sequencePositionCounter; }
 
     void setPositionAbsolute (const float newPos);
-    float getPositionAbsolute () const               { return sequencePositionCounter / (float) sequenceDurationFrames; }
+    float getPositionAbsolute () const               { return curAbsolute; };
 
-	double getPositionInBeats()                      { return static_cast<double>(sequencePositionCounter) / framesPerBeat; }
+	double getPositionInBeats();
 	int getPPQTicks(); // returns the tick position within the beat, i.e. mod 960 at 960 ticks per beat
    
     //==============================================================================
@@ -229,6 +229,8 @@ private:
     double bpmTempo;
     int numBars;
     int divDenominator;
+
+    double curAbsolute;
 
     // internal state bitflags
     bool playing        : 1,
