@@ -959,10 +959,10 @@ void AutomationGrid::removeAllEvents (const bool notifyListeners)
 	repaint();
 }
 
-void AutomationGrid::removeNote (AutomationEvent* note, const bool alsoFreeObject)
+void AutomationGrid::removeNote (AutomationEvent* note, const bool alsoFreeObject, bool notifyListener)
 {
 	AutomationGridListener* listener = getListener();
-    if (listener && listener->eventRemoved (note->getController(), note->getValue(), note->getBeat ()))
+    if (!notifyListener || (listener && listener->eventRemoved (note->getController(), note->getValue(), note->getBeat ())))
     {
         selectedNotes.deselect (note);
 
@@ -971,13 +971,13 @@ void AutomationGrid::removeNote (AutomationEvent* note, const bool alsoFreeObjec
     }
 }
 
-void AutomationGrid::removeAllEvents (const int controller)
+void AutomationGrid::removeAllEvents (const int controller, bool notifyListener)
 {
     for (int i = notes.size ()-1; i >= 0; i--)
     {
         AutomationEvent* note = getEvent (i);
 		if (note->getController() == controller)
-			removeNote(note, true);
+			removeNote(note, true, notifyListener);
 	}
 }
 
