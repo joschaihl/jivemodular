@@ -168,15 +168,32 @@ void MidiSequencePluginBase::newRenderEvents(
          //specialNoteOffPastReloop 
          )
       {
-         // now we play it - if it's a note off, or we're enabled
-         if (midiMessage->isNoteOff() || isEnabled())
+         // now we play the event ..
+         if (
+            (isEnabled() && midiMessage->isNoteOn()) || // if it's a note on & we're enabled, OR
+            weAreRenderingNoteOffs // it's a queued note off
+            )
          {
             // determine the frame time of the event relative to start of chunk
             int renderAtFrame = framesPerBeat * (beatsTime - beatCount) + frameCounter;
             
             // set the channel, and render it
             midiMessage->setChannel(midiChannel); // a bit dirty, touching the actual message, though no real need to take a copy
-            outMidiBuffer->addEvent(*midiMessage, renderAtFrame);            
+            outMidiBuffer->addEvent(*midiMessage, renderAtFrame);
+
+            // store the note off so we are sure to play it 
+            // we cache note offs for played notes so that if sequencer gets disabled, any dangling notes are turned note-offed 
+            if (!weAreRenderingNoteOffs)
+            {
+               int noteOffIndex = sourceMidiBuffer.getIndexOfMatchingKeyUp(i);
+               MidiMessage* noteOffMessage = &sourceMidiBuffer.getEventPointer (noteOffIndex)->message;
+               if (noteOffMessage)
+               {
+                  MidiMessage blowOffSteam = MidiMessage::noteOff(midiMessage->getChannel(), midiMessage->getNoteNumber());
+                  blowOffSteam.setTimeStamp(noteOffMessage->getTimeStamp());
+                  noteOffs.addEvent(blowOffSteam);
+               }
+            }
          }
       }
       
