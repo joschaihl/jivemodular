@@ -38,9 +38,9 @@ MidiSequencePlugin::MidiSequencePlugin()
 :
 	MidiSequencePluginBase (),
    isEnabledRightNow(true),
-   enableCCMax(1.1),
-   enableCCMin(-0.1),
-   enableCCValue(0.5),
+   enableCCMax(1),
+   enableCCMin(0),
+   enableCCValue(0),
    partNumber(0)
 {
    setNumParameters (1);
@@ -91,7 +91,7 @@ void MidiSequencePlugin::setParameterReal (int paramNumber, float value)
    if (paramNumber == 0)
    {
       enableCCValue = value;
-      isEnabledRightNow = (value >= enableCCMin && value < enableCCMax);
+      isEnabledRightNow = (partNumber == 0) || (value >= enableCCMin && value < enableCCMax);
    }
 }
 
@@ -105,7 +105,9 @@ float MidiSequencePlugin::getParameterReal (int paramNumber)
 const String MidiSequencePlugin::getParameterTextReal (int paramNumber, float value)
 {
    String paramTxt("Off");
-   if ((paramNumber == 0) && (value >= enableCCMin) && (value < enableCCMax))
+   if (partNumber == 0)
+      paramTxt = String("Always");
+   else if ((paramNumber == 0) && (value >= enableCCMin) && (value < enableCCMax))
       paramTxt = String("On");
    return paramTxt;
 }
@@ -119,7 +121,7 @@ void MidiSequencePlugin::setPatternNumberInPart(int indexOfPattern)
 {
    const int patternsPerPart = MAXPATTERNSPERPART;
    assert(indexOfPattern >= 0 && indexOfPattern <= patternsPerPart);
-   if (indexOfPattern >= 0 && indexOfPattern <= patternsPerPart)
+   if (indexOfPattern > 0 && indexOfPattern <= patternsPerPart)
    {
       partNumber = indexOfPattern;
       double ccDiffPerPattern = 1.0 / patternsPerPart;
@@ -129,6 +131,14 @@ void MidiSequencePlugin::setPatternNumberInPart(int indexOfPattern)
       enableCCMin = enablePoint - half;
       enableCCMax = enablePoint + half;
    }
+   else if (indexOfPattern == 0) // zero is ALWAYS!
+   {
+      partNumber = indexOfPattern;
+      enableCCMin = 0;
+      enableCCMax = 1.0;
+   }
+   
+   isEnabledRightNow = (partNumber == 0) || (enableCCValue >= enableCCMin && enableCCValue < enableCCMax);
 }
 
 //==============================================================================

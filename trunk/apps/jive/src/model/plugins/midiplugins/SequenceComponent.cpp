@@ -585,7 +585,7 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
 
    addAndMakeVisible(partPatternNumSlider = new Slider("Pattern Number"));
    partPatternNumSlider->setSliderStyle(Slider::IncDecButtons);
-   partPatternNumSlider->setRange(1, patternsPerPart, 1);   
+   partPatternNumSlider->setRange(0, patternsPerPart, 1);
    partPatternNumSlider->addListener(this);
 
    updateParameters ();
