@@ -50,7 +50,8 @@ Transport::Transport (HostFilterBase* owner_)
     doStopRecord (false),
     doRewind (false),
     doAllNotesOff (false),
-    externalTransport (0)
+    externalTransport (0),
+    curAbsolute(0)
 {
     DBG ("Transport::Transport");
 
@@ -176,6 +177,7 @@ void Transport::rewind ()
     else
     {
         sequencePositionCounter = leftLocator;
+        curAbsolute = sequencePositionCounter / sequenceDurationFrames;
         doRewind = false;
         sendChangeMessage (this);
     }
@@ -287,13 +289,15 @@ void Transport::processBlock (const int blockSize)
 
         // increase counter
         sequencePositionCounter += blockSize;
+        curAbsolute += static_cast<float>(blockSize) / sequenceDurationFrames;
 
         // we should update play button
-        if (sequencePositionCounter >= sequenceDurationFrames) // rightLocator
+        if (sequencePositionCounter >= sequenceDurationFrames || curAbsolute > 1.0) // rightLocator
         {
             if (looping)
             {
                 sequencePositionCounter = leftLocator;
+                curAbsolute = sequencePositionCounter / sequenceDurationFrames;
             }
             else
             {
@@ -316,6 +320,7 @@ void Transport::processBlock (const int blockSize)
     if (doRewind)
     {
         sequencePositionCounter = leftLocator;
+        curAbsolute = sequencePositionCounter / sequenceDurationFrames;
         doRewind = false;
     }
 
@@ -456,7 +461,8 @@ void Transport::setTempo (const double newTempo)
 //==============================================================================
 void Transport::setPositionAbsolute (const float newPos)
 {
-    sequencePositionCounter = roundFloatToInt (newPos * sequenceDurationFrames);
+     sequencePositionCounter = roundFloatToInt (newPos * sequenceDurationFrames);
+     curAbsolute = sequencePositionCounter / sequenceDurationFrames;
 
     if (playing)
         doAllNotesOff = true;
@@ -502,6 +508,11 @@ void Transport::loadFromXml (XmlElement* xml)
 int Transport::getPPQTicks()
 {
    return (static_cast<double>(sequencePositionCounter % framesPerBeat) / framesPerBeat) * PPQ_960;
+}
+
+double Transport::getPositionInBeats()
+{
+   return curAbsolute * numBars * 4; // an incrementally-updated "as played" beat count, instead of a dynamic one
 }
 
 //==============================================================================
