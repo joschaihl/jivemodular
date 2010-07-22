@@ -43,6 +43,8 @@ private:
    ComboBox* quantizeBox;
    ParamSlider* partStatus[MAXPARTS];
    Slider* partCC[MAXPARTS];
+   Slider* midiChannel;
+   int gridWidth;
 
 private:
     //==============================================================================
