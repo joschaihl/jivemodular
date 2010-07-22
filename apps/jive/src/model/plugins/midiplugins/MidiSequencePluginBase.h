@@ -43,6 +43,7 @@
 #define PROP_SEQNOTELENGTH                    T("sNlen")
 #define PROP_SEQBAR                           T("sNbar")
 #define PROP_SEQENABLED                       T("sEnabled")
+#define PROP_SEQMIDICHANNEL                   T("sMidiChan")
 
 
 //==============================================================================
@@ -160,8 +161,11 @@ public:
 	/* Get the number of beats per bar (currently hard-coded to four) */
 	double getBeatsPerBar() { return 4; };
 
-   virtual bool isEnabled() {return getBoolValue(PROP_SEQENABLED, true); };
+	/* Returns true if sequencer playback is enabled */
+    bool isEnabled() {return getBoolValue(PROP_SEQENABLED, true); };
 
+	/* Get the MIDI channel used for all events (notes & CCs) output from the sequencer */
+    int getMidiChannel() {return getIntValue(PROP_SEQMIDICHANNEL, 1); };
 
     //==============================================================================
     /** Serialize internal properties to an Xml element */

@@ -30,7 +30,6 @@
 #include "HostFilterBase.h"
 #include "SequenceComponent.h"
 
-#define NOTE_CHANNEL       1
 #define NOTE_VELOCITY      0.8f
 #define NOTE_PREFRAMES     0.001
 
@@ -82,20 +81,8 @@ void MidiSequencePluginBase::processBlock (AudioSampleBuffer& buffer,
     if (transport->isPlaying ())
     {
         const int frameCounter = transport->getPositionInFrames ();
-
         const int framesPerBeat = transport->getFramesPerBeat ();
         const double framePerBeatDelta = 1.0f / (double) framesPerBeat;
-
-        const int nextBlockFrameNumber = frameCounter + blockSize;
-
-//std::cerr << (String("frameCounter is ") + String(frameCounter) + String(" nextBlockFrameNumber is ") + String(nextBlockFrameNumber)).toUTF8() << std::endl;
-        
-		const int seqIndex = getLoopRepeatIndex();
-		const double beatCount = getLoopBeatPosition();
-		const double frameLenBeatCount = (nextBlockFrameNumber - frameCounter) / (double)framesPerBeat;		
-		double frameEndBeatCount = beatCount + frameLenBeatCount;
-		if (frameEndBeatCount > getLengthInBeats())
-			frameEndBeatCount -= getLengthInBeats();
 
         // prepare record incoming midi messages
         if (transport->isRecording ())
@@ -111,6 +98,14 @@ void MidiSequencePluginBase::processBlock (AudioSampleBuffer& buffer,
             }
         }
 
+        const int nextBlockFrameNumber = frameCounter + blockSize;        
+		const int seqIndex = getLoopRepeatIndex();
+		const double beatCount = getLoopBeatPosition();
+		const double frameLenBeatCount = (nextBlockFrameNumber - frameCounter) / (double)framesPerBeat;		
+		double frameEndBeatCount = beatCount + frameLenBeatCount;
+		if (frameEndBeatCount > getLengthInBeats())
+			frameEndBeatCount -= getLengthInBeats();
+
 		if (frameEndBeatCount > beatCount)
 		{
 			renderEventsInRange(*midiSequence, midiBuffer, beatCount, frameEndBeatCount, frameCounter, framesPerBeat, nextBlockFrameNumber, seqIndex, blockSize);
@@ -119,14 +114,15 @@ void MidiSequencePluginBase::processBlock (AudioSampleBuffer& buffer,
 		}
 		else
 		{
-			renderEventsInRange(*midiSequence, midiBuffer, beatCount, getLengthInBeats(), frameCounter, framesPerBeat, nextBlockFrameNumber, seqIndex, blockSize);
-			renderEventsInRange(*midiSequence, midiBuffer, 0.00, frameEndBeatCount, frameCounter, framesPerBeat, nextBlockFrameNumber, seqIndex+1, blockSize);		
-			renderEventsInRange(noteOffs, midiBuffer, beatCount, getLengthInBeats(), frameCounter, framesPerBeat, nextBlockFrameNumber, seqIndex, blockSize);
-			renderEventsInRange(noteOffs, midiBuffer, 0.00, frameEndBeatCount, frameCounter, framesPerBeat, nextBlockFrameNumber, seqIndex+1, blockSize);		
-			cleanUpNoteOffs(beatCount, getLengthInBeats());
-			cleanUpNoteOffs(0.00, frameEndBeatCount);
+         double endChunkLenBeats = getLengthInBeats() - beatCount;
+         int framesMoved = endChunkLenBeats * framesPerBeat;
+         renderEventsInRange(*midiSequence, midiBuffer, beatCount, getLengthInBeats(), frameCounter, framesPerBeat, nextBlockFrameNumber-framesMoved, seqIndex, blockSize);
+         renderEventsInRange(*midiSequence, midiBuffer, 0.00, frameEndBeatCount, frameCounter+framesMoved, framesPerBeat, nextBlockFrameNumber, seqIndex+1, blockSize);		
+         renderEventsInRange(noteOffs, midiBuffer, beatCount, getLengthInBeats(), frameCounter, framesPerBeat, nextBlockFrameNumber-framesMoved, seqIndex, blockSize);
+         renderEventsInRange(noteOffs, midiBuffer, 0.00, frameEndBeatCount, frameCounter+framesMoved, framesPerBeat, nextBlockFrameNumber, seqIndex+1, blockSize);		
+         cleanUpNoteOffs(beatCount, getLengthInBeats());
+         cleanUpNoteOffs(0.00, frameEndBeatCount);
 		}
-
     }
 
     if (doAllNotesOff || transport->willSendAllNotesOff ())
@@ -138,6 +134,7 @@ void MidiSequencePluginBase::processBlock (AudioSampleBuffer& buffer,
 
 void MidiSequencePluginBase::renderEventsInRange(const MidiMessageSequence& sourceMidi, MidiBuffer* midiBuffer, double beatCount, double frameEndBeatCount, const int frameCounter, const int framesPerBeat, const int nextBlockFrameNumber, const int seqIndex, const int blockSize)
 {
+    int midiChannel = getMidiChannel();
 	for (int i = sourceMidi.getNextIndexInTimeRange (beatCount, frameEndBeatCount);
 		i < sourceMidi.getNumEvents (); i++)
 	{
@@ -146,12 +143,8 @@ void MidiSequencePluginBase::renderEventsInRange(const MidiMessageSequence& sour
 		int timeStamp = timeStampInSeq + (seqIndex * getLengthInBeats() * framesPerBeat);
 
 		MidiMessage* midiMessage = &sourceMidi.getEventPointer (i)->message;
-		if (timeStamp >= nextBlockFrameNumber || !midiMessage)
-		{
-			break;
-		}
 
-		if (timeStamp >= transport->getDurationInFrames())
+		if (!midiMessage || timeStamp > transport->getDurationInFrames())
 		{
 			break;
 		}
@@ -159,10 +152,13 @@ void MidiSequencePluginBase::renderEventsInRange(const MidiMessageSequence& sour
 		// now play the event - unless we are disabled (muted), or it is a note off (always play note offs so we don't get dangling note-ons when user disables during a note sounding)
 		if (midiMessage->isNoteOff() || isEnabled())
 		{
-			midiBuffer->addEvent (*midiMessage, timeStamp - frameCounter);
-         
-std:: cerr << (String("rendering event at ") + String(timeStamp - frameCounter)).toUTF8() << std::endl;
-                 
+			// and this needs to be in terms of beats, not frames
+            int renderAtFrame = framesPerBeat * (sourceMidi.getEventTime (i) - beatCount);
+            if (renderAtFrame < (nextBlockFrameNumber - frameCounter))
+            {
+               midiMessage->setChannel(midiChannel);
+               midiBuffer->addEvent (*midiMessage, renderAtFrame);
+            }
 
 			// look for matching note off - if it is past the loop end then we need to wrap it and ensure it gets played at the right time
 			if (midiMessage->isNoteOn())
@@ -244,9 +240,9 @@ bool MidiSequencePluginBase::noteAdded (const int noteNumber,
                                     const float beatNumber,
                                     const float noteLength)
 {
-    MidiMessage msgOn = MidiMessage::noteOn (NOTE_CHANNEL, noteNumber, NOTE_VELOCITY);
+    MidiMessage msgOn = MidiMessage::noteOn (getMidiChannel(), noteNumber, NOTE_VELOCITY);
     msgOn.setTimeStamp (beatNumber);
-    MidiMessage msgOff = MidiMessage::noteOff (NOTE_CHANNEL, noteNumber);
+    MidiMessage msgOff = MidiMessage::noteOff (getMidiChannel(), noteNumber);
     msgOff.setTimeStamp ((beatNumber + noteLength) - NOTE_PREFRAMES);
 
     DBG ("Adding:" + String (noteNumber) + " " + String (beatNumber));
@@ -322,9 +318,9 @@ bool MidiSequencePluginBase::noteMoved (const int oldNote,
         {
             // TODO - check old note off distance == oldNoteLength
 
-            MidiMessage msgOn = MidiMessage::noteOn (NOTE_CHANNEL, noteNumber, NOTE_VELOCITY);
+            MidiMessage msgOn = MidiMessage::noteOn (getMidiChannel(), noteNumber, NOTE_VELOCITY);
             msgOn.setTimeStamp (beatNumber);
-            MidiMessage msgOff = MidiMessage::noteOff (NOTE_CHANNEL, noteNumber);
+            MidiMessage msgOff = MidiMessage::noteOff (getMidiChannel(), noteNumber);
             msgOff.setTimeStamp ((beatNumber + noteLength) - NOTE_PREFRAMES);
 
             {
@@ -374,9 +370,9 @@ bool MidiSequencePluginBase::noteResized (const int noteNumber,
         {
             // TODO - check old note off distance == oldNoteLength
 
-            MidiMessage msgOn = MidiMessage::noteOn (NOTE_CHANNEL, noteNumber, NOTE_VELOCITY);
+            MidiMessage msgOn = MidiMessage::noteOn (getMidiChannel(), noteNumber, NOTE_VELOCITY);
             msgOn.setTimeStamp (beatNumber);
-            MidiMessage msgOff = MidiMessage::noteOff (NOTE_CHANNEL, noteNumber);
+            MidiMessage msgOff = MidiMessage::noteOff (getMidiChannel(), noteNumber);
             msgOff.setTimeStamp ((beatNumber + noteLength) - NOTE_PREFRAMES);
 
             {
@@ -461,7 +457,7 @@ int MidiSequencePluginBase::getNumNoteOn () const
 //==============================================================================
 static void dumpMidiMessageSequence (MidiMessageSequence* midiSequence)
 {
-#if JUCE_DEBUG
+#if JUCE_DEBUG && 0
     for (int i = 0; i < midiSequence->getNumEvents (); i++)
     {
         MidiMessage* midiMessage = &midiSequence->getEventPointer (i)->message;
@@ -577,6 +573,7 @@ void MidiSequencePluginBase::savePropertiesToXml (XmlElement* xml)
     xml->setAttribute (PROP_SEQNOTESNAP,             getIntValue (PROP_SEQNOTESNAP, 4));
     xml->setAttribute (PROP_SEQBAR,                  getIntValue (PROP_SEQBAR, 4));
     xml->setAttribute (PROP_SEQENABLED,              getBoolValue (PROP_SEQENABLED, true));
+    xml->setAttribute (PROP_SEQMIDICHANNEL,          getIntValue (PROP_SEQMIDICHANNEL, 1));
 }
 
 void MidiSequencePluginBase::loadPropertiesFromXml (XmlElement* xml)
@@ -589,6 +586,7 @@ void MidiSequencePluginBase::loadPropertiesFromXml (XmlElement* xml)
     setValue (PROP_SEQNOTESNAP,                      xml->getIntAttribute (PROP_SEQNOTESNAP, 4));
     setValue (PROP_SEQBAR,                           xml->getIntAttribute (PROP_SEQBAR, 4));
     setValue (PROP_SEQENABLED,                       xml->getBoolAttribute (PROP_SEQENABLED, true));
+    setValue (PROP_SEQMIDICHANNEL,                   xml->getIntAttribute (PROP_SEQMIDICHANNEL, 1));
 }
 
 //==============================================================================
