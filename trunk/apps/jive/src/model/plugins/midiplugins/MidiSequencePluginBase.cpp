@@ -39,7 +39,8 @@ MidiSequencePluginBase::MidiSequencePluginBase ()
   : transport (0),
     midiSequence (0),
     doAllNotesOff (false),
-    allNotesOff (MidiMessage::allNotesOff (1))
+    allNotesOff (MidiMessage::allNotesOff (1)),
+    uptoBeatReloopHack(0.0)
 {
     midiSequence = new MidiMessageSequence ();
 }
@@ -98,30 +99,32 @@ void MidiSequencePluginBase::processBlock (AudioSampleBuffer& buffer,
             }
         }
 
-        const int nextBlockFrameNumber = frameCounter + blockSize;        
+      const int nextBlockFrameNumber = frameCounter + blockSize;        
 		const int seqIndex = getLoopRepeatIndex();
-		const double beatCount = getLoopBeatPosition();
+		double beatCount = getLoopBeatPosition();
 		const double frameLenBeatCount = (nextBlockFrameNumber - frameCounter) / (double)framesPerBeat;		
 		double frameEndBeatCount = beatCount + frameLenBeatCount;
 		if (frameEndBeatCount > getLengthInBeats())
 			frameEndBeatCount -= getLengthInBeats();
 
+      int midiChannel = getMidiChannel();
+      
+      // normal case - the buffer occurs somewhere within the seq loop (i.e. start is before end!)
 		if (frameEndBeatCount > beatCount)
 		{
-			renderEventsInRange(*midiSequence, midiBuffer, beatCount, frameEndBeatCount, frameCounter, framesPerBeat, nextBlockFrameNumber, seqIndex, blockSize);
-			renderEventsInRange(noteOffs, midiBuffer, beatCount, frameEndBeatCount, frameCounter, framesPerBeat, nextBlockFrameNumber, seqIndex, blockSize);
-			cleanUpNoteOffs(beatCount, frameEndBeatCount);
-		}
+         if (uptoBeatReloopHack >0.0) // if this is > 0 it means we rendered a partial chunk of the start of the loop last time, so should not render those notes again, to avoid hanging double ups
+            beatCount = uptoBeatReloopHack;
+         newRenderEvents(*midiSequence, midiBuffer, beatCount, frameEndBeatCount, false, 0, framesPerBeat, nextBlockFrameNumber, seqIndex, blockSize, midiChannel);
+         uptoBeatReloopHack = 0;
+      }
+      // special case - the buffer straddles the end/start seq loop
 		else
 		{
          double endChunkLenBeats = getLengthInBeats() - beatCount;
          int framesMoved = endChunkLenBeats * framesPerBeat;
-         renderEventsInRange(*midiSequence, midiBuffer, beatCount, getLengthInBeats(), frameCounter, framesPerBeat, nextBlockFrameNumber-framesMoved, seqIndex, blockSize);
-         renderEventsInRange(*midiSequence, midiBuffer, 0.00, frameEndBeatCount, frameCounter+framesMoved, framesPerBeat, nextBlockFrameNumber, seqIndex+1, blockSize);		
-         renderEventsInRange(noteOffs, midiBuffer, beatCount, getLengthInBeats(), frameCounter, framesPerBeat, nextBlockFrameNumber-framesMoved, seqIndex, blockSize);
-         renderEventsInRange(noteOffs, midiBuffer, 0.00, frameEndBeatCount, frameCounter+framesMoved, framesPerBeat, nextBlockFrameNumber, seqIndex+1, blockSize);		
-         cleanUpNoteOffs(beatCount, getLengthInBeats());
-         cleanUpNoteOffs(0.00, frameEndBeatCount);
+         newRenderEvents(*midiSequence, midiBuffer, beatCount, getLengthInBeats(), true, 0, framesPerBeat, nextBlockFrameNumber-framesMoved, seqIndex, blockSize, midiChannel);
+         newRenderEvents(*midiSequence, midiBuffer, 0.0, frameEndBeatCount, false, framesMoved, framesPerBeat, nextBlockFrameNumber, seqIndex+1, blockSize, midiChannel);
+         uptoBeatReloopHack = frameEndBeatCount; // store where we relooped in case Transport asks us to do some of it again..
 		}
     }
 
@@ -132,45 +135,77 @@ void MidiSequencePluginBase::processBlock (AudioSampleBuffer& buffer,
     }
 }
 
-void MidiSequencePluginBase::renderEventsInRange(const MidiMessageSequence& sourceMidi, MidiBuffer* midiBuffer, double beatCount, double frameEndBeatCount, const int frameCounter, const int framesPerBeat, const int nextBlockFrameNumber, const int seqIndex, const int blockSize)
+void MidiSequencePluginBase::newRenderEvents(
+   const MidiMessageSequence& sourceMidiBuffer,
+   MidiBuffer* outMidiBuffer,
+   double beatCount, // beat pos at start of render chunk
+   double frameEndBeatCount, // beat pos at end of render chunk
+   bool isEndOfLoop, // are we the render that buts up to the end of the loop?
+   const int frameCounter, // frame (sample) number at start of render chunk, relative to chunk (i.e. often 0)
+   const int framesPerBeat, // number of frames per beat
+   const int nextBlockFrameNumber, // next render chunk frame number (upper limit)
+   const int seqIndex, // how many times we've already looped
+   const int blockSize, // number of frames long this render chunk is
+   const int midiChannel // the midi channel to use for all rendered events
+   )
 {
-    int midiChannel = getMidiChannel();
-	for (int i = sourceMidi.getNextIndexInTimeRange (beatCount, frameEndBeatCount);
-		i < sourceMidi.getNumEvents (); i++)
+   bool weAreRenderingNoteOffs = (&sourceMidiBuffer == &noteOffs);
+
+	for (int i = sourceMidiBuffer.getNextIndexAtTime(beatCount);
+		i < sourceMidiBuffer.getNumEvents(); i++)
 	{
-		int timeStampInSeq = roundFloatToInt (sourceMidi.getEventTime (i) * framesPerBeat);
-		
-		int timeStamp = timeStampInSeq + (seqIndex * getLengthInBeats() * framesPerBeat);
+      // get the event (its time is in beats)
+		MidiMessage* midiMessage = &sourceMidiBuffer.getEventPointer (i)->message;
+      if (!midiMessage || !midiMessage->isNoteOnOrOff()) // we only sequence note events - not a fully generic rec-play sequencer
+         continue;
+         
+      // determine whether the event is one that we need to play in this time chunk..
+      double beatsTime = sourceMidiBuffer.getEventTime(i);
+      // we care about note offs after the end of the loop (in case the user has resized loop and cut off the end of a note)
+      bool specialNoteOffPastReloop = (isEndOfLoop && midiMessage->isNoteOff() && beatsTime >= frameEndBeatCount); 
+      if (
+         (beatsTime >= beatCount && beatsTime < frameEndBeatCount) //|| // event occurs within render chunk time frame OR
+         //specialNoteOffPastReloop 
+         )
+      {
+         // now we play it - if it's a note off, or we're enabled
+         if (midiMessage->isNoteOff() || isEnabled())
+         {
+            // determine the frame time of the event relative to start of chunk
+            int renderAtFrame = framesPerBeat * (beatsTime - beatCount) + frameCounter;
+            
+            // set the channel, and render it
+            midiMessage->setChannel(midiChannel); // a bit dirty, touching the actual message, though no real need to take a copy
+            outMidiBuffer->addEvent(*midiMessage, renderAtFrame);            
+         }
+      }
+      
+      if (specialNoteOffPastReloop)
+      {
+         MidiMessage blowOffSteam = MidiMessage::noteOff(midiMessage->getChannel(), midiMessage->getNoteNumber());
+         noteOffs.addEvent(blowOffSteam, beatsTime - getLengthInBeats());
+      }
+   }
+   
+   // and now we recurse for note offs!
+   if (!weAreRenderingNoteOffs && noteOffs.getNumEvents() > 0)
+   {
+      newRenderEvents(
+         noteOffs,
+         outMidiBuffer,
+         beatCount, // beat pos at start of render chunk
+         frameEndBeatCount, // beat pos at end of render chunk
+         isEndOfLoop, // are we the render that buts up to the end of the loop?
+         frameCounter, // frame (sample) number at start of render chunk
+         framesPerBeat, // number of frames per beat
+         nextBlockFrameNumber, // next render chunk frame number (upper limit)
+         seqIndex, // how many times we've already looped
+         blockSize, // number of frames long this render chunk is
+         midiChannel // the midi channel to use for all rendered events
+      );
+      cleanUpNoteOffs(beatCount, frameEndBeatCount);
+   }
 
-		MidiMessage* midiMessage = &sourceMidi.getEventPointer (i)->message;
-
-		if (!midiMessage || timeStamp > transport->getDurationInFrames())
-		{
-			break;
-		}
-		
-		// now play the event - unless we are disabled (muted), or it is a note off (always play note offs so we don't get dangling note-ons when user disables during a note sounding)
-		if (midiMessage->isNoteOff() || isEnabled())
-		{
-			// and this needs to be in terms of beats, not frames
-            int renderAtFrame = framesPerBeat * (sourceMidi.getEventTime (i) - beatCount);
-            if (renderAtFrame < (nextBlockFrameNumber - frameCounter))
-            {
-               midiMessage->setChannel(midiChannel);
-               midiBuffer->addEvent (*midiMessage, renderAtFrame);
-            }
-
-			// look for matching note off - if it is past the loop end then we need to wrap it and ensure it gets played at the right time
-			if (midiMessage->isNoteOn())
-			{
-				int up = sourceMidi.getIndexOfMatchingKeyUp(i);
-				if (sourceMidi.getEventPointer (up)->message.isNoteOff() && 
-					sourceMidi.getEventPointer (up)->message.getTimeStamp() > getLengthInBeats())
-					noteOffs.addEvent(sourceMidi.getEventPointer (up)->message, -getLengthInBeats());
-			}
-		}
-		
-	}
 }
 
 void MidiSequencePluginBase::cleanUpNoteOffs(double fromTime, double toTime)

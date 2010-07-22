@@ -162,7 +162,8 @@ public:
 	double getBeatsPerBar() { return 4; };
 
 	/* Returns true if sequencer playback is enabled */
-    bool isEnabled() {return getBoolValue(PROP_SEQENABLED, true); };
+   /* er.. virtual because the CC-bound enabledness is implemented in the subclass */
+    virtual bool isEnabled() {return getBoolValue(PROP_SEQENABLED, true); };
 
 	/* Get the MIDI channel used for all events (notes & CCs) output from the sequencer */
     int getMidiChannel() {return getIntValue(PROP_SEQMIDICHANNEL, 1); };
@@ -190,15 +191,18 @@ public:
 protected:
 
 	// internal, used when rendering midi events to ensure loops render appropriately and note offs don't get lost
-	void renderEventsInRange(const MidiMessageSequence& sourceMidi,
-	                          MidiBuffer* midiBuffer,
+
+	void newRenderEvents(const MidiMessageSequence& sourceMidiBuffer,
+	                          MidiBuffer* outMidiBuffer,
 	                          double beatCount,
 	                          double frameEndBeatCount,
+                             bool isEndOfLoop,
 	                          const int frameCounter,
 	                          const int framesPerBeat,
 	                          const int nextBlockFrameNumber,
 	                          const int seqIndex,
-	                          const int blockSize);
+	                          const int blockSize,
+                             const int midiChan);
 
 	void cleanUpNoteOffs(double fromTime, double toTime);
 
@@ -211,6 +215,8 @@ protected:
 
     bool doAllNotesOff;
     MidiMessage allNotesOff;
+
+   double uptoBeatReloopHack;
 };
 
 
