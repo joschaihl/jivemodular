@@ -332,8 +332,8 @@ public:
     void addNote (AutomationEvent* note);
     Rectangle getNoteRect (AutomationEvent* note);
 	void moveEvent (AutomationEvent* note, const double beatNumber, const double newValue);
-	void removeNote (AutomationEvent* note, const bool alsoFreeObject);
-	void removeAllEvents (const int controller);
+	void removeNote (AutomationEvent* note, const bool alsoFreeObject, bool notifyListener=true);
+	void removeAllEvents (const int controller, bool notifyListener=true);
 
     //==============================================================================
 	void findLassoItemsInArea (Array<MidiGridItem*> &itemsFound, int x, int y, int width, int height);
