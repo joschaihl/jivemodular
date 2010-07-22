@@ -318,6 +318,8 @@ void Host::processBlock (AudioSampleBuffer& buffer,
     for (int j = plugins.size (); --j >= 0;)
         plugins.getUnchecked (j)->clearMidiBuffers ();
     
+    MidiManipulator manip;
+    
     // process audio for plugins
     if (audioGraph)
     {
@@ -416,6 +418,18 @@ void Host::processBlock (AudioSampleBuffer& buffer,
             // clear input buffers (avoid zipper noise, but can be optimized) --
             if (inBuffers)
                 inBuffers->clear ();
+
+            // filter output midi to specified channel (hmm, on midi out 1 only!)
+            if (currentPlugin->getNumMidiOutputs() > 0)
+            {
+               MidiBuffer* curMidiOutput = currentPlugin->getMidiBuffer (0);
+               MidiFilter* channelFilter = currentPlugin->getMidiOutputChannelFilter();
+               if (curMidiOutput && channelFilter)
+               {
+                  manip.setMidiFilter(channelFilter);
+                  manip.processEvents(*curMidiOutput, blockSamples);
+               }
+            }
 
             // copy over midi processing --    
             for (int i = node->getLinksCount (JOST_LINKTYPE_MIDI); --i >= 0;)
