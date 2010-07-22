@@ -455,7 +455,7 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
     currentClickedNode = node;
 
     bool addFirstSeparator = false;
-    PopupMenu menu, subMenu;
+    PopupMenu menu, subMenu, midiChanMenu;
 
     BasePlugin* plugin = (BasePlugin*) node->getUserData ();
 
@@ -492,6 +492,12 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
     menu.addItem (5, "Mute", true, plugin->isMuted ());
     menu.addItem (6, "Bypass", true, plugin->isBypass ());
     menu.addItem (7, "Solo", false, false);
+    menu.addSeparator ();
+
+    midiChanMenu.addItem(1020, "Omni", true, !plugin->getMidiOutputChannelFilter() || plugin->getMidiOutputChannel() == -1);
+    for (int i=1; i<17; i++)
+       midiChanMenu.addItem(1000+i, String("Ch ") + String(i), true, plugin->getMidiOutputChannelFilter() && plugin->getMidiOutputChannel() == i);
+    menu.addSubMenu (T("Filter output MIDI channel"), midiChanMenu);
     menu.addSeparator ();
 
     int inputLinks = node->getInputLinksCount ();
@@ -583,7 +589,12 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
          setNodeDisplayName(plugin, node, newName);
     }
       break;
+   case 1020:
+      plugin->clearMidiOutputFilter();
+      break;
     default:
+      if (result >= 1001 && result <= 1016)
+         plugin->setMidiOutputChannelFilter(result - 1000);
         break;
     }
     
