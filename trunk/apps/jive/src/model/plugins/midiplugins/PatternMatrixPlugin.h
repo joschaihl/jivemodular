@@ -45,6 +45,9 @@ public:
    int getPartPattern(int part);
    int getQuantize() { return quantizeLength;};
    void setQuantize(double q) {quantizeLength = q;};
+   int getMidiChannel() { return midiChannel;};
+   void setMidiChannel(int q) {if (midiChannel >=1 && midiChannel <=16) midiChannel = q;};
+
     //==============================================================================
     void setParameterReal (int paramNumber, float value);
     float getParameterReal (int paramNumber);
@@ -55,6 +58,7 @@ private:
    int playingPattern[MAXPARTS];
    int partCC[MAXPARTS];
    double quantizeLength; // in bars
+   int midiChannel;
    
    Transport* transport;
 };

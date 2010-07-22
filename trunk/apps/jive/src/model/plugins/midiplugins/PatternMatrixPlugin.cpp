@@ -6,13 +6,13 @@
 #include "PatternMatrixEditor.h"
 
 const int QuantiseParamId = MAXPARTS;
-const int MidiChannel = 1;
 
 //==============================================================================
 PatternMatrixPlugin::PatternMatrixPlugin ()
 :
    transport(0),
-   quantizeLength(1)
+   quantizeLength(1),
+   midiChannel(1)
 {
    // param for each part, and one for the quantize amount
    setNumParameters( + 1);
@@ -79,7 +79,7 @@ int PatternMatrixPlugin::getPartPattern(int part)
 void PatternMatrixPlugin::setParameterReal (int paramNumber, float value)
 {
    if (paramNumber < MAXPARTS)
-      currentPattern[paramNumber] = value * (MAXPATTERNSPERPART);
+      currentPattern[paramNumber] = (value + 1.0 / MAXPATTERNSPERPART) * (MAXPATTERNSPERPART); // add 1 so the round rounds us where we want
    else if (paramNumber == QuantiseParamId)
    {
    
@@ -170,7 +170,7 @@ void PatternMatrixPlugin::processBlock (AudioSampleBuffer& buffer, MidiBuffer& m
          {
             // render a CC...
             float val = 1.0 / MAXPATTERNSPERPART + (currentPattern[i] / static_cast<float>(MAXPATTERNSPERPART)) * 127.0;
-            midiBuffer->addEvent(MidiMessage::controllerEvent(MidiChannel, partCC[i], val), eventPos);
+            midiBuffer->addEvent(MidiMessage::controllerEvent(midiChannel, partCC[i], val), eventPos);
             
             // effect the state change
             playingPattern[i] = currentPattern[i];
