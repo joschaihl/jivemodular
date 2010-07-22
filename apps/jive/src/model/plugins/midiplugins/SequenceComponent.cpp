@@ -160,8 +160,8 @@ public:
 	//==================================================
 	// Manage the controllers to edit via this component.
 	void addCC();
-	void deleteCurrentCC();
-	void clearCCs();
+	void deleteCurrentCC(bool notifyListener=true);
+	void clearCCs(bool notifyListener=true);
 	void setCurrentCC(int controller = -1);
 	int findIndexOfCC(int controller); // returns the row index for the CC, or -1 if not found
 	
@@ -349,13 +349,13 @@ void AutomationEditComponent::addCC()
 	setCurrentCC(newOne);
 }
 
-void AutomationEditComponent::deleteCurrentCC()
+void AutomationEditComponent::deleteCurrentCC(bool notifyListener)
 {
 	int curSel = leftPane->getSelectedRow();
 	if (curSel >= 0 && curSel < controllers.size())
 	{
 		AutomatableController* deleteMe = controllers.getUnchecked(curSel);
-		automationGrid->removeAllEvents(deleteMe->getController());
+		automationGrid->removeAllEvents(deleteMe->getController(), notifyListener);
 		controllers.remove(curSel);
 
 		AutomatableController sorter;
@@ -364,12 +364,12 @@ void AutomationEditComponent::deleteCurrentCC()
 	}
 }
 
-void AutomationEditComponent::clearCCs()
+void AutomationEditComponent::clearCCs(bool notifyListener)
 {
 	for (int i=controllers.size()-1; i>=0; i--)
 	{
 		setCurrentCC(controllers.getUnchecked(i)->getController());
-		deleteCurrentCC();
+		deleteCurrentCC(notifyListener);
 	}
 }
 
@@ -492,6 +492,7 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
   : PluginEditorComponent (plugin_),
     noteEditor (0),
 	automationEditor(0),
+    channelNumSlider(0),
    enabledButton(0),
    ccEnabledSlider(0),
    partPatternNumSlider(0),
@@ -567,6 +568,14 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
    //	enabledButton->setToggleState(seq->getBoolValue(PROP_SEQENABLED, true), false);
    //	enabledButton->addButtonListener (this);
 
+   addAndMakeVisible (channelNumSlider = new Slider (String::empty));
+   channelNumSlider->setRange (1, 16, 1);
+   channelNumSlider->setSliderStyle (Slider::IncDecButtons);
+   channelNumSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+   channelNumSlider->setValue (plugin_->getMidiChannel(), false);
+   channelNumSlider->setTooltip (T("MIDI Channel"));
+   channelNumSlider->addListener (this);
+
    const int patternsPerPart = MAXPATTERNSPERPART;
    AudioParameter* theEnablyParameter = plugin->getParameterObject(0);
    addAndMakeVisible(ccEnabledSlider = new ParamSlider(plugin, theEnablyParameter, 0));
@@ -598,12 +607,13 @@ void SequenceComponent::resized ()
    int headHeight = 32;
 
    // header-left
-   ccEnabledSlider->setBounds (0, 2, 76, 16);
-   partPatternNumSlider->setBounds (76, 2, 75, 16);
+   channelNumSlider->setBounds (0, 2, 50, 16);
+   ccEnabledSlider->setBounds (60, 2, 40, 16);
+   partPatternNumSlider->setBounds (100, 2, 75, 16);
 
    // header-centre
-   quantizeLabel->setBounds (160, 2, 70, 16);
-   quantizeBox->setBounds (230, 2, 60, 16);
+   quantizeLabel->setBounds (200, 2, 70, 16);
+   quantizeBox->setBounds (275, 2, 60, 16);
 
    // header-right
    barLabel->setBounds (getWidth () - 210, 2, 45, 16);
@@ -651,11 +661,20 @@ void SequenceComponent::updateParameters ()
 {
    MidiSequencePlugin* sequencer = getPlugin ();
     
+   if (channelNumSlider)
+      channelNumSlider->setValue(sequencer->getMidiChannel(), false);
+    
    if (partPatternNumSlider)
       partPatternNumSlider->setValue(sequencer->getPatternNumberInPart(), false);
    if (ccEnabledSlider)
       ccEnabledSlider->setValue(sequencer->getParameterReal(0), false);
 
+   if (barSlider)
+      barSlider->setValue(sequencer->getIntValue(PROP_SEQBAR, 4), false);
+
+   if (zoomSlider)
+      zoomSlider->setValue(sequencer->getIntValue (PROP_SEQCOLSIZE, 120), false);
+   
    if (noteEditor) 
    {
       PianoGrid* pianoGrid = noteEditor->getPianoGrid();
@@ -668,36 +687,25 @@ void SequenceComponent::updateParameters ()
          double notelen = sequencer->getIntValue (PROP_SEQNOTELENGTH, 4);   
          if (noteEditor->getNoteLengthBox())
             noteEditor->getNoteLengthBox()->setSelectedId(notelen, true);
+
+         pianoGrid->removeAllNotes (false);
+         for (int i = 0; i < sequencer->getNumNoteOn (); i++)
+         {
+            int note = -1;
+            float beat = -1;
+            float length = 0.0f;
+            sequencer->getNoteOnIndexed (i, note, beat, length);
+
+            if (length > 0.0f)
+               pianoGrid->addNote (note, beat, length);
+         }
+
+         pianoGrid->resized ();
       }
-   }
-
-   if (barSlider)
-      barSlider->setValue(sequencer->getIntValue(PROP_SEQBAR, 4), false);
-
-   if (zoomSlider)
-      zoomSlider->setValue(sequencer->getIntValue (PROP_SEQCOLSIZE, 120), false);
-   
-	if (noteEditor)
-	{
-		PianoGrid* pianoGrid = noteEditor->getPianoGrid();
-
-		pianoGrid->removeAllNotes (false);
-		for (int i = 0; i < sequencer->getNumNoteOn (); i++)
-		{
-			int note = -1;
-			float beat = -1;
-			float length = 0.0f;
-			sequencer->getNoteOnIndexed (i, note, beat, length);
-
-			if (length > 0.0f)
-				pianoGrid->addNote (note, beat, length);
-		}
-
-		pianoGrid->resized ();
 	}
 	if (automationEditor)
 	{
-		automationEditor->clearCCs();
+		automationEditor->clearCCs(false); // ensure the listener (seq) doesn't delete the real CC data!
 		automationEditor->getAutomationGrid()->removeAllEvents(false);
 		for (int i = 0; i < sequencer->getNumControllerEvents (); i++)
 		{
@@ -811,6 +819,12 @@ void SequenceComponent::sliderValueChanged (Slider* sliderThatWasMoved)
    {
       seq->setPatternNumberInPart(partPatternNumSlider->getValue());
       ccEnabledSlider->updateText();
+   }
+   if (sliderThatWasMoved == channelNumSlider)
+   {
+      seq->setValue(PROP_SEQMIDICHANNEL, channelNumSlider->getValue());
+      if (seq->getMidiOutputChannel() != -1 && seq->getMidiOutputChannel() != seq->getMidiChannel())
+         seq->setMidiOutputChannelFilter(seq->getMidiChannel());
    }
 
 }
