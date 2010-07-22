@@ -32,7 +32,6 @@
 #include <algorithm>
 
 #define NOTE_PREFRAMES     0.001
-#define NOTE_CHANNEL 1
 
 //==============================================================================
 MidiSequencePlugin::MidiSequencePlugin()
@@ -169,7 +168,7 @@ int MidiSequencePlugin::getNumControllerEvents () const
 //==============================================================================
 bool MidiSequencePlugin::eventAdded (const int controller, const double automationValue, const float beatNumber)
 {
-    MidiMessage msgOn = MidiMessage::controllerEvent (NOTE_CHANNEL, controller, automationValue * 127);
+    MidiMessage msgOn = MidiMessage::controllerEvent (getMidiChannel(), controller, automationValue * 127);
     msgOn.setTimeStamp (beatNumber);
 
     DBG ("Adding:" +String (automationValue) + " " + String (beatNumber));
@@ -241,7 +240,7 @@ bool MidiSequencePlugin::eventMoved (
 
         if (eventOn->isController() && eventOn->getControllerNumber() == controllerNum && eventOn->getControllerValue() == floor(oldValue * 127)) // should make this a "matches controller" method
         {		
-		    MidiMessage msgOn = MidiMessage::controllerEvent (NOTE_CHANNEL, controllerNum, automationValue * 127);
+		    MidiMessage msgOn = MidiMessage::controllerEvent (getMidiChannel(), controllerNum, automationValue * 127);
     		msgOn.setTimeStamp (beatNumber);
 		
 			{
@@ -304,6 +303,7 @@ void MidiSequencePlugin::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mi
     {
 		const int blockSize = buffer.getNumSamples ();
 
+        const int midiChannel = getMidiChannel();
         const int frameCounter = transport->getPositionInFrames ();
         const int framesPerBeat = transport->getFramesPerBeat ();
         const int nextBlockFrameNumber = frameCounter + blockSize;
@@ -367,7 +367,7 @@ void MidiSequencePlugin::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mi
 						double nextPart = interpRemainBeats / deltaBeats;
 						nextPart = 1 - nextPart;
 						double interpdVal = a + nextPart * (b - a);
-						MidiMessage interpy = MidiMessage::controllerEvent(lastCtrlEvent->getChannel(), lastCtrlEvent->getControllerNumber(), static_cast<int>(interpdVal));
+						MidiMessage interpy = MidiMessage::controllerEvent(midiChannel, lastCtrlEvent->getControllerNumber(), static_cast<int>(interpdVal));
 						midiBuffer->addEvent (interpy, (nextBlockFrameNumber - frameCounter) / 2);
 					}
 					else
