@@ -50,7 +50,9 @@ BasePlugin::BasePlugin ()
       bypassOutput (false),
       outputGain (1.0f),
       currentOutputGain (1.0f),
-      stemFileWriter(0)
+      stemFileWriter(0),
+      outputMidiChannel(-1),
+      outputMidiChanFilter(0)
 {
     keyboardState.reset();
 
@@ -65,6 +67,8 @@ BasePlugin::BasePlugin ()
 BasePlugin::~BasePlugin ()
 {
     closeStemFile();
+
+    clearMidiOutputFilter();
 }
 
 String BasePlugin::getInstanceName()
@@ -192,6 +196,7 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
    }
 }
 
+//==============================================================================
 void BasePlugin::openStemFile(String uniquePrefix, int sampleRate)
 {
    String stemFname(uniquePrefix);
@@ -225,11 +230,39 @@ void BasePlugin::renderBlock(AudioSampleBuffer& buffer)
 }
 
 //==============================================================================
+void BasePlugin::setMidiOutputChannelFilter(int midiChannel)
+{
+   clearMidiOutputFilter();
+   
+   if (midiChannel >= 1 || midiChannel <= 16)
+   {
+      outputMidiChanFilter = new MidiFilter();
+      outputMidiChanFilter->setUseChannelFilter(true);
+      outputMidiChanFilter->clearAllChannels();
+      outputMidiChanFilter->setChannel(midiChannel);
+      outputMidiChannel = midiChannel;
+   }
+}
+
+MidiFilter* BasePlugin::getMidiOutputChannelFilter()
+{
+   return outputMidiChanFilter;
+}
+
+void BasePlugin::clearMidiOutputFilter()
+{
+   if (outputMidiChanFilter)
+      delete outputMidiChanFilter;
+   outputMidiChannel = -1;
+}
+
+//==============================================================================
 void BasePlugin::savePresetToXml (XmlElement* xml)
 {
     xml->setAttribute (T("gain"), outputGain);
     xml->setAttribute (T("mute"), mutedOutput);
     xml->setAttribute (T("bypass"), bypassOutput);
+    xml->setAttribute (T("outMidiChan"), outputMidiChannel);
 
     MemoryBlock mb;
     getStateInformation (mb);
@@ -249,6 +282,7 @@ void BasePlugin::loadPresetFromXml (XmlElement* xml)
     outputGain =  xml->getDoubleAttribute (T("gain"), 1.0);
     mutedOutput = xml->getBoolAttribute (T("mute"), 0);
     bypassOutput = xml->getBoolAttribute (T("bypass"), 0);
+    outputMidiChannel = xml->getIntAttribute (T("outMidiChan"), -1);
 
     // current preset
     XmlElement* chunk = xml->getChildByName (T("data"));

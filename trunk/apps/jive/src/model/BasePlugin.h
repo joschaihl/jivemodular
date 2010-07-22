@@ -118,9 +118,11 @@ public:
     String getInstanceName();
     void setInstanceName(const String&);
     
-//    virtual bool preferGenericEditor() {return prefersGenericEditor;};
-//    virtual void setPreferGenericEditor(bool p) { prefersGenericEditor = p; };
-//    bool prefersGenericEditor;
+   //==============================================================================
+   void setMidiOutputChannelFilter(int midiChannel = -1);
+   MidiFilter* getMidiOutputChannelFilter();
+   int getMidiOutputChannel() { return outputMidiChannel; };
+   void clearMidiOutputFilter();
 
 public:
 
@@ -214,8 +216,12 @@ protected:
     float outputGain, currentOutputGain;
     float outputPan, currentOutputPan;
 
-    //==============================================================================
+   //==============================================================================
    AudioFormatWriter* stemFileWriter;
+   
+   //==============================================================================
+   int outputMidiChannel;
+   MidiFilter* outputMidiChanFilter;
 };
 
 
