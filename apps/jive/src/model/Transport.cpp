@@ -107,7 +107,10 @@ void Transport::play ()
 void Transport::togglePlay ()
 {
    if (playing)
+   {
       stop();
+      rewind();
+   }
    else 
       play();
 }
