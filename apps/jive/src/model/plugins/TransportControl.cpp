@@ -16,8 +16,8 @@ enum ParamIDs
 //==============================================================================
 TransportControlPlugin::TransportControlPlugin()
 :
-   maxBPM(50),
-   minBPM(200),
+   maxBPM(200),
+   minBPM(50),
    lastRequestedBPM(-1),
    softTakeover(false),
    loadingParams(false)
@@ -195,6 +195,8 @@ float TransportControlPlugin::getParameterReal (int index)
    {
 //      double oldBpm = t->getTempo(); 
       double oldBpm = lastRequestedBPM; // show the requested value, works better during soft-takeover
+      if (oldBpm == -1)
+         oldBpm = t->getTempo(); // ..eexcept when last value is -1 (i.e. init, first pass after soft-takeover trigger)
       val = (oldBpm - minBPM) / (maxBPM - minBPM);
    }
    break;
