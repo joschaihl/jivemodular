@@ -38,6 +38,94 @@
 
 class MidiAutomatorManager;
 
+enum NoteBindingMode
+{
+   NoteOff = 0, // bound to note-off only
+   NoteOn = 1, // bound to note-on only
+   NoteHeld = 2, // parameter is max when note is down, otherwise min
+   Controller = 3 // the classic CC binding!
+};
+
+enum BindingStepMode
+{
+   Decrease = 1,
+   Increase = 2,
+   Bidirectional = 3,
+   SetToValue = 4
+};
+
+// A lightweight ish class encapsulating a single binding.
+// Split out from MidiAutomatable so can support multiple bindings to single parameter.
+// Enhanced to support more interesting binding modes/options.
+class MidiBinding 
+{
+public:
+   MidiBinding()
+   :
+      mode(NoteOn),
+      triggerVal(-1),
+      maximum(1.0),
+      minimum(0.0),
+      invert(false),
+      incrAmount(1.0),
+      bidirectional(Increase),
+      incrMax(1.0),
+      incrMin(0.0)
+   {
+   };
+   
+   void setNote(int m);
+   void setCC(int m);
+   void setMode(int m);
+
+   bool isNoteBinding() const { return mode != Controller; };
+
+   int getNote() const { return isNoteBinding() ? triggerVal : -1; };
+   int getCC() const { return !isNoteBinding() ? triggerVal : -1; };  
+   int getTriggerValue() const { return triggerVal; };
+
+   NoteBindingMode getMode() const { return mode; }; // note-specific for now
+   float getIncrAmount() const { return incrAmount; };
+   BindingStepMode getStepMode() const { return bidirectional; };
+
+   float getMax() const { return maximum; };
+   float getMin() const { return minimum; };
+
+   float getIncrMax() const { return incrMax; };
+   float getIncrMin() const { return incrMin; };
+   
+   void setTriggerValue(int tv) { triggerVal = tv; };
+
+   void setIncrAmount(float incrAmount_) { incrAmount = incrAmount_; };
+   void setStepMode(BindingStepMode bidirectional_);
+
+   void setMax(float incrMax_) { maximum = incrMax_; };
+   void setMin(float incrMax_) { minimum = incrMax_; };
+
+   void setStepMax(float incrMax_) { incrMax = incrMax_; };
+   void setStepMin(float incrMax_) { incrMin = incrMax_; };
+   
+   float applyNoteIncrement(float val);
+   float applyCC(float val);
+
+   String getDescription();
+
+protected:
+//   bool isNoteBinding; // true if note, false if CC
+   NoteBindingMode mode;   
+   int triggerVal; // note or CC depending on mode
+      
+   float maximum;
+   float minimum;
+   bool invert;
+
+   // note-specific options (hmm.. at present)
+   // will either generalise these options, use a union, or have subclass or 2?
+   float incrAmount;
+   BindingStepMode bidirectional;
+   float incrMax;
+   float incrMin;
+};
 
 //==============================================================================
 /**
@@ -67,30 +155,19 @@ public:
     /** It actually start midi learning */
     void activateLearning ();
 
-   enum NoteBindingMode
-   {
-      NoteOff = 0, // bound to note-off only
-      NoteOn = 1, // bound to note-on only
-      NoteHeld = 2, // parameter is 1.0 when note is down, otherwise 0.0
-   };
+   //==============================================================================
+   MidiBinding& getBinding(int bindingNum=0) { return currentBinding; } // param because we will have lots..
 
-    //==============================================================================
-    /** Returns the actual controller number */
-    int getControllerNumber () const                  { return controllerNumber; };
-    int getNoteNumber () const                  { return noteNumber; };
-    NoteBindingMode getNoteMode() { return noteOn; };
-    float getIncrAmount() { return incrAmount; };
-    float getIncrMax() { return incrMax; };
-    bool isBidirectional() { return bidirectional; };
+   // these accessors are temporary - make no sense if this thing supports multiple bindings
+   // will be removed when MidiBinding is factored out and tested ok etc..
 
-    /** Set a new controller number */
-    void setControllerNumber (const int control);
-    void setNoteNumber (const int note);
-    void setNoteMode(int noteOnMode);
-    void setIncrAmount(float incrAmount_) { incrAmount = incrAmount_; };
-    void setIncrMax(float incrMax_) { incrMax = incrMax_; };
-    void setBidirectional(bool bidirectional_) { bidirectional = bidirectional_; };
+   int getControllerNumber () const                  { return currentBinding.getCC() ; };
+   int getNoteNumber () const                  { return currentBinding.getNote(); };
 
+   void setControllerNumber (const int control);
+   void setNoteNumber (const int note);
+   void setNoteMode(int noteOnMode);
+   
 #if 0
     //==============================================================================
     /** Returns the actual controller number */
@@ -113,18 +190,11 @@ public:
     /** Handle a midi message coming in */
     virtual bool handleMidiMessage (const MidiMessage& message) = 0;
 
-   float applyNoteIncrement(float val);
-
 protected:
 
    friend class MidiAutomatorManager;
-
-   int controllerNumber;
-   int noteNumber;
-   NoteBindingMode noteOn;
-   float incrAmount;
-   float incrMax;
-   bool bidirectional;
+   
+   MidiBinding currentBinding;
 
 #if 0
     MidiTransferFunction transfer;

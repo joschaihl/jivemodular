@@ -32,14 +32,95 @@ BEGIN_JUCE_NAMESPACE
 #include "jucetice_MidiAutomatorManager.h"
 
 //==============================================================================
+void MidiBinding::setNote(int m)
+{
+   if (mode == Controller)
+      mode = NoteOn;
+   triggerVal = m;
+}
+
+void MidiBinding::setCC(int m)
+{
+   mode = Controller;
+   triggerVal = m;
+}
+
+void MidiBinding::setMode(int noteOnMode)
+{
+   if (noteOnMode < NoteOff || noteOnMode > Controller) 
+      noteOnMode = NoteOn; 
+
+   mode = static_cast<NoteBindingMode>(noteOnMode); 
+}
+
+void MidiBinding::setStepMode(BindingStepMode bidirectional_) 
+{
+   bidirectional = bidirectional_; 
+   if (bidirectional == Increase && incrAmount < 0)
+      incrAmount = -incrAmount;
+   else if (bidirectional == Decrease && incrAmount > 0)
+      incrAmount = -incrAmount;
+};
+
+float MidiBinding::applyCC(float val)
+{
+   return (maximum - minimum) * val + minimum;
+}
+
+float MidiBinding::applyNoteIncrement(float val)
+{
+   double range = (maximum-minimum);
+   double upperLimit = (minimum + (incrMax * range));
+   double lowerLimit = (minimum + (incrMin * range));
+   double actualIncr = incrAmount * range;
+   float returnVal = val;
+   if (incrAmount > 0.9999) // toggle
+      returnVal = val > 0.5 ? lowerLimit : upperLimit;
+   else if (bidirectional == Increase || bidirectional == Decrease || bidirectional == Bidirectional)
+   {
+   // rejigged these to be relative to user-set max & mins 
+      returnVal += actualIncr;
+      if (returnVal > upperLimit + 0.00001)
+      {
+         if (bidirectional == Bidirectional)
+         {
+            incrAmount = -incrAmount;
+            returnVal = upperLimit + actualIncr;
+         }
+         else
+            returnVal = lowerLimit;
+      }
+      else if (returnVal < lowerLimit - 0.00001)
+      {
+         if (bidirectional == Bidirectional)
+         {
+            incrAmount = -incrAmount;
+            returnVal = lowerLimit + actualIncr;
+         }
+         else
+            returnVal = upperLimit;
+      }
+   }
+   else if (bidirectional == SetToValue)
+      returnVal = upperLimit;
+   return returnVal;
+}
+
+String MidiBinding::getDescription()
+{
+   String description;
+   if (getCC() != -1)
+      description = String("Assigned to CC ") + String (getCC());
+   else if (getNote() != -1)
+      description = String("Assigned to Note ") + String (getNote());
+   else
+      description = String("Not assigned");
+   return description;
+}
+
+//==============================================================================
 MidiAutomatable::MidiAutomatable()
-: 
-  controllerNumber (-1),
-  noteNumber(-1),
-  noteOn(NoteOn),
-  incrAmount(1.0),
-  incrMax(1.0),
-  bidirectional(false),
+:
 #if 0
     transfer (MidiAutomatable::Linear),
 #endif
@@ -68,37 +149,30 @@ void MidiAutomatable::activateLearning ()
 
 void MidiAutomatable::setControllerNumber (const int control)
 {
-    if (controllerNumber != control)
-    {
-        controllerNumber = control;
-        if (control != -1)
-         setNoteNumber(-1);
+   if (getControllerNumber() != control)
+   {
+      currentBinding.setCC(control);
 
-        if (midiAutomatorManager)
-            midiAutomatorManager->registerMidiAutomatable (this);    
-    }
+      if (midiAutomatorManager)
+         midiAutomatorManager->registerMidiAutomatable (this);    
+   }
 }
 
 void MidiAutomatable::setNoteNumber (const int note)
 {
-    if (noteNumber != note)
-    {
-        noteNumber = note;
-        if (note != -1)
-         setControllerNumber(-1);
+   if (getNoteNumber() != note)
+   {
+      currentBinding.setNote(note);
 
-        if (midiAutomatorManager)
-            midiAutomatorManager->registerMidiAutomatable (this);    
-    }
+      if (midiAutomatorManager)
+         midiAutomatorManager->registerMidiAutomatable (this);    
+   }
 }
 
 void MidiAutomatable::setNoteMode(int noteOnMode) 
 { 
-   if (noteOnMode < NoteOff || noteOnMode > NoteHeld) 
-      noteOnMode = NoteOn; 
-
-   noteOn = static_cast<NoteBindingMode>(noteOnMode); 
-
+   currentBinding.setMode(noteOnMode);
+   
    if (midiAutomatorManager)
       midiAutomatorManager->registerMidiAutomatable (this);    
 };
@@ -158,12 +232,7 @@ PopupMenu MidiAutomatable::generateMidiPopupMenu()
                          noteNumber == i);
    }
 
-   if (controllerNumber != -1)
-      menu.addItem (-1, "Assigned to CC# " + String (controllerNumber), false);
-   else if (noteNumber != -1)
-      menu.addItem (-1, "Assigned to Note# " + String (noteNumber), false);
-   else
-      menu.addItem (-1, "Not assigned", false);
+   menu.addItem (-1, currentBinding.getDescription(), false);
    menu.addSeparator ();
 
    menu.addItem (1, "Midi Learn");
@@ -214,38 +283,6 @@ void MidiAutomatable::handleMidiPopupMenu(const MouseEvent& e)
     processMidiPopupMenu(result);
 }
 
-float MidiAutomatable::applyNoteIncrement(float val)
-{
-   float returnVal = val;
-   if (incrAmount > 0.9999)
-      returnVal = val > 0.5 ? 0.0 : 1.0;
-   else {
-      double upperLimit = (incrMax + 0.00001);
-      returnVal += incrAmount;
-      if (returnVal > upperLimit)
-      {
-         if (bidirectional)
-         {
-            incrAmount = -incrAmount;
-            returnVal = incrMax + incrAmount;
-         }
-         else
-            returnVal = 0.0;
-      }
-      else if (returnVal < -0.00001)
-      {
-         if (bidirectional)
-         {
-            incrAmount = -incrAmount;
-            returnVal = 0.0 + incrAmount;
-         }
-         else
-            returnVal = incrMax;
-      }
-   }
-   return returnVal;
-}
-
 //==============================================================================
 MidiAutomatorManager::MidiAutomatorManager ()
     : activeLearner (0)
@@ -283,12 +320,12 @@ void MidiAutomatorManager::registerMidiAutomatable (MidiAutomatable* object)
    }
    else if (object->getNoteNumber () != -1)
    {
-      if (object->getNoteMode() == MidiAutomatable::NoteHeld || object->getNoteMode() == MidiAutomatable::NoteOn)
+      if (object->getBinding().getMode() == NoteHeld || object->getBinding().getMode() == NoteOn)
       {
          VoidArray* array = notes.getUnchecked (object->getNoteNumber ());      
          array->add (object);
       }
-      if (object->getNoteMode() == MidiAutomatable::NoteHeld || object->getNoteMode() == MidiAutomatable::NoteOff)
+      if (object->getBinding().getMode() == NoteHeld || object->getBinding().getMode() == NoteOff)
       {
          VoidArray* array = noteOffs.getUnchecked (object->getNoteNumber ());      
          array->add (object);
