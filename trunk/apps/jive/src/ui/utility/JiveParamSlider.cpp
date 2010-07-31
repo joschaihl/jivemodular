@@ -1,7 +1,7 @@
 
 #include "JiveParamSlider.h"
 
-// Component for editing note bindings..
+// Component for editing a single midi binding.
 class MidiBindingEditorContent : public Component, public ComboBoxListener
 {
 public:
@@ -86,12 +86,11 @@ public:
       incrMinLabel->setBounds(l, 2*h, labelw, itemh);
       incrMaxLabel->setBounds(l, 3*h, labelw, itemh);
       l += labelw;
-      incrDirection->setBounds(l, 0, itemw, itemh);
+      incrDirection->setBounds(l, pad, itemw, itemh);
       incrAmount->setBounds(l, h, itemw, itemh);
       incrMin->setBounds(l, 2*h, itemw, itemh);
       incrMax->setBounds(l, 3*h, itemw, itemh);
    }
-   
    
    ~MidiBindingEditorContent()
    {
@@ -112,9 +111,11 @@ public:
       {
          int realMax = incrAmount->getSelectedId();
          incrMax->setRange(1, realMax, 1);
+         incrMax->setValue(realMax);
          if (realMax < incrMax->getValue())
             incrMax->setValue(realMax);
          incrMin->setRange(0, realMax-1, 1);
+         incrMin->setValue(0);
       }
       // todo other sliders
    }
@@ -178,13 +179,218 @@ void MidiBindingEditorContent::getBindingOptions(MidiBinding& binding)
    binding.setStepMode(BindingStepMode(incrDirection->getSelectedId()));
 }
 
+// Component for editing a list of bindings for a parameter - 
+// lists all the bindings, showing the selected binding settings 
+// in a MidiBindingEditorContent at the bottom.
+// Can also support add/remove individual bindings.
+class MidiBindingsEditor : public Component, public TableListBoxModel, public ButtonListener
+{
+public:
+   MidiBindingsEditor(MidiAutomatable* parameter_);
+   ~MidiBindingsEditor();
+
+   void resized();
+
+   void showCurBindingOpts();
+   void saveCurBindingOpts();
+
+   //- TableListBoxModel implementation
+   virtual int getNumRows();
+   virtual void paintRowBackground (Graphics& g,
+                               int rowNumber,
+                               int width, int height,
+                               bool rowIsSelected);
+   virtual void paintCell (Graphics& g,
+                            int rowNumber,
+                            int columnId,
+                            int width, int height,
+                            bool rowIsSelected);
+   virtual void selectedRowsChanged (int lastRowSelected);
+   
+   // ButtonListener implementation
+   virtual void buttonClicked (Button* button);
+ 
+private:
+   enum ColumnIds {
+      Mode,
+      TriggerVal
+   };
+
+   Button* addButton;
+   Button* removeButton;
+   TableListBox* bindingsList;
+   MidiBindingEditorContent* bindingEditor;
+
+   MidiAutomatable* parameter;
+   int currentBinding;
+};
+
+MidiBindingsEditor::MidiBindingsEditor(MidiAutomatable* parameter_)
+:
+   parameter(parameter_),
+   currentBinding(-1)
+{
+   addAndMakeVisible(addButton = new TextButton("Add"));
+   addButton->addButtonListener(this);
+   addAndMakeVisible(removeButton = new TextButton("Delete"));
+   removeButton->addButtonListener(this);
+
+   addAndMakeVisible(bindingsList = new TableListBox("BindingsList", this));
+   TableHeaderComponent* header = bindingsList->getHeader();
+   header->addColumn("Mode", Mode, 100, 20, -1);
+   header->addColumn("Note/CC", TriggerVal, 100, 20, -1);
+   
+   addChildComponent(bindingEditor = new MidiBindingEditorContent());
+
+   bindingsList->updateContent();
+   bindingsList->selectRow(0);
+   
+   setSize(400, 350);
+}
+
+MidiBindingsEditor::~MidiBindingsEditor()
+{
+   saveCurBindingOpts();
+   deleteAllChildren();
+}
+
+void MidiBindingsEditor::resized()
+{
+   int width = getWidth()-10;
+   int height = getHeight();
+   int edH = 130;
+   int buttonH = 40;
+   int lh = height - edH - buttonH;
+
+   if (bindingsList)
+      bindingsList->setBounds(5, 5, width, lh - 5);
+   
+   if (addButton && removeButton)
+   {
+      int addw = width / 3;
+      addButton->setBounds(5, lh, addw*2-5, buttonH - 5);
+      removeButton->setBounds(addw*2, lh, addw-5, buttonH - 5);
+   }
+   
+   if (bindingEditor)
+      bindingEditor->setBounds(5, lh + buttonH, width, edH);
+}
+
+int MidiBindingsEditor::getNumRows()
+{
+   return parameter ? parameter->getNumBindings() : 0;
+}
+
+void MidiBindingsEditor::paintRowBackground (Graphics& g,
+                            int rowNumber,
+                            int width, int height,
+                            bool rowIsSelected)
+{
+   if (rowIsSelected)
+      g.setColour(Colours::yellow);
+   else
+      g.setColour(Colours::orange);
+   g.fillRect(0, 0, width, height);
+}
+
+void MidiBindingsEditor::paintCell (Graphics& g,
+                         int rowNumber,
+                         int columnId,
+                         int width, int height,
+                         bool rowIsSelected)
+{
+   String string("-");
+   MidiBinding* bp = parameter->getBinding(rowNumber);
+   if (bp)
+   {
+      if (columnId == Mode)
+      {
+      // move to a method on MidiBinding!!
+      // and use in the dropdown in MidiBindingEditorContent!
+         switch (bp->getMode()) {
+            case NoteOff:
+               string = "NoteOff";
+               break;
+            case NoteOn:
+               string = "NoteOn";
+               break;
+            case NoteHeld:
+               string = "NoteHeld";
+               break;
+            case Controller:
+               string = "CC";
+               break;
+         }
+      }
+      else if (columnId == TriggerVal)
+         string = String(bp->getTriggerValue());
+   }
+   g.setColour(Colours::black);
+   g.drawText(string, 0, 0, width, height, Justification(Justification::horizontallyCentred | Justification::verticallyCentred), true);
+}
+
+void MidiBindingsEditor::showCurBindingOpts()
+{
+   int sel = bindingsList->getSelectedRow();
+   MidiBinding* bp = parameter->getBinding(sel);   
+   if (bp)
+   {
+      bindingEditor->putBindingOptions(*bp);      
+      bindingEditor->setVisible(true);      
+      currentBinding = sel;
+   }
+}
+
+void MidiBindingsEditor::saveCurBindingOpts()
+{
+   MidiBinding* bp = parameter->getBinding(currentBinding);   
+   if (bp)
+   {
+      bindingEditor->getBindingOptions(*bp);
+      parameter->RegisterBinding(currentBinding);   
+   }
+}
+
+void MidiBindingsEditor::selectedRowsChanged (int lastRowSelected)
+{
+   saveCurBindingOpts();
+   showCurBindingOpts();
+}
+
+void MidiBindingsEditor::buttonClicked (Button* button)
+{
+   if (button == addButton)
+   {
+      // set up a new binding similar to the current one.. could do more here
+      int curTrig = 1;
+      NoteBindingMode curMode = Controller;
+      MidiBinding* bp = parameter->getBinding(currentBinding);
+      if (bp)
+      {
+         curTrig = bp->getTriggerValue();
+         curMode = bp->getMode();
+      }
+      int curBinding = 0;
+      if (curMode == Controller)
+         curBinding = parameter->addControllerNumber(curTrig);
+      else
+         curBinding = parameter->addNoteNumber(curTrig);
+      bindingsList->selectRow(curBinding);
+   }
+   else if (button == removeButton)
+   {
+      parameter->removeBinding(currentBinding);
+   }
+   bindingsList->updateContent();   
+}
+
 void ParamSlider::mouseDown(const MouseEvent& e)
 {
    if (managedParam && e.mods.isRightButtonDown ())
    {
       PopupMenu menu = managedParam->generateMidiPopupMenu();
 
-      menu.addItem (3, "Edit", true);
+      menu.addItem (3, "Bindings...", true);
 
       int result = menu.showAt (e.getScreenX(), e.getScreenY());
 
@@ -192,12 +398,8 @@ void ParamSlider::mouseDown(const MouseEvent& e)
       
       if (!handlerd && result == 3)
       {
-         MidiBindingEditorContent dialogStuff;
-         dialogStuff.putBindingOptions(managedParam->getBinding());
-         
-         DialogWindow::showModalDialog(String("Edit Note Binding"), &dialogStuff, 0, Colours::brown, true);
-
-         dialogStuff.getBindingOptions(managedParam->getBinding());
+         MidiBindingsEditor ed(managedParam);
+         DialogWindow::showModalDialog(String("Edit Parameter Bindings"), &ed, 0, Colours::green, true);
       }
    }
 

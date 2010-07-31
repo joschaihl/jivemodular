@@ -580,8 +580,6 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
    AudioParameter* theEnablyParameter = plugin->getParameterObject(0);
    addAndMakeVisible(ccEnabledSlider = new ParamSlider(plugin, theEnablyParameter, 0));
    ccEnabledSlider->setTextBoxIsEditable(false);
-   if (theEnablyParameter)
-      theEnablyParameter->setIncrAmount(1.0 / patternsPerPart);
 
    addAndMakeVisible(partPatternNumSlider = new Slider("Pattern Number"));
    partPatternNumSlider->setSliderStyle(Slider::IncDecButtons);

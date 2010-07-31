@@ -147,34 +147,77 @@ void MidiAutomatable::activateLearning ()
         midiAutomatorManager->setActiveLearner (this);
 }
 
-void MidiAutomatable::setControllerNumber (const int control)
+void MidiAutomatable::RegisterBinding(int bindingNum)
 {
-   if (getControllerNumber() != control)
-   {
-      currentBinding.setCC(control);
-
-      if (midiAutomatorManager)
-         midiAutomatorManager->registerMidiAutomatable (this);    
-   }
-}
-
-void MidiAutomatable::setNoteNumber (const int note)
-{
-   if (getNoteNumber() != note)
-   {
-      currentBinding.setNote(note);
-
-      if (midiAutomatorManager)
-         midiAutomatorManager->registerMidiAutomatable (this);    
-   }
-}
-
-void MidiAutomatable::setNoteMode(int noteOnMode) 
-{ 
-   currentBinding.setMode(noteOnMode);
-   
    if (midiAutomatorManager)
-      midiAutomatorManager->registerMidiAutomatable (this);    
+      midiAutomatorManager->registerMidiAutomatable (this, bindingNum);    
+}
+
+bool MidiAutomatable::isBindingNumValid(int bindingNum) const
+{
+   return (bindingNum >= 0 && bindingNum < bindings.size());
+}
+
+MidiBinding* MidiAutomatable::getBinding(int bindingNum) const 
+{
+   if (isBindingNumValid(bindingNum))
+      return bindings[bindingNum];
+   else 
+      return NULL;
+}
+
+void MidiAutomatable::removeBinding(int bindingNum)
+{
+   if (isBindingNumValid(bindingNum))
+      bindings.remove(bindingNum);
+}
+
+void MidiAutomatable::setControllerNumber (const int control, int bindingNum)
+{
+   MidiBinding* b = getBinding(bindingNum);
+   if (b)
+   {
+      b->setCC(control);
+      RegisterBinding(bindingNum);
+   }
+}
+
+void MidiAutomatable::setNoteNumber (const int note, int bindingNum)
+{
+   MidiBinding* b = getBinding(bindingNum);
+   if (b)
+   {
+      b->setNote(note);
+      RegisterBinding(bindingNum);
+   }
+}
+
+int MidiAutomatable::addControllerNumber (const int control)
+{
+   int newBinding = bindings.size();
+   bindings.add(new MidiBinding);
+   setControllerNumber(control, newBinding);
+   RegisterBinding(newBinding);
+   return newBinding;
+}
+
+int MidiAutomatable::addNoteNumber (const int note)
+{
+   int newBinding = bindings.size();
+   bindings.add(new MidiBinding);
+   setNoteNumber(note, newBinding);
+   RegisterBinding(newBinding);
+   return newBinding;
+}
+
+void MidiAutomatable::setNoteMode(int noteOnMode, int bindingNum) 
+{ 
+      MidiBinding* b = getBinding(bindingNum);
+      if (b)
+      {
+         b->setMode(noteOnMode);
+   RegisterBinding(bindingNum);
+   }
 };
 
 
@@ -232,8 +275,9 @@ PopupMenu MidiAutomatable::generateMidiPopupMenu()
                          noteNumber == i);
    }
 
-   menu.addItem (-1, currentBinding.getDescription(), false);
-   menu.addSeparator ();
+// to do summarise multiple bindings
+//   menu.addItem (-1, getBinding(0).getDescription(), false);
+//   menu.addSeparator ();
 
    menu.addItem (1, "Midi Learn");
    menu.addSubMenu ("Set CC", ccSubMenu);
@@ -249,6 +293,8 @@ bool MidiAutomatable::processMidiPopupMenu(int result)
     switch (result)
     {
     case 1:
+        setControllerNumber (-1);
+        setNoteNumber (-1);
         activateLearning ();
         weHandledIt = true;
         break;
@@ -288,11 +334,13 @@ MidiAutomatorManager::MidiAutomatorManager ()
     : activeLearner (0)
 {
     for (int i = 0; i < 128; i++)
-        controllers.add (new VoidArray);
+        controllers.add (new TriggerValBindingMap);
+//    for (int i = 0; i < 128; i++)
+//        notes.add (new VoidArray);
     for (int i = 0; i < 128; i++)
-        notes.add (new VoidArray);
+        notes.add (new TriggerValBindingMap);
     for (int i = 0; i < 128; i++)
-        noteOffs.add (new VoidArray);
+        noteOffs.add (new TriggerValBindingMap);
 }
 
 MidiAutomatorManager::~MidiAutomatorManager ()
@@ -306,52 +354,69 @@ MidiAutomatorManager::~MidiAutomatorManager ()
 }
 
 //==============================================================================
-void MidiAutomatorManager::registerMidiAutomatable (MidiAutomatable* object)
+void MidiAutomatorManager::registerMidiAutomatable (MidiAutomatable* object, int bindingNum)
 {
    object->setMidiAutomatorManager (this);
 
-   removeMidiAutomatable(object);
-
-   if (object->getControllerNumber () != -1)
-   {
-      VoidArray* array = controllers.getUnchecked (object->getControllerNumber ());
-
-      array->add (object);
-   }
-   else if (object->getNoteNumber () != -1)
-   {
-      if (object->getBinding().getMode() == NoteHeld || object->getBinding().getMode() == NoteOn)
+   removeMidiAutomatable(object, bindingNum);
+   
+   MidiBinding* bindingOptsP = object->getBinding(bindingNum);
+   if (bindingOptsP)
+   {   
+      MidiBinding& bindingOpts = *bindingOptsP;
+      if (bindingOpts.getCC () != -1)
       {
-         VoidArray* array = notes.getUnchecked (object->getNoteNumber ());      
-         array->add (object);
+         TriggerValBindingMap* array = controllers.getUnchecked (bindingOpts.getCC ());
+//         array->add (object);
+         array->insert(TriggerValBinding(object, bindingNum));
       }
-      if (object->getBinding().getMode() == NoteHeld || object->getBinding().getMode() == NoteOff)
+      else if (bindingOpts.getNote () != -1)
       {
-         VoidArray* array = noteOffs.getUnchecked (object->getNoteNumber ());      
-         array->add (object);
+         if (bindingOpts.getMode() == NoteHeld || bindingOpts.getMode() == NoteOn)
+         {
+   //         VoidArray* array = notes.getUnchecked (bindingOpts.getNoteNumber ());      
+   //         array->add (object);
+            TriggerValBindingMap* array = notes.getUnchecked (bindingOpts.getNote ());      
+            array->insert(TriggerValBinding(object, bindingNum));
+         }
+         if (bindingOpts.getMode() == NoteHeld || bindingOpts.getMode() == NoteOff)
+         {
+            TriggerValBindingMap* array = noteOffs.getUnchecked (bindingOpts.getNote());      
+//            array->add (object);
+            array->insert(TriggerValBinding(object, bindingNum));
+         }
       }
    }
 }
 
 //==============================================================================
-void MidiAutomatorManager::removeMidiAutomatable (MidiAutomatable* object)
+void MidiAutomatorManager::removeMidiAutomatable (MidiAutomatable* object, int bindingNum)
 {
-    if (activeLearner == object)
-        activeLearner = 0;
+   if (activeLearner == object)
+      activeLearner = 0;
 
-    for (int i = 0; i < 128; i++)
-    {
-        VoidArray* array = controllers.getUnchecked (i);
-        VoidArray* arrayNote = notes.getUnchecked (i);
-        VoidArray* arrayNoteOff = noteOffs.getUnchecked (i);
-        
-        if (array->contains (object))
-            array->removeValue (object);
-        if (arrayNote->contains (object))
-            arrayNote->removeValue (object);
-        if (arrayNoteOff->contains (object))
-            arrayNoteOff->removeValue (object);
-    }
+   for (int i = 0; i < 128; i++)
+   {
+      TriggerValBindingMap* array;
+      array = controllers.getUnchecked (i);
+      for (TriggerValBindingMap::iterator it=array->lower_bound(object); it != array->upper_bound(object); it++)
+      {
+         if (bindingNum == -1 || bindingNum == it->second)
+            array->erase(it);
+      }
+      array = notes.getUnchecked (i);
+      for (TriggerValBindingMap::iterator it=array->lower_bound(object); it != array->upper_bound(object); it++)
+      {
+         if (bindingNum == -1 || bindingNum == it->second)
+         array->erase(it);
+      }
+      array = noteOffs.getUnchecked (i);
+      for (TriggerValBindingMap::iterator it=array->lower_bound(object); it != array->upper_bound(object); it++)
+      {
+         if (bindingNum == -1 || bindingNum == it->second)
+         array->erase(it);
+      }
+   }
 }
 
 //==============================================================================
@@ -359,8 +424,8 @@ void MidiAutomatorManager::clearMidiAutomatableFromCC (const int ccNumber)
 {
     jassert (ccNumber >= 0 && ccNumber < 128)
 
-    VoidArray* array = controllers.getUnchecked (ccNumber);
-    
+//    VoidArray* array = controllers.getUnchecked (ccNumber);
+   TriggerValBindingMap* array = controllers.getUnchecked (ccNumber);
     array->clear();
 }
     
@@ -368,16 +433,17 @@ void MidiAutomatorManager::clearMidiAutomatableFromNote (const int note)
 {
     jassert (note >= 0 && note < 128)
 
-    VoidArray* array = notes.getUnchecked (note);
-    
-    array->clear();
+//    VoidArray* array = notes.getUnchecked (note);
+//    array->clear();
+   TriggerValBindingMap* array = notes.getUnchecked (note);
+   array->clear();
+
 }
 void MidiAutomatorManager::clearMidiAutomatableFromNoteOff (const int note)
 {
     jassert (note >= 0 && note < 128)
 
-    VoidArray* array = noteOffs.getUnchecked (note);
-    
+    TriggerValBindingMap* array = noteOffs.getUnchecked (note);
     array->clear();
 }
     
@@ -396,49 +462,34 @@ bool MidiAutomatorManager::handleMidiMessage (const MidiMessage& message)
     {
         if (activeLearner != 0)
         {
-            activeLearner->setControllerNumber (message.getControllerNumber ());
+            activeLearner->addControllerNumber (message.getControllerNumber ());
             activeLearner = 0;
         }
         else
         {
-            VoidArray* array = controllers.getUnchecked (message.getControllerNumber ());
-            
-            for (int i = 0; i < array->size (); i++)
-            {
-                MidiAutomatable* learnObject = (MidiAutomatable*) array->getUnchecked (i);
-                
-                messageWasHandled |= learnObject->handleMidiMessage (message);
-            }
+            TriggerValBindingMap* mappy = controllers.getUnchecked(message.getNoteNumber ());
+            for (TriggerValBindingMap::iterator it = mappy->begin(); it != mappy->end(); it++)
+               messageWasHandled |= it->first->handleMidiMessage(message, it->second);
         }
     }
     else if (message.isNoteOnOrOff())
     {
         if (activeLearner != 0)
         {
-            activeLearner->setNoteNumber (message.getNoteNumber ());
+            activeLearner->addNoteNumber (message.getNoteNumber());
             activeLearner = 0;
         }
         else if (message.isNoteOn())
         {
-            VoidArray* array = notes.getUnchecked (message.getNoteNumber ());
-    
-            for (int i = 0; i < array->size (); i++)
-            {
-                MidiAutomatable* learnObject = (MidiAutomatable*) array->getUnchecked (i);
-                
-                messageWasHandled |= learnObject->handleMidiMessage (message);
-            }
+            TriggerValBindingMap* mappy = notes.getUnchecked(message.getNoteNumber ());
+            for (TriggerValBindingMap::iterator it = mappy->begin(); it != mappy->end(); it++)
+                messageWasHandled |= it->first->handleMidiMessage(message, it->second);
         }
         else 
         {
-            VoidArray* array = noteOffs.getUnchecked (message.getNoteNumber ());
-            
-            for (int i = 0; i < array->size (); i++)
-            {
-                MidiAutomatable* learnObject = (MidiAutomatable*) array->getUnchecked (i);
-                
-                messageWasHandled |= learnObject->handleMidiMessage (message);
-            }
+            TriggerValBindingMap* mappy = noteOffs.getUnchecked(message.getNoteNumber ());
+            for (TriggerValBindingMap::iterator it = mappy->begin(); it != mappy->end(); it++)
+               messageWasHandled |= it->first->handleMidiMessage(message, it->second);
         }
     
     }

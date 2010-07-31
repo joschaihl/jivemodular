@@ -264,26 +264,32 @@ void AudioParameter::handleAsyncUpdate ()
 }
 
 //==============================================================================
-bool AudioParameter::handleMidiMessage (const MidiMessage& message)
+bool AudioParameter::handleMidiMessage (const MidiMessage& message, int bindingNum)
 {
-   // may yet replace this with MidiBinding :: mutateValue(cur)..
-   if (message.isController())
-      plugin->setParameter (index, getBinding().applyCC(message.getControllerValue () * float_MidiScaler));
-   else if (message.isNoteOnOrOff())
+   MidiBinding* bp = getBinding(bindingNum);
+   if (bp)
    {
-      float cur = plugin->getParameter(index);
-      if (getBinding().getMode() == NoteHeld)
+      MidiBinding& bd = *bp;
+   
+      // may yet replace this with MidiBinding :: mutateValue(cur)..
+      if (message.isController())
+         plugin->setParameter (index, bd.applyCC(message.getControllerValue () * float_MidiScaler));
+      else if (message.isNoteOnOrOff())
       {
-         if (message.isNoteOn())
-            cur = 1.0;
-         else
-            cur = 0.0;
+         float cur = plugin->getParameter(index);
+         if (bd.getMode() == NoteHeld)
+         {
+			// this should be moved into mutateValue/applyNoteIncrement and make use of user specified max and min
+            if (message.isNoteOn())
+               cur = 1.0;
+            else
+               cur = 0.0;
+         }
+         else 
+            cur = bd.applyNoteIncrement(cur);
+         plugin->setParameter(index, cur);
       }
-      else 
-         cur = getBinding().applyNoteIncrement(cur);
-      plugin->setParameter(index, cur);
    }
-
    return true;
 }
 
