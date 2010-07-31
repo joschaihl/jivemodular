@@ -87,6 +87,8 @@
 #include <string>
 #include <list>
 #include <set>
+// haszari: added <map> so I can use multimap in MidiAutomatorManager
+#include <map>
 
 #if JUCE_USE_INTRINSICS
   #include <intrin.h>
