@@ -127,9 +127,10 @@ void BasePlugin::savePropertiesToXml (XmlElement* xml)
             XmlElement* binding = new XmlElement(MIDIBINDING_ELEMENT_NAME);
             binding->setAttribute(MIDIBINDING_PARAM_ATTRIB, i);
             binding->setAttribute(MIDIBINDING_NOTE_ATTRIB, note);
-            binding->setAttribute(MIDIBINDING_INCR_ATTRIB, param->getBinding().getIncrAmount());
-            binding->setAttribute(MIDIBINDING_BIDIRECTIONAL_ATTRIB, param->getBinding().getStepMode());
-            binding->setAttribute(MIDIBINDING_NOTEMODE_ATTRIB, param->getBinding().getMode());
+            // coming back sooon...
+//            binding->setAttribute(MIDIBINDING_INCR_ATTRIB, param->getBinding().getIncrAmount());
+//            binding->setAttribute(MIDIBINDING_BIDIRECTIONAL_ATTRIB, param->getBinding().getStepMode());
+//            binding->setAttribute(MIDIBINDING_NOTEMODE_ATTRIB, param->getBinding().getMode());
             bindingsElement->addChildElement(binding);
    }
 
@@ -185,10 +186,11 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
             {
                if (note >= 0 && note < 128)
                {
-                  param->getBinding().setNote(note);
-                  param->getBinding().setIncrAmount(bindingElement->getDoubleAttribute(MIDIBINDING_INCR_ATTRIB, 1));
-                  param->getBinding().setMode(bindingElement->getIntAttribute(MIDIBINDING_BIDIRECTIONAL_ATTRIB, false));
-                  param->getBinding().setMode(bindingElement->getIntAttribute(MIDIBINDING_NOTEMODE_ATTRIB, true));
+// coming back soon!!
+//                  param->getBinding().setNote(note);
+//                  param->getBinding().setIncrAmount(bindingElement->getDoubleAttribute(MIDIBINDING_INCR_ATTRIB, 1));
+//                  param->getBinding().setMode(bindingElement->getIntAttribute(MIDIBINDING_BIDIRECTIONAL_ATTRIB, false));
+//                  param->getBinding().setMode(bindingElement->getIntAttribute(MIDIBINDING_NOTEMODE_ATTRIB, true));
                }
             }
          }

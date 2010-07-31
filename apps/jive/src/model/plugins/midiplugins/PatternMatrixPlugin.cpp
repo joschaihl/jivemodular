@@ -79,7 +79,8 @@ int PatternMatrixPlugin::getPartPattern(int part)
 void PatternMatrixPlugin::setParameterReal (int paramNumber, float value)
 {
    if (paramNumber < MAXPARTS)
-      currentPattern[paramNumber] = (value + 1.0 / MAXPATTERNSPERPART) * (MAXPATTERNSPERPART); // add 1 so the round rounds us where we want
+//      currentPattern[paramNumber] = (value + 1.0 / MAXPATTERNSPERPART) * (MAXPATTERNSPERPART); // add 1 so the round rounds us where we want
+      currentPattern[paramNumber] = (value * MAXPATTERNSPERPART); // we only want the rounding when the user clicked on the slider - emulating a button matrix..
    else if (paramNumber == QuantiseParamId)
    {
    

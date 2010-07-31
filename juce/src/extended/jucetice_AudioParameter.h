@@ -338,7 +338,7 @@ public:
     /** @internal */
     void handleAsyncUpdate ();
     /** @internal */
-    bool handleMidiMessage (const MidiMessage& message);
+    bool handleMidiMessage (const MidiMessage& message, int bindingNum);
 
 protected:
 

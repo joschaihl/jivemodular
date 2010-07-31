@@ -156,17 +156,28 @@ public:
     void activateLearning ();
 
    //==============================================================================
-   MidiBinding& getBinding(int bindingNum=0) { return currentBinding; } // param because we will have lots..
+   int getNumBindings() { return bindings.size(); }
+   bool isBindingNumValid(int bindingNum) const;
+   MidiBinding* getBinding(int bindingNum=0) const;
+   void RegisterBinding(int bindingNum=0);
 
-   // these accessors are temporary - make no sense if this thing supports multiple bindings
-   // will be removed when MidiBinding is factored out and tested ok etc..
+   // these accessors are temporary
+   // currently AudioPlugin depends on these, need to factor out that and then remove these
+   // most likely to do with save/load of parameters
+   // (by the way, they do nothing!!)
 
-   int getControllerNumber () const                  { return currentBinding.getCC() ; };
-   int getNoteNumber () const                  { return currentBinding.getNote(); };
+   int getControllerNumber () const                  { return -1; };
+   int getNoteNumber () const                  { return -1; };
 
-   void setControllerNumber (const int control);
-   void setNoteNumber (const int note);
-   void setNoteMode(int noteOnMode);
+   void setControllerNumber (const int control, int bindingNum=-1);
+   void setNoteNumber (const int note, int bindingNum=-1);
+   void setNoteMode(int noteOnMode, int bindingNum=-1);
+
+   // add a new binding - returns the binding index
+   int addControllerNumber (const int control);
+   int addNoteNumber (const int note);
+   
+   void removeBinding(int bindingNum);
    
 #if 0
     //==============================================================================
@@ -188,13 +199,13 @@ public:
 
     //==============================================================================
     /** Handle a midi message coming in */
-    virtual bool handleMidiMessage (const MidiMessage& message) = 0;
+    virtual bool handleMidiMessage (const MidiMessage& message, int bindingNum = 0) = 0;
 
 protected:
 
    friend class MidiAutomatorManager;
    
-   MidiBinding currentBinding;
+   OwnedArray<MidiBinding> bindings;
 
 #if 0
     MidiTransferFunction transfer;
@@ -236,14 +247,14 @@ public:
         
         It is the first thing to call in order to use the actual learning caps.
     */ 
-    void registerMidiAutomatable (MidiAutomatable* object);
+    void registerMidiAutomatable (MidiAutomatable* object, int bindingNum=-1);
 
     /** Deregister an existing object
 
         The function is important because it actually tells to our objects which
         is the actual midi learn manager where we listen to.
     */ 
-    void removeMidiAutomatable (MidiAutomatable* object);
+    void removeMidiAutomatable (MidiAutomatable* object, int bindingNum=-1);
 
     //==============================================================================
     /** Deregister all objects listening to a CC number */ 
@@ -266,9 +277,12 @@ protected:
     /** Tells which is the learning object */
     void setActiveLearner (MidiAutomatable* object);
 
-    Array<VoidArray*> controllers;
-    Array<VoidArray*> notes;
-    Array<VoidArray*> noteOffs;
+   typedef std::multimap<MidiAutomatable*, int> TriggerValBindingMap;
+   typedef std::pair<MidiAutomatable*, int> TriggerValBinding;
+   Array<TriggerValBindingMap*> notes;
+   Array<TriggerValBindingMap*> noteOffs;
+   Array<TriggerValBindingMap*> controllers;
+
     MidiAutomatable* activeLearner;
 };
 
