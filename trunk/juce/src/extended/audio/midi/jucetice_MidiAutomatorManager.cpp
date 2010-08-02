@@ -55,7 +55,7 @@ void MidiBinding::setMode(int noteOnMode)
 
 void MidiBinding::setStepMode(BindingStepMode bidirectional_) 
 {
-   bidirectional = bidirectional_; 
+   bidirectional = bidirectional_ >= Decrease && bidirectional_ <= SetToValue ? bidirectional_ : Increase;
    if (bidirectional == Increase && incrAmount < 0)
       incrAmount = -incrAmount;
    else if (bidirectional == Decrease && incrAmount > 0)
@@ -78,14 +78,13 @@ float MidiBinding::applyNoteIncrement(float val)
       returnVal = val > 0.5 ? lowerLimit : upperLimit;
    else if (bidirectional == Increase || bidirectional == Decrease || bidirectional == Bidirectional)
    {
-   // rejigged these to be relative to user-set max & mins 
       returnVal += actualIncr;
       if (returnVal > upperLimit + 0.00001)
       {
          if (bidirectional == Bidirectional)
          {
             incrAmount = -incrAmount;
-            returnVal = upperLimit + actualIncr;
+            returnVal = upperLimit + -actualIncr;
          }
          else
             returnVal = lowerLimit;
@@ -95,7 +94,7 @@ float MidiBinding::applyNoteIncrement(float val)
          if (bidirectional == Bidirectional)
          {
             incrAmount = -incrAmount;
-            returnVal = lowerLimit + actualIncr;
+            returnVal = lowerLimit + -actualIncr;
          }
          else
             returnVal = upperLimit;
