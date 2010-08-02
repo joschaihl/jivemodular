@@ -51,11 +51,13 @@ VstPluginWindowContent::VstPluginWindowContent (PluginEditorWindowHolder* owner_
                                                                 nativeEditor,
                                                                 externalEditor));
 
-    mainPanel->setTabBarDepth (getTabbedPanelHeight ());
+    //mainPanel->setTabBarDepth (getTabbedPanelHeight ());
+    mainPanel->setTabBarDepth (0); // hide the tabs, in jive this is used for LADSPA etc and should just be a bunch of sliders
 
     // midi keyboard
-    int shouldActivateKeys = plugin->getIntValue (PROP_WINDOWVISIBLEMIDIKEY, plugin->acceptsMidi ());
-    activateMidiKeyboard (shouldActivateKeys == 1);
+    // defaulting to off for now as mostly I use these generic editors for LADSPA audio effects..
+    //int shouldActivateKeys = plugin->getIntValue (PROP_WINDOWVISIBLEMIDIKEY, plugin->acceptsMidi ());
+    activateMidiKeyboard (false);
 }
 
 VstPluginWindowContent::~VstPluginWindowContent ()

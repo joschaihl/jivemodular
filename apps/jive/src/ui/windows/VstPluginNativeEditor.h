@@ -30,7 +30,7 @@
 #define __JUCETICE_JOST_VSTPLUGINNATIVEEDITOR_HEADER__
 
 #include "../plugins/PluginEditorComponent.h"
-
+#include "ui/utility/JiveParamSlider.h"
 
 class VstPluginWindow;
 
@@ -93,7 +93,7 @@ protected:
 
     Array<Label*> names;
     Array<Label*> labels;
-    Array<ParameterSlider*> sliders;
+    Array<ParamSlider*> sliders;
     
     int preferredWidth, preferredHeight;
     int lastWidth, lastHeight;

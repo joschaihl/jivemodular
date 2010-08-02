@@ -49,7 +49,7 @@ VstPluginNativeEditor::VstPluginNativeEditor (BasePlugin* plugin_,
     Colour backgroundColour = window->getBackgroundColour ();
 
 //    ImageSlider* param;
-    ParameterSlider* param;
+    ParamSlider* param;
     Label* label;
     
     for (int j = 0; j < plugin->getNumParameters (); j++)
@@ -63,7 +63,7 @@ VstPluginNativeEditor::VstPluginNativeEditor (BasePlugin* plugin_,
         label->setBounds (0, 5 + j * size, labelWidth, size - 2);
         names.add (label);
 
-        addAndMakeVisible (param = new ParameterSlider (String (j)));
+        addAndMakeVisible (param = new ParamSlider (plugin_, plugin->getParameterObject(j), j));
 //        param->setOrientation (ImageSlider::LinearHorizontal);
         param->setRange (0, 1, 0.0001);
         param->setValue (plugin->getParameter (j));
@@ -182,7 +182,7 @@ void VstPluginNativeEditor::updateParameters ()
         {
             String paramNumber = String (i);
 
-            ParameterSlider* slider = sliders [i];
+            ParamSlider* slider = sliders [i];
             if (slider) {
                 slider->setValue (plugin->getParameter (i), false);
             }
