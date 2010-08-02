@@ -32,11 +32,14 @@
 #define MIDIBINDINGS_ELEMENT_NAME              T("midiBindings")
 #define MIDIBINDING_ELEMENT_NAME              T("binding")
 #define MIDIBINDING_PARAM_ATTRIB              T("parameterId")
-#define MIDIBINDING_CC_ATTRIB              T("controllerNum")
-#define MIDIBINDING_NOTE_ATTRIB              T("noteNum")
-#define MIDIBINDING_INCR_ATTRIB              T("incrementAmount")
-#define MIDIBINDING_BIDIRECTIONAL_ATTRIB              T("bidirectional")
-#define MIDIBINDING_NOTEMODE_ATTRIB              T("noteMode")
+#define MIDIBINDING_TRIGVAL_ATTRIB              T("triggerNoteOrCC")
+#define MIDIBINDING_MODE_ATTRIB              T("bindingMode")
+#define MIDIBINDING_RANGEMAX_ATTRIB              T("rangeMax")
+#define MIDIBINDING_RANGEMIN_ATTRIB              T("rangeMin")
+#define MIDIBINDING_INCRMAX_ATTRIB              T("incrementMax")
+#define MIDIBINDING_INCRMIN_ATTRIB              T("incrementMin")
+#define MIDIBINDING_INCREMENT_ATTRIB              T("incrValue")
+#define MIDIBINDING_STEPMODE_ATTRIB              T("stepMode")
 
 //==============================================================================
 int32 BasePlugin::globalUniqueCounter = 1;
@@ -107,33 +110,33 @@ void BasePlugin::savePropertiesToXml (XmlElement* xml)
     xml->setAttribute (PROP_MIXERMETERON,            getIntValue (PROP_MIXERMETERON, 1));
     xml->setAttribute (PROP_WINDOWPREFERGENERIC,            getBoolValue (PROP_WINDOWPREFERGENERIC, false));
     xml->setAttribute (PROP_RENDERSTEM,            getBoolValue (PROP_RENDERSTEM, false));
-    XmlElement* bindingsElement = new XmlElement(MIDIBINDINGS_ELEMENT_NAME);
+   
+   XmlElement* bindingsElement = new XmlElement(MIDIBINDINGS_ELEMENT_NAME);
    for (int i=0; i<getNumParameters(); i++)
    {
       AudioParameter* param = getParameterObject(i);
       if (param)
       {
-         int note = param->getNoteNumber();
-         int cc = param->getControllerNumber();
-      if (cc >= 0)
-      {
-         XmlElement* binding = new XmlElement(MIDIBINDING_ELEMENT_NAME);
-         binding->setAttribute(MIDIBINDING_PARAM_ATTRIB, i);
-         binding->setAttribute(MIDIBINDING_CC_ATTRIB, cc);
-         bindingsElement->addChildElement(binding);
-      }
-         else if (note >= 0)
+         for (int j=0; j<param->getNumBindings(); j++)
          {
-            XmlElement* binding = new XmlElement(MIDIBINDING_ELEMENT_NAME);
-            binding->setAttribute(MIDIBINDING_PARAM_ATTRIB, i);
-            binding->setAttribute(MIDIBINDING_NOTE_ATTRIB, note);
-            // coming back sooon...
-//            binding->setAttribute(MIDIBINDING_INCR_ATTRIB, param->getBinding().getIncrAmount());
-//            binding->setAttribute(MIDIBINDING_BIDIRECTIONAL_ATTRIB, param->getBinding().getStepMode());
-//            binding->setAttribute(MIDIBINDING_NOTEMODE_ATTRIB, param->getBinding().getMode());
-            bindingsElement->addChildElement(binding);
-   }
+            MidiBinding* bp = param->getBinding(j);
+            if (bp)
+            {
+               XmlElement* binding = new XmlElement(MIDIBINDING_ELEMENT_NAME);
 
+               binding->setAttribute(MIDIBINDING_PARAM_ATTRIB, i);
+               binding->setAttribute(MIDIBINDING_TRIGVAL_ATTRIB, bp->getTriggerValue());
+               binding->setAttribute(MIDIBINDING_MODE_ATTRIB, bp->getMode());
+               binding->setAttribute(MIDIBINDING_RANGEMAX_ATTRIB, bp->getMax());
+               binding->setAttribute(MIDIBINDING_RANGEMIN_ATTRIB, bp->getMin());
+               binding->setAttribute(MIDIBINDING_INCRMAX_ATTRIB, bp->getIncrMax());
+               binding->setAttribute(MIDIBINDING_INCRMIN_ATTRIB, bp->getIncrMin());
+               binding->setAttribute(MIDIBINDING_INCREMENT_ATTRIB, fabs(bp->getIncrAmount()));
+               binding->setAttribute(MIDIBINDING_STEPMODE_ATTRIB, bp->getStepMode());
+
+               bindingsElement->addChildElement(binding);
+            }
+         }
       }
    }
    xml->addChildElement(bindingsElement);
@@ -165,35 +168,38 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
     setValue (PROP_WINDOWPREFERGENERIC,                     xml->getBoolAttribute (PROP_WINDOWPREFERGENERIC, false));
     setValue (PROP_RENDERSTEM,                     xml->getBoolAttribute (PROP_RENDERSTEM, false));
     
-    XmlElement* bindingsElement = xml->getChildByName(MIDIBINDINGS_ELEMENT_NAME);
-    
+   XmlElement* bindingsElement = xml->getChildByName(MIDIBINDINGS_ELEMENT_NAME);
+
    if (bindingsElement)
    {
       forEachXmlChildElementWithTagName(*bindingsElement, bindingElement, MIDIBINDING_ELEMENT_NAME)
       {
-         int ccnum = bindingElement->getIntAttribute(MIDIBINDING_CC_ATTRIB, -1);
-         int note = bindingElement->getIntAttribute(MIDIBINDING_NOTE_ATTRIB, -1);
-         int paramId = bindingElement->getIntAttribute(MIDIBINDING_PARAM_ATTRIB, -1);
-         AudioParameter* param = 0;
-         if (paramId >= 0 && paramId < getNumParameters() && (param = getParameterObject(paramId))) // intentional assignment!
+         int paramid = bindingElement->getIntAttribute(MIDIBINDING_PARAM_ATTRIB, -1);
+         int trigval = bindingElement->getIntAttribute(MIDIBINDING_TRIGVAL_ATTRIB, -1);
+         int mode = bindingElement->getIntAttribute(MIDIBINDING_MODE_ATTRIB, -1);
+         AudioParameter* param = getParameterObject(paramid);
+         if (param && trigval >= 0 && trigval <= 127 && mode >= NoteOff && mode <= Controller && paramid >= 0 && paramid <= getNumParameters())
          {
-            if (ccnum > 0)
+            int dex = -1;
+            if (mode == Controller)
+               dex = param->addControllerNumber(trigval);
+            else
+               dex = param->addNoteNumber(trigval);
+            MidiBinding* bp = param->getBinding(dex);
+            if (bp)
             {
-               if (ccnum >= 0 && ccnum < 128)
-            setParameterControllerNumber(paramId, ccnum);
-            }
-            else if (note > 0)
-            {
-               if (note >= 0 && note < 128)
-               {
-// coming back soon!!
-//                  param->getBinding().setNote(note);
-//                  param->getBinding().setIncrAmount(bindingElement->getDoubleAttribute(MIDIBINDING_INCR_ATTRIB, 1));
-//                  param->getBinding().setMode(bindingElement->getIntAttribute(MIDIBINDING_BIDIRECTIONAL_ATTRIB, false));
-//                  param->getBinding().setMode(bindingElement->getIntAttribute(MIDIBINDING_NOTEMODE_ATTRIB, true));
-               }
+               bp->setMode(NoteBindingMode(mode));
+               bp->setMax(bindingElement->getDoubleAttribute(MIDIBINDING_RANGEMAX_ATTRIB, 1.0));
+               bp->setMin(bindingElement->getDoubleAttribute(MIDIBINDING_RANGEMIN_ATTRIB, 0.0));
+               bp->setStepMax(bindingElement->getDoubleAttribute(MIDIBINDING_INCRMAX_ATTRIB, 1.0));
+               bp->setStepMin(bindingElement->getDoubleAttribute(MIDIBINDING_INCRMIN_ATTRIB, 0.0));
+               bp->setIncrAmount(bindingElement->getDoubleAttribute(MIDIBINDING_INCREMENT_ATTRIB, 1.0));
+               bp->setStepMode(BindingStepMode(bindingElement->getIntAttribute(MIDIBINDING_STEPMODE_ATTRIB, 0)));
+               
+               param->RegisterBinding(dex);
             }
          }
+         
       }
    }
 }
