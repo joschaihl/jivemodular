@@ -126,6 +126,9 @@ VstPluginNativeEditor::~VstPluginNativeEditor ()
 void VstPluginNativeEditor::sliderValueChanged (Slider* sliderThatWasMoved)
 {
     int paramNumber = sliderThatWasMoved->getName ().getIntValue ();
+    ParamSlider* sl = dynamic_cast<ParamSlider*>(sliderThatWasMoved);
+    if (sl)
+      paramNumber = sl->getParameterIndex();
 
     if (plugin)
     {
