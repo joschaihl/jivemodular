@@ -11,7 +11,7 @@ class ParamSlider  : public Slider, public AudioParameterListener
 {
 public:
    ParamSlider (AudioProcessor* const owner_, AudioParameter* managedParam_, const int index_)
-      : Slider (String::empty),
+      : Slider (String(index)),  
         owner (owner_),
         managedParam(managedParam_),
         index (index_)
@@ -29,6 +29,8 @@ public:
       if (managedParam)
          managedParam->removeListener(this);
    }
+   
+   int getParameterIndex() { return index; };
 
    void parameterChanged (AudioParameter* newParameter, const int index)
    {
