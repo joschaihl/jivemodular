@@ -91,16 +91,25 @@ public:
     //==============================================================================
     juce_UseDebuggingNewOperator
     
-    //==============================================================================
+   //==============================================================================
    int getMaxZoneslots() { return 8; }; // fuc it for dynamic params, up to 8 slots only !
-    int getNumZoneslots();
-    void setNumZoneslots(int newslots);
-    float getNormedParam(int slot, int paramId);
-    void setNormedParam(int slot, int paramId, float val);
-    
-    int getPolyMode();
-    void setPolyMode(int m);
+   int getNumZoneslots();
+   void setNumZoneslots(int newslots);
+   
+   File getZoneslotSample(int slot);
+   void setZoneslotSample(int slot, const File sampleFile);
+   int getPolyMode();
+   void setPolyMode(int m);
 
+   // get/set slot parameters in normed range (i.e. 0-1) (used to implement get/setParameter) (misnamed!)
+   float getNormedParam(int slot, int paramId);
+   void setNormedParam(int slot, int paramId, float val);
+    
+   // get/set slot parameters in real (aka "raw" - unnormalised, user-meaningful) units
+   // (these are the only place we have a switch statement mapping our Parameters to highlife members/methods)
+   float getRawParam(int slot, int paramId);
+   void setRawParam(int slot, int paramId, float val);
+    
     enum Parameters {
        KeyLow = 0,
        KeyCentre,
@@ -108,9 +117,17 @@ public:
        Tune,
        Fader,
        BPMSync,
-       SyncTicks
+       SyncTicks,
+       Attack,
+       Decay,
+       Sustain,
+       Release,
+       FilterType, // 0 = off, 1=lowpass, 2=highpass, 3=bandpass, 4=bandreject
+       FilterCutoff,
+       FilterResonance,
+       LowlifeParameterCount
     };
-   enum { paramsPerSlot = 7 }; 
+   enum { paramsPerSlot = LowlifeParameterCount }; 
    static const int MinKey;
    static const int MaxKey;
    static const int MinFader;
@@ -121,23 +138,8 @@ public:
    static const int MaxPolyMode;
    static const int MinSyncTicks;
    static const int MaxSyncTicks;
-
-    File getZoneslotSample(int slot);
-    void setZoneslotSample(int slot, const File sampleFile);
-    int getZoneslotFader(int slot);
-    void setZoneslotFader(int slot, int level);
-    int getZoneslotKeyMin(int slot);
-    void setZoneslotKeyMin(int slot, int keymin);
-    int getZoneslotKeyCentre(int slot);
-    void setZoneslotKeyCentre(int slot, int keymin);
-    int getZoneslotKeyMax(int slot);
-    void setZoneslotKeyMax(int slot, int keymin);
-    int getZoneslotTuneFactor(int slot);
-    void setZoneslotTuneFactor(int slot, int fac);
-    bool getZoneslotBPMSync(int slot);
-    void setZoneslotBPMSync(int slot, bool fac);
-    double getZoneslotSyncTicks(int slot);
-    void setZoneslotSyncTicks(int slot, double tic);
+   static const int MinFilterType;
+   static const int MaxFilterType;
 
 private:
    HIGHLIFE_PROGRAM& getHProgramRef(int zoneslot = 0) // don't care baout zoneslot anymore!!
