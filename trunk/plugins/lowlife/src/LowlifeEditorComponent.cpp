@@ -56,6 +56,7 @@ LowlifeSlotEditComponent::LowlifeSlotEditComponent(DemoJuceFilter* filter, int s
 
    addAndMakeVisible(keySlider = new Slider(T("key")));
    keySlider->setSliderStyle(Slider::ThreeValueHorizontal);
+   keySlider->setPopupDisplayEnabled(true, this);
    keySlider->addListener (this);
    keySlider->setRange (DemoJuceFilter::MinKey, DemoJuceFilter::MaxKey, 1.);
    keySlider->setTooltip (T("midi key min/centre/max"));
@@ -99,13 +100,13 @@ void LowlifeSlotEditComponent::updateParametersFromFilter()
    if (myFilter)
    {
       sampleFile->setCurrentFile(myFilter->getZoneslotSample(mySlot), true, false);
-      syncButton->setToggleState(myFilter->getZoneslotBPMSync(mySlot), false);
-      syncTicksSlider->setValue(myFilter->getZoneslotSyncTicks(mySlot), false);
-      keySlider->setMinValue(myFilter->getZoneslotKeyMin(mySlot), false);
-      keySlider->setValue(myFilter->getZoneslotKeyCentre(mySlot), false);
-      keySlider->setMaxValue(myFilter->getZoneslotKeyMax(mySlot), false);
-      tuneSlider->setValue(myFilter->getZoneslotTuneFactor(mySlot), false);
-      faderSlider->setValue(myFilter->getZoneslotFader(mySlot), false);
+      syncButton->setToggleState(myFilter->getRawParam(mySlot, DemoJuceFilter::BPMSync), false);
+      syncTicksSlider->setValue(myFilter->getRawParam(mySlot, DemoJuceFilter::SyncTicks), false);
+      keySlider->setMinValue(myFilter->getRawParam(mySlot, DemoJuceFilter::KeyLow), false);
+      keySlider->setValue(myFilter->getRawParam(mySlot, DemoJuceFilter::KeyCentre), false);
+      keySlider->setMaxValue(myFilter->getRawParam(mySlot, DemoJuceFilter::KeyHigh), false);
+      tuneSlider->setValue(myFilter->getRawParam(mySlot, DemoJuceFilter::Tune), false);
+      faderSlider->setValue(myFilter->getRawParam(mySlot, DemoJuceFilter::Fader), false);
    }
 }
 
@@ -114,20 +115,20 @@ void LowlifeSlotEditComponent::sliderValueChanged(Slider* sl)
    if (myFilter)
    {
       if (sl == syncTicksSlider)
-         myFilter->setZoneslotSyncTicks(mySlot, sl->getValue());
+         myFilter->setRawParam(mySlot, DemoJuceFilter::SyncTicks, sl->getValue());
       
       else if (sl == keySlider) 
       {
-         myFilter->setZoneslotKeyMin(mySlot, sl->getMinValue());
-         myFilter->setZoneslotKeyCentre(mySlot, sl->getValue());
-         myFilter->setZoneslotKeyMax(mySlot, sl->getMaxValue());
+         myFilter->setRawParam(mySlot, DemoJuceFilter::KeyLow, sl->getMinValue());
+         myFilter->setRawParam(mySlot, DemoJuceFilter::KeyCentre, sl->getValue());
+         myFilter->setRawParam(mySlot, DemoJuceFilter::KeyHigh, sl->getMaxValue());
       }
 
       else if (sl == tuneSlider) 
-         myFilter->setZoneslotTuneFactor(mySlot, sl->getValue());
+         myFilter->setRawParam(mySlot, DemoJuceFilter::Tune, sl->getValue());
 
       else if (sl == faderSlider) 
-         myFilter->setZoneslotFader(mySlot, sl->getValue());
+         myFilter->setRawParam(mySlot, DemoJuceFilter::Fader, sl->getValue());
    }
 }
 
@@ -143,7 +144,7 @@ void LowlifeSlotEditComponent::filenameComponentChanged(FilenameComponent* filec
 void LowlifeSlotEditComponent::buttonClicked(Button* button)
 {
    if (button == syncButton)
-      myFilter->setZoneslotBPMSync(mySlot, syncButton->getToggleState());
+      myFilter->setRawParam(mySlot, DemoJuceFilter::BPMSync, syncButton->getToggleState());
 }
 
 //==============================================================================
