@@ -383,12 +383,12 @@ void MidiGrid::notifyListenersOfPlayingPositionChanged (const float newPosition)
 
 //==============================================================================
 PianoGrid::PianoGrid()
-  : numRows (128),
-    rowsOffset (0),
-    rowHeight (8),
-    draggingNote (0),
+  : draggingNote (0),
     draggingRow (-1),
     draggingColumn (-1),
+    numRows (128),
+    rowsOffset (0),
+    rowHeight (8),
     defaultNoteLength (1.0f)
 {
 }
@@ -756,8 +756,9 @@ void PianoGrid::mouseExit (const MouseEvent& e)
 
 //==============================================================================
 AutomationGrid::AutomationGrid()
-: templateEvent(NULL),
-  draggingNote(NULL)
+: 
+   draggingNote(NULL),
+   templateEvent(NULL)
 {
 
 }
