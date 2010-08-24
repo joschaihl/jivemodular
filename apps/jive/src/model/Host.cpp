@@ -51,7 +51,8 @@ Host::Host (HostFilterBase* owner_,
     audioGraph = new ProcessingGraph ();
 
     // add generic plugins
-    addPlugin (inputPlugin = new InputPlugin (maxNumInputChannels));
+    //addPlugin (inputPlugin = new InputPlugin (maxNumInputChannels));
+    addPlugin (inputPlugin = new TransportInputPlugin (maxNumInputChannels));
     addPlugin (outputPlugin = new OutputPlugin (maxNumOutputChannels));
 }
 
@@ -323,23 +324,12 @@ void Host::processBlock (AudioSampleBuffer& buffer,
     // process audio for plugins
     if (audioGraph)
     {
-      // we just know that the transport plugin has to be processed first!
-      // (until we support a plugin dependency/hierachy)
-      for (int j = 0; j < audioGraph->getNodeCount (); j++)
-      {
-         ProcessingNode* node = audioGraph->getNode (j);
-         currentPlugin = (BasePlugin*) node->getData ();
-         
-         if (currentPlugin && currentPlugin->getType == JOST_PLUGINTYPE_UTILITYTRANSPORTCONTROL)
-            currentPlugin->processBlock (buffer, midiMessages); // no support for bypass, stem rendering, etc with transport control plugin
-      }
-
         for (int j = 0; j < audioGraph->getNodeCount (); j++)
         {
             ProcessingNode* node = audioGraph->getNode (j);
             currentPlugin = (BasePlugin*) node->getData ();
             
-            if (!currentPlugin || currentPlugin->getType == JOST_PLUGINTYPE_UTILITYTRANSPORTCONTROL) // can skip the transport control, we did it above
+            if (!currentPlugin)
                 continue;
             
             currentPluginType = currentPlugin->getType ();

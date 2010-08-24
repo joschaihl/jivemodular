@@ -74,5 +74,37 @@ private:
     int numChannels;
 };
 
+class TransportInputPlugin : public InputPlugin
+{
+public:
+   TransportInputPlugin(const int numChannels);
+   ~TransportInputPlugin();
+
+   //==============================================================================
+   int getNumParameters();
+   void setParameterReal(int paramNumber, float value);
+   float getParameterReal(int paramNumber);
+   const String getParameterTextReal(int paramNumber, float value);
+   void loadPresetFromXml(XmlElement* xml);
+
+   //==============================================================================
+   bool hasEditor () const               { return false; }
+   bool wantsEditor () const             { return true; }
+
+   //==============================================================================
+   void processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages);
+
+private:
+   double RoundBPM(double);
+
+
+   double maxBPM;
+   double minBPM;
+
+   double lastRequestedBPM;
+   bool softTakeover;
+   
+   bool loadingParams;
+};
 
 #endif

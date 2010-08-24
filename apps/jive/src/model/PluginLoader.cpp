@@ -201,8 +201,8 @@ BasePlugin* PluginLoader::getFromTypeID (const int typeID,
         return new OppressorPlugin ();
 	case JOST_PLUGINTYPE_UTILITYFADER:
         return new FaderPlugin ();
-	case JOST_PLUGINTYPE_UTILITYTRANSPORTCONTROL:
-        return new TransportControlPlugin ();
+//	case JOST_PLUGINTYPE_UTILITYTRANSPORTCONTROL:
+//        return new TransportControlPlugin ();
 	case JOST_PLUGINTYPE_CHANNEL:
         return new ChannelPlugin (1, base);
 	case JOST_PLUGINTYPE_CHANNELSTEREO:
@@ -273,7 +273,7 @@ BasePlugin* PluginLoader::handlePopupMenu (const bool subChannelPlugin,
         midiMenu.addItem (JOST_PLUGINTYPE_MIDIPADS,        "Pads");
         midiMenu.addItem (JOST_PLUGINTYPE_MIDIFILTER,      "Filter");
         midiMenu.addItem (JOST_PLUGINTYPE_MIDIMONITOR,     "Monitor");
-        midiMenu.addItem (JOST_PLUGINTYPE_UTILITYTRANSPORTCONTROL,         "Transport Control");
+//        midiMenu.addItem (JOST_PLUGINTYPE_UTILITYTRANSPORTCONTROL,         "Transport Control");
     }
 
     {
