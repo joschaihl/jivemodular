@@ -455,7 +455,7 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
     currentClickedNode = node;
 
     bool addFirstSeparator = false;
-    PopupMenu menu, subMenu, midiChanMenu;
+    PopupMenu menu, subMenu, synthMidiChanMenu, midiChanMenu;
 
     BasePlugin* plugin = (BasePlugin*) node->getUserData ();
 
@@ -494,11 +494,16 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
     menu.addItem (7, "Solo", false, false);
     menu.addSeparator ();
 
-    midiChanMenu.addItem(1020, "Omni", true, !plugin->getMidiOutputChannelFilter() || plugin->getMidiOutputChannel() == -1);
-    for (int i=1; i<17; i++)
-       midiChanMenu.addItem(1000+i, String("Ch ") + String(i), true, plugin->getMidiOutputChannelFilter() && plugin->getMidiOutputChannel() == i);
-    menu.addSubMenu (T("Filter output MIDI channel"), midiChanMenu);
-    menu.addSeparator ();
+   synthMidiChanMenu.addItem(2020, "Omni", true, !plugin->getSynthInputChannelFilter() || plugin->getSynthInputChannel() == -1);
+   midiChanMenu.addItem(1020, "Omni", true, !plugin->getMidiOutputChannelFilter() || plugin->getMidiOutputChannel() == -1);
+   for (int i=1; i<17; i++)
+   {
+      synthMidiChanMenu.addItem(2000+i, String("Ch ") + String(i), true, plugin->getSynthInputChannelFilter() && plugin->getSynthInputChannel() == i);
+      midiChanMenu.addItem(1000+i, String("Ch ") + String(i), true, plugin->getMidiOutputChannelFilter() && plugin->getMidiOutputChannel() == i);
+   }
+   menu.addSubMenu (T("Filter synth input MIDI channel"), synthMidiChanMenu);
+   menu.addSubMenu (T("Filter output MIDI channel"), midiChanMenu);
+   menu.addSeparator ();
 
     int inputLinks = node->getInputLinksCount ();
     int outputLinks = node->getOutputLinksCount ();
@@ -592,10 +597,15 @@ void GraphComponent::nodePopupMenuSelected (GraphNodeComponent* node)
    case 1020:
       plugin->clearMidiOutputFilter();
       break;
+   case 2020:
+      plugin->clearSynthInputFilter();
+      break;
     default:
       if (result >= 1001 && result <= 1016)
          plugin->setMidiOutputChannelFilter(result - 1000);
-        break;
+      if (result >= 2001 && result <= 2016)
+         plugin->setSynthInputChannelFilter(result - 2000);
+      break;
     }
     
     currentClickedNode = 0;
