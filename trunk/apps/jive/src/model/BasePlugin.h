@@ -124,6 +124,12 @@ public:
    int getMidiOutputChannel() { return outputMidiChannel; };
    void clearMidiOutputFilter();
 
+   //==============================================================================
+   void setSynthInputChannelFilter(int midiChannel = -1);
+   MidiFilter* getSynthInputChannelFilter();
+   int getSynthInputChannel() { return synthInputMidiChan; };
+   void clearSynthInputFilter();
+
 public:
 
     //==============================================================================
@@ -221,7 +227,9 @@ protected:
    
    //==============================================================================
    int outputMidiChannel;
+   int synthInputMidiChan;
    MidiFilter* outputMidiChanFilter;
+   MidiFilter* synthInputMidiChanFilter;
 };
 
 

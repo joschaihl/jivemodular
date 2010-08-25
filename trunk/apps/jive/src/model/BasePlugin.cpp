@@ -55,7 +55,9 @@ BasePlugin::BasePlugin ()
       currentOutputGain (1.0f),
       stemFileWriter(0),
       outputMidiChannel(-1),
-      outputMidiChanFilter(0)
+      synthInputMidiChan(-1),
+      outputMidiChanFilter(0),
+      synthInputMidiChanFilter(0)
 {
     keyboardState.reset();
 
@@ -262,6 +264,32 @@ void BasePlugin::clearMidiOutputFilter()
    if (outputMidiChanFilter)
       delete outputMidiChanFilter;
    outputMidiChannel = -1;
+}
+
+void BasePlugin::setSynthInputChannelFilter(int midiChannel)
+{
+   clearSynthInputFilter();
+   
+   if (midiChannel >= 1 || midiChannel <= 16)
+   {
+      synthInputMidiChanFilter = new MidiFilter();
+      synthInputMidiChanFilter->setUseChannelFilter(true);
+      synthInputMidiChanFilter->clearAllChannels();
+      synthInputMidiChanFilter->setChannel(midiChannel);
+      synthInputMidiChan = midiChannel;
+   }
+}
+
+MidiFilter* BasePlugin::getSynthInputChannelFilter()
+{
+   return synthInputMidiChanFilter;
+}
+
+void BasePlugin::clearSynthInputFilter()
+{
+   if (synthInputMidiChanFilter)
+      delete synthInputMidiChanFilter;
+   synthInputMidiChan = -1;
 }
 
 //==============================================================================

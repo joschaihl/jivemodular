@@ -285,6 +285,15 @@ void WrappedJucePlugin::processBlock (AudioSampleBuffer& buffer,
          midiAutomatorManager.handleMidiMessageBuffer(*midiBuffer);
       }
       
+      // apply a midi filter on the input to the synth if one is set
+      MidiFilter* synthInputFilter = getSynthInputChannelFilter();
+      if (synthInputFilter)
+      {
+         MidiManipulator manip;
+         manip.setMidiFilter(synthInputFilter);
+         manip.processEvents(*midiBuffer, blockSize);
+      }
+      
       // Call through to Juce plugin instance to get the VST to actually do its thing!
       instance->processBlock(buffer, *midiBuffer);
 
