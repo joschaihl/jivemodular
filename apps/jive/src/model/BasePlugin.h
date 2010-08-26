@@ -64,6 +64,8 @@
 #define PROP_MIXERMETERON                     T("mMon")
 #define PROP_WINDOWPREFERGENERIC              T("wPreferGeneric")
 #define PROP_RENDERSTEM                       T("renderStem")
+#define PROP_SYNTHINPUTCHANNELFILTER          T("inputFiltChan")
+#define PROP_OUTPUTCHANNELFILTER              T("outputFiltChan")
 
 class BasePlugin;
 class PluginEditorComponent;

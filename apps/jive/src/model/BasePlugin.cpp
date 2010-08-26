@@ -112,6 +112,8 @@ void BasePlugin::savePropertiesToXml (XmlElement* xml)
     xml->setAttribute (PROP_MIXERMETERON,            getIntValue (PROP_MIXERMETERON, 1));
     xml->setAttribute (PROP_WINDOWPREFERGENERIC,            getBoolValue (PROP_WINDOWPREFERGENERIC, false));
     xml->setAttribute (PROP_RENDERSTEM,            getBoolValue (PROP_RENDERSTEM, false));
+    xml->setAttribute (PROP_SYNTHINPUTCHANNELFILTER, getSynthInputChannel());
+    xml->setAttribute (PROP_OUTPUTCHANNELFILTER, getMidiOutputChannel());
    
    XmlElement* bindingsElement = new XmlElement(MIDIBINDINGS_ELEMENT_NAME);
    for (int i=0; i<getNumParameters(); i++)
@@ -169,6 +171,9 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
     setValue (PROP_MIXERMETERON,                     xml->getIntAttribute (PROP_MIXERMETERON, 1));
     setValue (PROP_WINDOWPREFERGENERIC,                     xml->getBoolAttribute (PROP_WINDOWPREFERGENERIC, false));
     setValue (PROP_RENDERSTEM,                     xml->getBoolAttribute (PROP_RENDERSTEM, false));
+
+    setSynthInputChannelFilter(xml->getIntAttribute(PROP_SYNTHINPUTCHANNELFILTER, -1));
+    setMidiOutputChannelFilter(xml->getIntAttribute(PROP_OUTPUTCHANNELFILTER, -1));
     
    XmlElement* bindingsElement = xml->getChildByName(MIDIBINDINGS_ELEMENT_NAME);
 
