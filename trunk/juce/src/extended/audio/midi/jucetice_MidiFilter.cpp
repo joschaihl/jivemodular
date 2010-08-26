@@ -113,6 +113,11 @@ void MidiFilter::setUsePitchWeelFilter (const bool useFilter)
 //==============================================================================
 bool MidiFilter::filterEvent (const MidiMessage& message)
 {
+   // usually we want to keep allNotesOff and allSoundOff events (etc)!
+   // if we ever don't, will need to make an option for this
+   if (message.isAllNotesOff() || message.isAllSoundOff())
+      return true;
+
     if (useChannelFilter)
     {
         const int channelNumber = message.getChannel () - 1;
