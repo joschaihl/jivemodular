@@ -249,7 +249,7 @@ void BasePlugin::setMidiOutputChannelFilter(int midiChannel)
 {
    clearMidiOutputFilter();
    
-   if (midiChannel >= 1 || midiChannel <= 16)
+   if (midiChannel >= 1 && midiChannel <= 16)
    {
       outputMidiChanFilter = new MidiFilter();
       outputMidiChanFilter->setUseChannelFilter(true);
@@ -269,13 +269,14 @@ void BasePlugin::clearMidiOutputFilter()
    if (outputMidiChanFilter)
       delete outputMidiChanFilter;
    outputMidiChannel = -1;
+   outputMidiChanFilter = 0;
 }
 
 void BasePlugin::setSynthInputChannelFilter(int midiChannel)
 {
    clearSynthInputFilter();
    
-   if (midiChannel >= 1 || midiChannel <= 16)
+   if (midiChannel >= 1 && midiChannel <= 16)
    {
       synthInputMidiChanFilter = new MidiFilter();
       synthInputMidiChanFilter->setUseChannelFilter(true);
@@ -295,6 +296,7 @@ void BasePlugin::clearSynthInputFilter()
    if (synthInputMidiChanFilter)
       delete synthInputMidiChanFilter;
    synthInputMidiChan = -1;
+   synthInputMidiChanFilter = 0;
 }
 
 //==============================================================================
