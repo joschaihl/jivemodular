@@ -194,7 +194,10 @@ void TransportInputPlugin::setParameterReal (int index, float value)
 
 float TransportInputPlugin::getParameterReal (int index)
 {
-   Transport* t = getParentHost()->getTransport();
+   Transport* t = 0;
+   HostFilterBase* h = getParentHost();
+   if (h)
+      t = h->getTransport();
    float val = 0.0;
    switch (index)
    {
@@ -202,7 +205,7 @@ float TransportInputPlugin::getParameterReal (int index)
    {
 //      double oldBpm = t->getTempo(); 
       double oldBpm = lastRequestedBPM; // show the requested value, works better during soft-takeover
-      if (oldBpm == -1)
+      if (oldBpm == -1 && t)
          oldBpm = t->getTempo(); // ..eexcept when last value is -1 (i.e. init, first pass after soft-takeover trigger)
       val = (oldBpm - minBPM) / (maxBPM - minBPM);
    }
@@ -214,7 +217,7 @@ float TransportInputPlugin::getParameterReal (int index)
       val = (maxBPM - 6) / 250;
    break;
    case PlayStop:
-      if (t->isPlaying())
+      if (t && t->isPlaying())
          val = 1.0;
       else
          val = 0.0;
