@@ -280,6 +280,11 @@ bool HostFilterComponent::isPluginEditorWindowOpen (BasePlugin* plugin) const
 
 void HostFilterComponent::openPluginEditorWindow (BasePlugin* plugin)
 {
+   // Because the mouse event that invokes this routine is asynchronous, if user double clicks twice in quick succession, we get called again while we are bringing the editor up, and crash in the vst gui show code.
+   // This boolean is will prevent entering that code while it is still in progress.
+   // (it's possible that we may miss a double-click if user tries to open 2 plugins in quick succession - in which case they can double-click again..)
+    static bool creatingWindowNow = false;
+    
     DBG ("HostFilterComponent::openPluginEditorWindow");
 
     if (plugin)
@@ -287,19 +292,21 @@ void HostFilterComponent::openPluginEditorWindow (BasePlugin* plugin)
       if (plugin->getType() == JOST_PLUGINTYPE_WRAPPEDJUCEVST)
       {
          WrappedJuceVSTPluginWindow* jucePlugWindow = 0;
-        for (int i = jucePluginWindows.size(); --i >= 0;)
-        {
+         for (int i = jucePluginWindows.size(); --i >= 0;)
+         {
             WrappedJuceVSTPluginWindow* window = jucePluginWindows.getUnchecked (i);
             if (window && window->getPlugin() == plugin)
             {
                 jucePlugWindow = window;
                 break;
             }
-        }
-        if (!jucePlugWindow)
-        {
+         }
+         if (!jucePlugWindow && !creatingWindowNow)
+         {
+            creatingWindowNow = true;
             jucePlugWindow = WrappedJuceVSTPluginWindow::CreateWindowFor(plugin, this); 
             jucePluginWindows.add(jucePlugWindow);
+            creatingWindowNow = false;
          }
          
          if (jucePlugWindow)
