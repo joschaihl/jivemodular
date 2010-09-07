@@ -208,6 +208,7 @@ public:
     /** Recent session state directory and files list */
     RecentlyOpenedFilesList recentSessions;
     File lastSessionDirectory;
+    File lastSessionFile;
 
     /** Recent preset directory */
     File lastPresetDirectory;

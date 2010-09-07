@@ -124,6 +124,7 @@ void Config::read ()
     recentSessions.restoreFromString (config->getValue (T("sessions_files")));
     lastSessionDirectory = File (config->getValue (T("last_session_directory"),
                                                    File::getCurrentWorkingDirectory().getFullPathName()));
+    lastSessionFile = File (config->getValue (T("last_session_file"), ""));
 
     // restore recent preset directory
     lastPresetDirectory = File (config->getValue (T("last_preset_directory"),
@@ -172,6 +173,7 @@ void Config::write ()
     config->setValue (T("last_plugins_directory"), lastPluginDirectory.getFullPathName());
     config->setValue (T("sessions_files"), recentSessions.toString());
     config->setValue (T("last_session_directory"), lastSessionDirectory.getFullPathName());
+    config->setValue (T("last_session_file"), lastSessionFile.getFullPathName());
     config->setValue (T("last_preset_directory"), lastPresetDirectory.getFullPathName());
     config->setValue (T("last_stems_directory"), lastStemsDirectory.getFullPathName());
     config->setValue (T("external_tempo_sync"), externalTempoSync);
