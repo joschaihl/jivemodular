@@ -145,8 +145,13 @@ public:
     void setBrowserVisible (const bool isVisible,
                             const bool positionLeft,
                             const bool issueResize = true);
+                            
+    //==============================================================================
+    void handleSaveCommand(bool saveToExistingFileAndDontPrompt = false);
 
 private:
+
+    void setCurrentSessionFile(const File& newFile);
 
     //==============================================================================
     friend class HostFilterBase;
@@ -182,6 +187,9 @@ private:
 
    // Array of Juce-managed VST or AU plugin windows.
     OwnedArray<WrappedJuceVSTPluginWindow> jucePluginWindows;
+    
+    // the file for the current session
+    File currentSessionFile;
 
 public: // yep, should be behind accessor and yep, should be in app config / state class!
     KnownPluginList knownPluginList;

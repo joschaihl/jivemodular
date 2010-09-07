@@ -45,8 +45,9 @@ namespace CommandIDs
     static const int showPluginListEditor = 0x2006;
 
     static const int sessionLoad        = 0x2100;
-    static const int sessionSave        = 0x2101;
+    static const int sessionSave        = 0x2101; // aka save
     static const int sessionNew         = 0x2102;
+    static const int sessionSaveNoPrompt = 0x2103; // aka save as
 
     static const int audioOptions       = 0x2200;
     static const int audioPlay          = 0x2201;

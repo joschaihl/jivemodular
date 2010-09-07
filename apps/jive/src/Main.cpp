@@ -64,22 +64,21 @@ public:
         Process::setPriority(Process::LowPriority);
         Thread::setCurrentThreadPriority (8);
 
-        // setup window name
-        String jostMainWindowName;
-        jostMainWindowName << JucePlugin_Name << " v" << JucePlugin_VersionString;
-
-#ifdef JUCE_DEBUG       
-        jostMainWindowName << " (DEBUG)";
-#endif
-
       AudioPluginFormatManager::getInstance()->addFormat(new VSTPluginFormat()); // for now we just support VST, keep things simple
 
         // create the window
-        window = new StandaloneFilterWindow (jostMainWindowName,
+        window = new StandaloneFilterWindow ("",
                                              config->getColour (T("mainBackground")),
                                              DocumentWindow::allButtons,
                                              false,
                                              commandLine.trim());
+        // setup window name
+        if (window)
+        {
+           String jostMainWindowName;
+           jostMainWindowName << JucePlugin_Name << " - " << Config::getInstance()->lastSessionFile.getFileNameWithoutExtension();
+           window->setName(jostMainWindowName);
+        }
         
         // attach the menubar to the window
         // or make the menu the main menubar (on mac)

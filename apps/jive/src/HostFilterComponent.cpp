@@ -143,7 +143,7 @@ HostFilterComponent::HostFilterComponent (HostFilterBase* const ownerFilter_)
 //==============================================================================
 HostFilterComponent::~HostFilterComponent()
 {
-    DBG ("HostFilterComponent::~HostFilterComponent");
+     DBG ("HostFilterComponent::~HostFilterComponent");
 
     knownPluginList.removeChangeListener (this);
 
@@ -458,6 +458,8 @@ void HostFilterComponent::rebuildComponents ()
         navigator->setViewedViewport (main->getGraphViewport ());
         navigator->updateVisibleArea (false);
     }
+
+    setCurrentSessionFile(Config::getInstance()->lastSessionFile);
 }
 
 //==============================================================================
@@ -625,6 +627,7 @@ const PopupMenu HostFilterComponent::getMenuForIndex (int menuIndex,
 
             menu.addCommandItem (commandManager, CommandIDs::sessionNew);
             menu.addCommandItem (commandManager, CommandIDs::sessionLoad);
+            menu.addCommandItem (commandManager, CommandIDs::sessionSaveNoPrompt);
             menu.addCommandItem (commandManager, CommandIDs::sessionSave);
             menu.addSubMenu (T("Recent sessions"), recentSessionsSubMenu);
             menu.addSeparator();
@@ -698,6 +701,7 @@ void HostFilterComponent::menuItemSelected (int menuItemID,
                     getFilter ()->setStateInformation (fileData.getData (), fileData.getSize());
 
                     Config::getInstance()->addRecentSession (fileToLoad);
+                    Config::getInstance()->lastSessionFile = fileToLoad;
                 }
             }
             break;
@@ -739,6 +743,7 @@ void HostFilterComponent::getAllCommands (Array <CommandID>& commands)
                                 CommandIDs::sessionNew,
                                 CommandIDs::sessionLoad,
                                 CommandIDs::sessionSave,
+                                CommandIDs::sessionSaveNoPrompt,
 
                                 CommandIDs::appToolbar,
                                 CommandIDs::appBrowser,
@@ -765,13 +770,13 @@ void HostFilterComponent::getCommandInfo (const CommandID commandID, Application
     {
     //----------------------------------------------------------------------------------------------
     case CommandIDs::pluginOpen:
-        result.setInfo (T("Open plugin..."), T("Open a plugin"), CommandCategories::file, 0);
+        result.setInfo (T("Open Plugin..."), T("Open a plugin"), CommandCategories::file, 0);
         result.addDefaultKeypress (T('l'), cmd);
         result.setActive (true);
         break;
     case CommandIDs::pluginClose:
         {
-        result.setInfo (T("Close plugins"), T("Close selected plugins"), CommandCategories::file, 0);
+        result.setInfo (T("Close Plugins"), T("Close selected plugins"), CommandCategories::file, 0);
         result.addDefaultKeypress (T('k'), cmd);
         // TODO - have to update this !
 //        GraphComponent* track = tracks.getUnchecked (0);
@@ -781,14 +786,14 @@ void HostFilterComponent::getCommandInfo (const CommandID commandID, Application
         }
     case CommandIDs::pluginClear:
         {
-        result.setInfo (T("Clear plugins"), T("Close all plugins"), CommandCategories::file, 0);
+        result.setInfo (T("Clear Plugins"), T("Close all plugins"), CommandCategories::file, 0);
         result.addDefaultKeypress (T('j'), cmd);
         result.setActive ((graph ? (graph->getPluginsCount () > 2) : false));
         break;
         }
     case CommandIDs::showPluginListEditor:
         {
-        result.setInfo (T("Show plugin list"), T("Show plugin list window"), CommandCategories::file, 0);
+        result.setInfo (T("Show Plugin List"), T("Show plugin list window"), CommandCategories::file, 0);
         result.addDefaultKeypress (T('p'), cmd);
         result.setActive (true);
         break;
@@ -797,7 +802,7 @@ void HostFilterComponent::getCommandInfo (const CommandID commandID, Application
 #ifndef JOST_VST_PLUGIN
     case CommandIDs::audioOptions:
         {
-        result.setInfo (T("Show device manager"), T("Show device manager"), CommandCategories::audio, 0);
+        result.setInfo (T("Audio & MIDI Settings..."), T("Show device manager"), CommandCategories::audio, 0);
         // result.addDefaultKeypress (KeyPress::backspaceKey, none);
         result.setActive (true);
         break;
@@ -872,19 +877,26 @@ void HostFilterComponent::getCommandInfo (const CommandID commandID, Application
     //----------------------------------------------------------------------------------------------
     case CommandIDs::sessionNew:
         {
-        result.setInfo (T("New session"), T("New session"), CommandCategories::file, 0);
+        result.setInfo (T("New Session"), T("New session"), CommandCategories::file, 0);
         result.addDefaultKeypress (T('n'), cmd);
         result.setActive (true);
         break;
         }
     case CommandIDs::sessionLoad:
-        result.setInfo (T("Load session..."), T("Open an session"), CommandCategories::file, 0);
+        result.setInfo (T("Open Session..."), T("Open a session"), CommandCategories::file, 0);
         result.addDefaultKeypress (T('a'), cmd);
         result.setActive (true);
         break;
     case CommandIDs::sessionSave:
         {
-        result.setInfo (T("Save session"), T("Save a session"), CommandCategories::file, 0);
+        result.setInfo (T("Save Session As..."), T("Save a session to a specified file"), CommandCategories::file, 0);
+        result.addDefaultKeypress (T('s'), ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+        result.setActive ((graph ? (graph->getPluginsCount () > 0) : false));
+        break;
+        }
+    case CommandIDs::sessionSaveNoPrompt:
+        {
+        result.setInfo (T("Save Session"), T("Save session to existing file"), CommandCategories::file, 0);
         result.addDefaultKeypress (T('s'), cmd);
         result.setActive ((graph ? (graph->getPluginsCount () > 0) : false));
         break;
@@ -899,23 +911,70 @@ void HostFilterComponent::getCommandInfo (const CommandID commandID, Application
         result.setActive (true);
         break;
     case CommandIDs::appFullScreen:
-        result.setInfo (T("FullScreen"), T("Set main window full screen"), CommandCategories::file, 0);
+        result.setInfo (T("Full Screen"), T("Set main window full screen"), CommandCategories::file, 0);
         result.addDefaultKeypress (T('t'), cmd);
         result.setActive (true);
         break;
     case CommandIDs::appExit:
-        result.setInfo (T("Quit"), T("Quit application"), CommandCategories::file, 0);
+        result.setInfo (T("Quit"), T("Quit Jive"), CommandCategories::file, 0);
         result.addDefaultKeypress (T('q'), cmd);
         result.setActive (true);
         break;
     case CommandIDs::appAbout:
-        result.setInfo (T("About..."), T("About application"), CommandCategories::about, 0);
+        result.setInfo (T("About..."), T("About Jive"), CommandCategories::about, 0);
         result.setActive (true);
         break;
     //----------------------------------------------------------------------------------------------
     default:
         break;
     }
+}
+
+void HostFilterComponent::setCurrentSessionFile(const File& newFile)
+{
+   currentSessionFile = newFile;
+   StandaloneFilterWindow* window = findParentComponentOfClass ((StandaloneFilterWindow*) 0);
+   if (window)
+   {
+     String jostMainWindowName;
+     String filename = currentSessionFile.getFileNameWithoutExtension();
+     jostMainWindowName << JucePlugin_Name;
+     if (!filename.isEmpty())
+        jostMainWindowName << " - " << filename;
+     window->setName(jostMainWindowName);
+   }
+}
+
+void HostFilterComponent::handleSaveCommand(bool saveToExistingFileAndDontPrompt)
+{
+   File tmp = currentSessionFile;
+   
+   bool userConfirmed = true;
+   if (!saveToExistingFileAndDontPrompt || !tmp.exists())
+   {
+      FileChooser myChooser (T("Save Session..."),
+                              currentSessionFile.exists() ? tmp : Config::getInstance ()->lastSessionDirectory,
+                              JOST_SESSION_WILDCARD,
+                              JOST_USE_NATIVE_FILE_CHOOSER);
+
+      if (myChooser.browseForFileToSave (true))
+         tmp = myChooser.getResult().withFileExtension (JOST_SESSION_EXTENSION);
+      else
+         userConfirmed = false;      
+   }
+   
+   if (userConfirmed && (tmp != File::nonexistent))
+   {
+      MemoryBlock fileData;
+      getFilter ()->getStateInformation (fileData);
+
+      if (tmp.replaceWithData (fileData.getData (), fileData.getSize()))
+      {
+         Config::getInstance()->addRecentSession (tmp);
+         setCurrentSessionFile(tmp);
+         Config::getInstance()->lastSessionFile = tmp;
+      }
+   }
 }
 
 bool HostFilterComponent::perform (const InvocationInfo& info)
@@ -1009,6 +1068,7 @@ bool HostFilterComponent::perform (const InvocationInfo& info)
                getFilter()->getHost ()->closeAllPlugins (true);
 
                clearComponents ();
+               Config::getInstance()->lastSessionFile = File::nonexistent;
                rebuildComponents ();
             }
             break;
@@ -1022,6 +1082,13 @@ bool HostFilterComponent::perform (const InvocationInfo& info)
 
             if (myChooser.browseForFileToOpen())
             {
+              bool retValue = 
+               AlertWindow::showYesNoCancelBox (AlertWindow::WarningIcon,
+                                             T("Unsaved Changes"),
+                                             T("Are you sure you want to close the current session? You may lose any unsaved changes."));
+               if (retValue)
+               {
+
                 MemoryBlock fileData;
                 File fileToLoad = myChooser.getResult();
 
@@ -1031,29 +1098,20 @@ bool HostFilterComponent::perform (const InvocationInfo& info)
                     getFilter ()->setStateInformation (fileData.getData (), fileData.getSize());
 
                     Config::getInstance()->addRecentSession (fileToLoad);
+                    Config::getInstance()->lastSessionFile = fileToLoad;
                 }
+               }
             }
             break;
         }
     case CommandIDs::sessionSave:
         {
-            FileChooser myChooser (T("Save a session file..."),
-                                    Config::getInstance ()->lastSessionDirectory,
-                                    JOST_SESSION_WILDCARD,
-									JOST_USE_NATIVE_FILE_CHOOSER);
-
-            if (myChooser.browseForFileToSave (true))
-            {
-                MemoryBlock fileData;
-                getFilter ()->getStateInformation (fileData);
-
-                File fileToSave = myChooser.getResult().withFileExtension (JOST_SESSION_EXTENSION);
-
-                if (fileToSave.replaceWithData (fileData.getData (), fileData.getSize()))
-                {
-                    Config::getInstance()->addRecentSession (fileToSave);
-                }
-            }
+            handleSaveCommand();
+            break;
+        }
+    case CommandIDs::sessionSaveNoPrompt:
+        {
+            handleSaveCommand(true);
             break;
         }
 
@@ -1064,7 +1122,7 @@ bool HostFilterComponent::perform (const InvocationInfo& info)
         }
     case CommandIDs::audioStemsSetup:
         {
-            FileChooser myChooser (T("Save rendered stem files to..."),
+            FileChooser myChooser (T("Save Rendered Stem Files To..."),
                                     Config::getInstance ()->lastStemsDirectory);
             if (myChooser.browseForDirectory ())
             {
