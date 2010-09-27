@@ -57,17 +57,24 @@ public:
       addAndMakeVisible(incrMin = new Slider("IncrMin")); 
       incrMin->setSliderStyle(Slider::LinearBar);
 
+      addAndMakeVisible(velocityScalingLabel = new Label("VelocitySensitive", "Velocity Sensitive:")); 
+      addAndMakeVisible(velocityScaling = new Slider("VelocitySensitivity")); 
+      velocityScaling->setSliderStyle(Slider::LinearBar);
+      velocityScaling->setRange(0., 1., 1.0/127);
+
       setSize(400, 140);
    }
    
    void resized() 
    {
-      int pad = 5;
+      int pad = 3;
       int h = getHeight() / 4;
+      int h2 = getHeight() / 5;
       int w = getWidth() / 2 - pad;
       int labelw = 80 - pad;
       int itemw = w-labelw;
       int itemh = h-pad;
+      int itemh2 = h2-pad;
       
       // left column
       bindToLabel->setBounds(pad, pad, labelw, itemh);
@@ -81,15 +88,17 @@ public:
 
       // right column
       int l = w+pad;
-      incrModeLabel->setBounds(l, pad, labelw, itemh);
-      incrStepLabel->setBounds(l, 1*h, labelw, itemh);
-      incrMinLabel->setBounds(l, 2*h, labelw, itemh);
-      incrMaxLabel->setBounds(l, 3*h, labelw, itemh);
+      incrModeLabel->setBounds(l, pad, labelw, itemh2);
+      incrStepLabel->setBounds(l, 1*h2, labelw, itemh2);
+      incrMinLabel->setBounds(l, 2*h2, labelw, itemh2);
+      incrMaxLabel->setBounds(l, 3*h2, labelw, itemh2);
+      velocityScalingLabel->setBounds(l, 4*h2, labelw, itemh2);
       l += labelw;
-      incrDirection->setBounds(l, pad, itemw, itemh);
-      incrAmount->setBounds(l, h, itemw, itemh);
-      incrMin->setBounds(l, 2*h, itemw, itemh);
-      incrMax->setBounds(l, 3*h, itemw, itemh);
+      incrDirection->setBounds(l, pad, itemw, itemh2);
+      incrAmount->setBounds(l, h2, itemw, itemh2);
+      incrMin->setBounds(l, 2*h2, itemw, itemh2);
+      incrMax->setBounds(l, 3*h2, itemw, itemh2);
+      velocityScaling->setBounds(l, 4*h2, itemw, itemh2);
    }
    
    ~MidiBindingEditorContent()
@@ -111,11 +120,11 @@ public:
       {
          int realMax = incrAmount->getSelectedId();
          incrMax->setRange(1, realMax, 1);
-         incrMax->setValue(realMax);
+         //incrMax->setValue(realMax);
          if (realMax < incrMax->getValue())
             incrMax->setValue(realMax);
          incrMin->setRange(0, realMax-1, 1);
-         incrMin->setValue(0);
+         //incrMin->setValue(0);
       }
       // todo other sliders
    }
@@ -142,26 +151,31 @@ public:
    ComboBox* incrAmount;
    Slider* incrMax;
    Slider* incrMin;
+
+   Label* velocityScalingLabel;
+   Slider* velocityScaling;
 };
 
 void MidiBindingEditorContent::putBindingOptions(const MidiBinding& binding)
 {
-   modeCombo->setSelectedId(binding.getMode() + 1);
+   modeCombo->setSelectedId(binding.getMode() + 1, true);
    triggerValue->setValue(binding.getTriggerValue());
 
-   minSlider->setValue(binding.getMin());
-   maxSlider->setValue(binding.getMax());
+   minSlider->setValue(binding.getMin(), false);
+   maxSlider->setValue(binding.getMax(), false);
 
    double incrAmountd = binding.getIncrAmount();
    int incr = roundToInt(1.0 / fabs(incrAmountd));
    int imax = binding.getIncrMax() / fabs(incrAmountd);
-   incrMax->setValue(imax);
+   incrMax->setValue(imax, false);
    int imin = binding.getIncrMin() / fabs(incrAmountd);
-   incrMin->setValue(imin);
+   incrMin->setValue(imin, false);
 
-   incrAmount->setSelectedId(incr, false);
+   incrAmount->setSelectedId(incr);
       
    incrDirection->setSelectedId(binding.getStepMode());
+
+   velocityScaling->setValue(binding.getVelocityScaling(), false);
 }
 
 void MidiBindingEditorContent::getBindingOptions(MidiBinding& binding)
@@ -177,6 +191,7 @@ void MidiBindingEditorContent::getBindingOptions(MidiBinding& binding)
    binding.setStepMin(incrAmountd * incrMin->getValue());
    binding.setStepMax(incrAmountd * incrMax->getValue());
    binding.setStepMode(BindingStepMode(incrDirection->getSelectedId()));
+   binding.setVelocityScaling(velocityScaling->getValue());
 }
 
 // Component for editing a list of bindings for a parameter - 

@@ -40,6 +40,7 @@
 #define MIDIBINDING_INCRMIN_ATTRIB              T("incrementMin")
 #define MIDIBINDING_INCREMENT_ATTRIB              T("incrValue")
 #define MIDIBINDING_STEPMODE_ATTRIB              T("stepMode")
+#define MIDIBINDING_VELOCITYSENSE_ATTRIB              T("velocitySensitivity")
 
 //==============================================================================
 int32 BasePlugin::globalUniqueCounter = 1;
@@ -137,6 +138,7 @@ void BasePlugin::savePropertiesToXml (XmlElement* xml)
                binding->setAttribute(MIDIBINDING_INCRMIN_ATTRIB, bp->getIncrMin());
                binding->setAttribute(MIDIBINDING_INCREMENT_ATTRIB, fabs(bp->getIncrAmount()));
                binding->setAttribute(MIDIBINDING_STEPMODE_ATTRIB, bp->getStepMode());
+               binding->setAttribute(MIDIBINDING_VELOCITYSENSE_ATTRIB, bp->getVelocityScaling());
 
                bindingsElement->addChildElement(binding);
             }
@@ -202,6 +204,7 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
                bp->setStepMin(bindingElement->getDoubleAttribute(MIDIBINDING_INCRMIN_ATTRIB, 0.0));
                bp->setIncrAmount(bindingElement->getDoubleAttribute(MIDIBINDING_INCREMENT_ATTRIB, 1.0));
                bp->setStepMode(BindingStepMode(bindingElement->getIntAttribute(MIDIBINDING_STEPMODE_ATTRIB, 0)));
+               bp->setVelocityScaling(bindingElement->getDoubleAttribute(MIDIBINDING_VELOCITYSENSE_ATTRIB, 0.0));
                
                param->RegisterBinding(dex);
             }
@@ -269,7 +272,6 @@ void BasePlugin::clearMidiOutputFilter()
    if (outputMidiChanFilter)
       delete outputMidiChanFilter;
    outputMidiChannel = -1;
-   outputMidiChanFilter = 0;
 }
 
 void BasePlugin::setSynthInputChannelFilter(int midiChannel)

@@ -60,6 +60,9 @@ void MidiBinding::setStepMode(BindingStepMode bidirectional_)
       incrAmount = -incrAmount;
    else if (bidirectional == Decrease && incrAmount > 0)
       incrAmount = -incrAmount;
+      
+   hitMax = false;
+   hitMin = false;
 };
 
 float MidiBinding::applyCC(float val)
@@ -67,41 +70,84 @@ float MidiBinding::applyCC(float val)
    return (maximum - minimum) * val + minimum;
 }
 
-float MidiBinding::applyNoteIncrement(float val)
+float MidiBinding::applyNoteIncrement(float val, bool isNoteOn, float velocityValue)
 {
-   double range = (maximum-minimum);
-   double upperLimit = (minimum + (incrMax * range));
-   double lowerLimit = (minimum + (incrMin * range));
-   double actualIncr = incrAmount * range;
    float returnVal = val;
-   if (incrAmount > 0.9999) // toggle
-      returnVal = val > 0.5 ? lowerLimit : upperLimit;
-   else if (bidirectional == Increase || bidirectional == Decrease || bidirectional == Bidirectional)
+
+   // get the min & max around the way we expect & detect inverse binding
+   bool bindingIsInverse = maximum < minimum; // only currently supporting inverse for note-held bindings
+   double absMin = bindingIsInverse ? maximum : minimum;
+   double absMax = bindingIsInverse ? minimum : maximum;
+
+   double range = (absMax-absMin); // full available range we want to automate over (user specifiable)
+
+   // step mode allows skipping steps past N; this value represents that max CC value (usually 100%)
+   // these values are of course relative to the user specified range, so not always 0 and 100%
+   // may be flipped to support inverse bindings
+   double stepUpperLimit = (absMin + (incrMax * range)); 
+   double stepLowerLimit = (absMin + (incrMin * range)); // similar for lower limit (usually 0%)
+
+   // the actual increment - this is adjusted based on the current velocity
+   double incrementValue = incrAmount;
+   if (mode == NoteHeld || bidirectional == SetToValue)
+      incrementValue = range; 
+   if (velocityScaling > 0.001)
+      incrementValue -= incrementValue * (1.0-velocityValue) * (velocityScaling); // i.e. subtract a portion of the increment 
+   
+   if (mode == NoteHeld)
    {
-      returnVal += actualIncr;
-      if (returnVal > upperLimit + 0.00001)
+      if (bindingIsInverse)
+         returnVal = 
+            isNoteOn ? 
+               (absMax - incrementValue) : 
+               absMax;
+      else
+         returnVal = 
+            isNoteOn ? 
+               (absMin + incrementValue) : 
+               absMin;
+   }
+   else
+   {
+      // slightly different behaviour based on direction-mode
+      switch (bidirectional)
       {
-         if (bidirectional == Bidirectional)
-         {
-            incrAmount = -incrAmount;
-            returnVal = upperLimit + -actualIncr;
-         }
+      case Increase: // subtract 1 step, or <1 step depending on velocity
+         returnVal = hitMax ? stepLowerLimit : returnVal + incrementValue;
+      break;
+      case Decrease: // add 1 step, or <1 step depending on velocity
+         returnVal = hitMin ? stepUpperLimit : returnVal + incrementValue; // plus or minus?
+      break;
+      case Bidirectional: // add/subtract 1 step, or <1 step depending on velocity
+         returnVal = returnVal + incrementValue;
+      break;
+      case SetToValue: // set to upper value, or approach upper value depending on velocity
+         if (bindingIsInverse)
+            returnVal = absMax - incrementValue;
          else
-            returnVal = lowerLimit;
-      }
-      else if (returnVal < lowerLimit - 0.00001)
-      {
-         if (bidirectional == Bidirectional)
-         {
-            incrAmount = -incrAmount;
-            returnVal = lowerLimit + -actualIncr;
-         }
-         else
-            returnVal = upperLimit;
+            returnVal = absMin + incrementValue;
+      break;
       }
    }
-   else if (bidirectional == SetToValue)
-      returnVal = upperLimit;
+   
+   hitMax = false;
+   hitMin = false;
+
+   // here we snap to upper or lower so we don't ever return values out of range
+   if (returnVal >= stepUpperLimit)
+   {
+      returnVal = stepUpperLimit;
+      hitMax = true;
+   }
+   else if (returnVal <= stepLowerLimit)
+   {
+      returnVal = stepLowerLimit;
+      hitMin = true;
+   }
+   
+   if ((bidirectional == Bidirectional) && (hitMax || hitMin))
+      incrAmount = -incrAmount;
+   
    return returnVal;
 }
 
