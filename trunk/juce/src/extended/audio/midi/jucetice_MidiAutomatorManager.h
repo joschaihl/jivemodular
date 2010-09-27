@@ -70,7 +70,10 @@ public:
       incrAmount(1.0),
       bidirectional(Increase),
       incrMax(1.0),
-      incrMin(0.0)
+      incrMin(0.0),
+      velocityScaling(0),
+      hitMax(false),
+      hitMin(false)
    {
    };
    
@@ -105,8 +108,11 @@ public:
    void setStepMax(float incrMax_) { incrMax = incrMax_; };
    void setStepMin(float incrMax_) { incrMin = incrMax_; };
    
-   float applyNoteIncrement(float val);
+   float applyNoteIncrement(float val, bool isNoteOn = false, float velocityValue = 1.0);
    float applyCC(float val);
+
+   float getVelocityScaling() const { return velocityScaling; } ;
+   void setVelocityScaling(float scale_) { velocityScaling = scale_ < 0.1 ? 0 : scale_ > 1.0 ? 1 : scale_; };
 
    String getDescription();
 
@@ -125,6 +131,11 @@ protected:
    BindingStepMode bidirectional;
    float incrMax;
    float incrMin;
+   float velocityScaling;
+
+   // tells us which direction we are going, if we have flipped, etc in note mode so we don't have to infer state from current/prev value
+   bool hitMax;
+   bool hitMin;
 };
 
 //==============================================================================

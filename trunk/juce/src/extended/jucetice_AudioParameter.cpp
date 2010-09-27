@@ -277,16 +277,10 @@ bool AudioParameter::handleMidiMessage (const MidiMessage& message, int bindingN
       else if (message.isNoteOnOrOff())
       {
          float cur = plugin->getParameter(index);
-         if (bd.getMode() == NoteHeld)
-         {
-			// this should be moved into mutateValue/applyNoteIncrement and make use of user specified max and min
-            if (message.isNoteOn())
-               cur = 1.0;
-            else
-               cur = 0.0;
-         }
-         else 
-            cur = bd.applyNoteIncrement(cur);
+         float velocityScaling = 1.0;
+         if (message.isNoteOn())
+            velocityScaling = message.getFloatVelocity();
+         cur = bd.applyNoteIncrement(cur, message.isNoteOn(), velocityScaling);
          plugin->setParameter(index, cur);
       }
    }
