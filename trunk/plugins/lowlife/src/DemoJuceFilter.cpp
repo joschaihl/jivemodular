@@ -63,8 +63,8 @@ const int DemoJuceFilter::MinPolyMode = 0;
 const int DemoJuceFilter::MaxPolyMode = 2;
 const int DemoJuceFilter::MinSyncTicks = 0;
 const int DemoJuceFilter::MaxSyncTicks = 999; // ticks are 16th notes
-const int DemoJuceFilter::MinFilterType = 0;
-const int DemoJuceFilter::MaxFilterType = 4; 
+//const int DemoJuceFilter::MinFilterType = 0;
+//const int DemoJuceFilter::MaxFilterType = 4; 
 
 float DemoJuceFilter::getNormedParam(int slot, int paramId)
 {
@@ -89,9 +89,9 @@ float DemoJuceFilter::getNormedParam(int slot, int paramId)
       case SyncTicks:
          paramVal = (paramVal - MinSyncTicks) / static_cast<float>(MaxSyncTicks - MinSyncTicks);
          break;
-      case FilterType:
-         paramVal = paramVal / MaxFilterType;
-         break;
+//      case FilterType:
+//         paramVal = paramVal; // let highlife do the work of mapping 0-1 to filter types!
+//         break;
    }
    return paramVal;
 }
@@ -118,9 +118,9 @@ void DemoJuceFilter::setNormedParam(int slot, int paramId, float val)
       case SyncTicks:
          val = (MaxSyncTicks - MinSyncTicks) + MinSyncTicks;
          break;
-      case FilterType:
-         val = round(val * MaxFilterType);
-         break;
+//      case FilterType:
+//         val = val; // let highlife do the work of mapping 0-1 to filter types!
+//         break;
       default:
          break;
    }
@@ -215,7 +215,24 @@ const String DemoJuceFilter::getParameterText (int index)
 {
    int slot = index / paramsPerSlot;
    int paramOfInterest = index % paramsPerSlot;
-   String paramVal = String(getRawParam(slot, paramOfInterest));
+   double paramValue = getRawParam(slot, paramOfInterest);
+   String paramVal = String(paramValue);
+   
+   // special case filter type so we can show the filter type
+   if (index == FilterType)
+   {
+      if (paramValue < 0.2)
+         paramVal = "Off";
+      else if (paramValue < 0.4)
+         paramVal = "Lowpass";
+      else if (paramValue < 0.6)
+         paramVal = "Highpass";
+      else if (paramValue < 0.8)
+         paramVal = "Bandpass";
+      else
+         paramVal = "Bandstop";
+    }
+    
    return paramVal;
 }
 

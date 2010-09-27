@@ -138,8 +138,8 @@ public:
    static const int MaxPolyMode;
    static const int MinSyncTicks;
    static const int MaxSyncTicks;
-   static const int MinFilterType;
-   static const int MaxFilterType;
+//   static const int MinFilterType;
+//   static const int MaxFilterType;
 
 private:
    HIGHLIFE_PROGRAM& getHProgramRef(int zoneslot = 0) // don't care baout zoneslot anymore!!
