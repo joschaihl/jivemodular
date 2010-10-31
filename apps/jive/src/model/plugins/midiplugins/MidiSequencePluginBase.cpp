@@ -162,7 +162,7 @@ void MidiSequencePluginBase::newRenderEvents(
       // determine whether the event is one that we need to play in this time chunk..
       double beatsTime = sourceMidiBuffer.getEventTime(i);
       // we care about note offs after the end of the loop (in case the user has resized loop and cut off the end of a note)
-      bool specialNoteOffPastReloop = (isEndOfLoop && midiMessage->isNoteOff() && beatsTime >= frameEndBeatCount); 
+      bool specialNoteOffPastReloop = !weAreRenderingNoteOffs && (isEndOfLoop && midiMessage->isNoteOff() && beatsTime >= frameEndBeatCount); 
       if (
          (beatsTime >= beatCount && beatsTime < frameEndBeatCount) //|| // event occurs within render chunk time frame OR
          //specialNoteOffPastReloop 
