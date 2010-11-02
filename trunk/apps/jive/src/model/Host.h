@@ -35,6 +35,48 @@
 #include "PluginLoader.h"
 #include "Transport.h"
 
+#include <map>
+
+//==============================================================================
+
+class StemRenderingThread : public TimeSliceClient
+{
+public:
+   StemRenderingThread()
+   : 
+      TimeSliceClient(),
+      currentlyRecording(false)
+   {
+   }
+   ~StemRenderingThread();
+   
+   void startRendering();
+   void stopRendering();
+   
+   void openStemFileForPlugin(const BasePlugin* plugin, String uniquePrefix, int sampleRate);
+   void appendSamplesToBuffer(const BasePlugin* plugin, const AudioSampleBuffer& buffer);
+   
+   virtual bool useTimeSlice();
+   
+protected:
+   bool isBufferedDataWaiting();
+
+   struct PluginStemInfo
+   {
+      PluginStemInfo() : stemOutputBuffer(NULL), stemFileWriter(NULL), numSamples(0) {};
+   
+      AudioSampleBuffer* stemOutputBuffer;
+      AudioFormatWriter* stemFileWriter;
+      int numSamples;
+   };
+   
+   typedef std::map<const BasePlugin*, PluginStemInfo> StemWriterMap;
+   StemWriterMap currentStemsInfo;
+   bool currentlyRecording;
+   
+   ReadWriteLock StemBuffersLock;
+   ReadWriteLock CurrentlyRecordingLock;
+};
 
 //==============================================================================
 /**
@@ -240,6 +282,8 @@ private:
 
    bool renderingStems;
    int stemRenderNumber;
+   StemRenderingThread stemRenderThread;
+   TimeSliceThread stemRenderRunner;
 
     Host (const Host&);
     const Host& operator= (const Host&);
