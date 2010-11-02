@@ -117,7 +117,7 @@ public:
     virtual void idleEditor () {}
     virtual void closeEditor () {}
     
-    String getInstanceName();
+    String getInstanceName() const;
     void setInstanceName(const String&);
     
    //==============================================================================
@@ -199,11 +199,7 @@ public:
 
     /** Set the desired mute state */
     void setBypass (const bool bypass)                 { bypassOutput = bypass; }
-    
-    void openStemFile(String uniquePrefix, int sampleRate);
-    void closeStemFile();
-    void renderBlock(AudioSampleBuffer& buffer);
-   
+       
 protected:
 
     //==============================================================================
@@ -223,9 +219,6 @@ protected:
     //==============================================================================
     float outputGain, currentOutputGain;
     float outputPan, currentOutputPan;
-
-   //==============================================================================
-   AudioFormatWriter* stemFileWriter;
    
    //==============================================================================
    int outputMidiChannel;

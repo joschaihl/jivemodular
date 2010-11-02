@@ -54,7 +54,6 @@ BasePlugin::BasePlugin ()
       bypassOutput (false),
       outputGain (1.0f),
       currentOutputGain (1.0f),
-      stemFileWriter(0),
       outputMidiChannel(-1),
       synthInputMidiChan(-1),
       outputMidiChanFilter(0),
@@ -72,12 +71,10 @@ BasePlugin::BasePlugin ()
 
 BasePlugin::~BasePlugin ()
 {
-    closeStemFile();
-
     clearMidiOutputFilter();
 }
 
-String BasePlugin::getInstanceName()
+String BasePlugin::getInstanceName() const
 {
    return getValue(PROP_GRAPHNAME, getName ());
 }
@@ -212,39 +209,6 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
          
       }
    }
-}
-
-//==============================================================================
-void BasePlugin::openStemFile(String uniquePrefix, int sampleRate)
-{
-   String stemFname(uniquePrefix);
-   stemFname += String("__");
-   stemFname += getInstanceName();
-   stemFname += String(".wav");
-   
-   FileOutputStream* outputStream = new FileOutputStream(
-      File(Config::getInstance ()->lastStemsDirectory).getChildFile(stemFname));
-         
-   StringPairArray metadata;
-   if (getNumOutputs())
-      stemFileWriter = WavAudioFormat().createWriterFor (outputStream,
-                                        sampleRate,
-                                        getNumOutputs(),
-                                        32, // aka floating point, good paranoid format for potentially clippy plugins!
-                                        metadata,
-                                        0);   
-}
-
-void BasePlugin::closeStemFile()
-{
-   delete stemFileWriter;
-   stemFileWriter = 0;
-}
-
-void BasePlugin::renderBlock(AudioSampleBuffer& buffer)
-{
-   if (stemFileWriter)
-      buffer.writeToAudioWriter(stemFileWriter, 0, buffer.getNumSamples());
 }
 
 //==============================================================================
