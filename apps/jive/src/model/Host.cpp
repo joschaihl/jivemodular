@@ -30,6 +30,154 @@
 #include "../HostFilterBase.h"
 #include "plugins/WrappedJucePlugin.h"
 
+//==============================================================================
+// StemRenderingThread
+
+StemRenderingThread::~StemRenderingThread()
+{
+   stopRendering();
+}
+
+void StemRenderingThread::startRendering()
+{
+   {
+      ScopedWriteLock lck(CurrentlyRecordingLock);
+      currentlyRecording = true;
+   }
+}
+
+void StemRenderingThread::stopRendering()
+{
+   {
+      ScopedWriteLock lck(CurrentlyRecordingLock);
+      currentlyRecording = false;
+   }
+   
+   // force all the buffers to get emptied right now
+   while (isBufferedDataWaiting())
+   {
+      useTimeSlice();
+   }
+   
+   {
+      ScopedWriteLock lck(StemBuffersLock);
+      
+      for (StemWriterMap::iterator it=currentStemsInfo.begin(); it!=currentStemsInfo.end(); it++)
+      {
+         PluginStemInfo& info = it->second;
+         delete info.stemOutputBuffer;
+         info.stemOutputBuffer = 0;
+         delete info.stemFileWriter;
+         info.stemFileWriter = 0;
+      }
+      
+      currentStemsInfo.clear();
+   }   
+}
+
+bool StemRenderingThread::isBufferedDataWaiting()
+{
+   ScopedReadLock lck(StemBuffersLock);
+   
+   bool isDataLeft = false;
+   for (StemWriterMap::iterator it=currentStemsInfo.begin(); !isDataLeft && it->second.stemOutputBuffer && it!=currentStemsInfo.end(); it++)
+      isDataLeft = (it->second.numSamples > 0);
+   return isDataLeft;
+}
+
+const long MaxBufferSize = 88200*16;
+
+void StemRenderingThread::openStemFileForPlugin(const BasePlugin* plugin, String uniquePrefix, int sampleRate)
+{
+   if (plugin)
+   {
+      String stemFname(uniquePrefix);
+      stemFname += String("_");
+      stemFname += plugin->getInstanceName();
+      stemFname += String(".wav");
+      
+      FileOutputStream* outputStream = new FileOutputStream(
+         File(Config::getInstance ()->lastStemsDirectory).getChildFile(stemFname)); // does this need to be freed, or does the stemFileWriter now own it?
+            
+      int nChan = plugin->getNumOutputs();
+      if (nChan)
+      {
+         ScopedWriteLock lck(StemBuffersLock);
+
+         StringPairArray metadata;
+         AudioFormatWriter* tmp = WavAudioFormat().createWriterFor (outputStream,
+                                           sampleRate,
+                                           nChan,
+                                           32, // aka floating point, good paranoid format for potentially clippy plugins!
+                                           metadata,
+                                           0);
+         AudioSampleBuffer* buf = new AudioSampleBuffer(nChan, MaxBufferSize); // nice big buffer!
+         currentStemsInfo[plugin].stemFileWriter = tmp;
+         currentStemsInfo[plugin].stemOutputBuffer = buf;
+      }
+   }
+}
+
+void StemRenderingThread::appendSamplesToBuffer(const BasePlugin* plugin, const AudioSampleBuffer& buffer)
+{
+   bool cur = false;
+   {
+      ScopedReadLock lck(CurrentlyRecordingLock);
+      cur = currentlyRecording;
+   }
+   
+   if (cur)
+   {
+      {
+         ScopedWriteLock lck(StemBuffersLock);
+         PluginStemInfo& info = currentStemsInfo[plugin];
+         
+         if (info.stemOutputBuffer)
+         {
+
+            int samplesToCopy = buffer.getNumSamples();
+            if (samplesToCopy + info.numSamples > MaxBufferSize)
+               samplesToCopy = MaxBufferSize - info.numSamples;
+            for (int i=0; samplesToCopy && info.stemOutputBuffer && i<plugin->getNumOutputs(); i++)
+               info.stemOutputBuffer->copyFrom(i, info.numSamples, buffer, i, 0, samplesToCopy);
+            info.numSamples += samplesToCopy;
+         }
+      }
+   }
+}
+
+bool StemRenderingThread::useTimeSlice()
+{
+   bool needMoreTime = false;
+   {
+      ScopedReadLock lck(CurrentlyRecordingLock);
+      needMoreTime = needMoreTime || currentlyRecording;
+   }
+   
+   {
+      ScopedWriteLock lck(StemBuffersLock);
+
+      for (StemWriterMap::iterator it=currentStemsInfo.begin(); it!=currentStemsInfo.end(); it++)
+      {
+         PluginStemInfo& info = it->second;
+
+         if (info.stemFileWriter && info.stemOutputBuffer && info.numSamples > 0)
+         {
+            if (info.stemFileWriter)
+               info.stemOutputBuffer->writeToAudioWriter(info.stemFileWriter, 0, info.numSamples);
+            
+            // "clear the buffer" as it has been written out
+            info.numSamples = 0;
+            
+            // break here so the write thread is more granuley (only does one plugin each call)
+            needMoreTime = true;
+            break;
+         }
+      }
+   }
+      
+   return needMoreTime;
+}
 
 //==============================================================================
 Host::Host (HostFilterBase* owner_,
@@ -41,7 +189,8 @@ Host::Host (HostFilterBase* owner_,
     sampleRate (44100.0),
     samplesPerBlock (512),
     renderingStems(false),
-    stemRenderNumber(0)
+    stemRenderNumber(0),
+    stemRenderRunner("StemRenderTimeSliceManager")
 {
     DBG ("Host::Host");
 
@@ -54,6 +203,9 @@ Host::Host (HostFilterBase* owner_,
     //addPlugin (inputPlugin = new InputPlugin (maxNumInputChannels));
     addPlugin (inputPlugin = new TransportInputPlugin (maxNumInputChannels));
     addPlugin (outputPlugin = new OutputPlugin (maxNumOutputChannels));
+
+   stemRenderRunner.addTimeSliceClient(&stemRenderThread);
+   stemRenderRunner.startThread();
 }
 
 Host::~Host()
@@ -283,23 +435,17 @@ void Host::toggleStemRendering()
          if (! currentPlugin || !currentPlugin->getBoolValue(PROP_RENDERSTEM, false))
              continue;
              
-         currentPlugin->openStemFile(String(stemRenderNumber), sampleRate);
+         stemRenderThread.openStemFileForPlugin(currentPlugin, String("Take") + String(stemRenderNumber) + String("_Track") + String(j), sampleRate);
+         
+         // start rendering
+         stemRenderThread.startRendering();
       }
    }
    else 
    {
-      // stop rendering, close files
-      for (int j = 0; j < audioGraph->getNodeCount (); j++)
-      {
-         ProcessingNode* node = audioGraph->getNode (j);
-         currentPlugin = (BasePlugin*) node->getData ();
+      // stop rendering & close files
+      stemRenderThread.stopRendering();
 
-         if (! currentPlugin)
-             continue;
-             
-         currentPlugin->closeStemFile();
-      }
-      
       stemRenderNumber++; // update unique number so easy to work record/stop/record/stop etc, data keeps accumulating
    }
 }
@@ -372,9 +518,7 @@ void Host::processBlock (AudioSampleBuffer& buffer,
 #endif
 
                if (renderingStems && currentPlugin->getBoolValue(PROP_RENDERSTEM, false))
-               {
-                  currentPlugin->renderBlock(*outBuffers);
-               }
+                  stemRenderThread.appendSamplesToBuffer(currentPlugin, *outBuffers);
             
             }
 
