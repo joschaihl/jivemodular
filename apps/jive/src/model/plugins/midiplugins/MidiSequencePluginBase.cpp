@@ -620,7 +620,7 @@ void MidiSequencePluginBase::savePropertiesToXml (XmlElement* xml)
     BasePlugin::savePropertiesToXml (xml);
 
     xml->setAttribute (PROP_SEQROWOFFSET,            getIntValue (PROP_SEQROWOFFSET, 0));
-    xml->setAttribute (PROP_SEQCOLSIZE,              getIntValue (PROP_SEQCOLSIZE, 100));
+    xml->setAttribute (PROP_SEQCOLSIZE,              getIntValue (PROP_SEQCOLSIZE, 80));
     xml->setAttribute (PROP_SEQNOTELENGTH,           getIntValue (PROP_SEQNOTELENGTH, 4));
     xml->setAttribute (PROP_SEQNOTESNAP,             getIntValue (PROP_SEQNOTESNAP, 4));
     xml->setAttribute (PROP_SEQBAR,                  getIntValue (PROP_SEQBAR, 4));
@@ -633,7 +633,7 @@ void MidiSequencePluginBase::loadPropertiesFromXml (XmlElement* xml)
     BasePlugin::loadPropertiesFromXml (xml);
 
     setValue (PROP_SEQROWOFFSET,                     xml->getIntAttribute (PROP_SEQROWOFFSET, 0));
-    setValue (PROP_SEQCOLSIZE,                       xml->getIntAttribute (PROP_SEQCOLSIZE, 100));
+    setValue (PROP_SEQCOLSIZE,                       xml->getIntAttribute (PROP_SEQCOLSIZE, 80));
     setValue (PROP_SEQNOTELENGTH,                    xml->getIntAttribute (PROP_SEQNOTELENGTH, 4));
     setValue (PROP_SEQNOTESNAP,                      xml->getIntAttribute (PROP_SEQNOTESNAP, 4));
     setValue (PROP_SEQBAR,                           xml->getIntAttribute (PROP_SEQBAR, 4));
