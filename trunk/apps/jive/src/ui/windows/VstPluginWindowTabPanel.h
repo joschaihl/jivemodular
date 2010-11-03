@@ -61,6 +61,7 @@ public:
     void currentTabChanged (const int newCurrentTabIndex,
                             const String &newCurrentTabName);
 
+   void resized();
 protected:
 
     PluginEditorWindowHolder* owner;

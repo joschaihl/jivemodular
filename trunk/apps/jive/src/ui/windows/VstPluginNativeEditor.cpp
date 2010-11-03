@@ -29,6 +29,9 @@
 #include "VstPluginNativeEditor.h"
 #include "VstPluginWindow.h"
 
+const int ParameterRowHeight = 18;
+const int LabelWidth = 130;
+const int DisplayWidth = 130;
 
 //==============================================================================
 VstPluginNativeEditor::VstPluginNativeEditor (BasePlugin* plugin_,
@@ -38,11 +41,8 @@ VstPluginNativeEditor::VstPluginNativeEditor (BasePlugin* plugin_,
 {
     DBG ("VstPluginNativeEditor::VstPluginNativeEditor");
 
-    int size = 18;
     int width = 540;
     int height = 5;
-    int labelWidth = 110;
-    int displayWidth = 80;
     
    String windowTitle(plugin->getInstanceName() + String(" - ") + plugin->getName());
 
@@ -55,12 +55,12 @@ VstPluginNativeEditor::VstPluginNativeEditor (BasePlugin* plugin_,
     for (int j = 0; j < plugin->getNumParameters (); j++)
     {
         addAndMakeVisible (label = new Label (String::empty, plugin->getParameterName (j)));
-        label->setFont (Font (size * 0.8f, Font::bold));
+        label->setFont (Font (ParameterRowHeight * 0.8f, Font::bold));
         label->setJustificationType (Justification::centredLeft);
         label->setEditable (false, false, false);
         label->setColour (TextEditor::textColourId, Colours::white);
         label->setColour (TextEditor::backgroundColourId, backgroundColour);
-        label->setBounds (0, 5 + j * size, labelWidth, size - 2);
+        label->setBounds (0, 5 + j * ParameterRowHeight, LabelWidth, ParameterRowHeight - 2);
         names.add (label);
 
         addAndMakeVisible (param = new ParamSlider (plugin_, plugin->getParameterObject(j), j));
@@ -70,26 +70,23 @@ VstPluginNativeEditor::VstPluginNativeEditor (BasePlugin* plugin_,
         param->setSliderStyle (Slider::LinearBar); // LinearHorizontal
         param->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
         param->addListener (this);
-        param->setBounds (labelWidth, 5 + j * size, width - labelWidth - displayWidth, size - 2);
+        param->setBounds (LabelWidth, 5 + j * ParameterRowHeight, width - LabelWidth - DisplayWidth, ParameterRowHeight - 2);
         sliders.add (param);
 
         addAndMakeVisible (label = new Label (String::empty, plugin->getParameterText (j)));
-        label->setFont (Font (size * 0.8f, Font::plain));
+        label->setFont (Font (ParameterRowHeight * 0.8f, Font::plain));
         label->setJustificationType (Justification::centredLeft);
         label->setEditable (false, false, false);
         label->setColour (TextEditor::textColourId, Colours::white);
         label->setColour (TextEditor::backgroundColourId, backgroundColour);
-        label->setBounds (width - displayWidth, 5 + j * size, displayWidth - 20, size - 2);
+        label->setBounds (width - DisplayWidth, 5 + j * ParameterRowHeight, DisplayWidth - 20, ParameterRowHeight - 2);
         labels.add (label);
 
-        height += size;
+        height += ParameterRowHeight;
     }
 
     height += 5;
 
-    // set its size
-    if (height > 400)
-      height = 400;
     setSize (width, height);
 
     // remember original sizes
@@ -120,6 +117,20 @@ VstPluginNativeEditor::~VstPluginNativeEditor ()
     plugin->getParameterLock().exit ();
 
     deleteAllChildren();
+}
+
+void VstPluginNativeEditor::resized()
+{  
+   int width = getWidth();
+   
+   for (int j = 0; j < plugin->getNumParameters (); j++)
+   {
+      labels[j]->setBounds (width - DisplayWidth, 5 + j * ParameterRowHeight, DisplayWidth - 20, ParameterRowHeight - 2);
+      sliders[j]->setBounds (LabelWidth, 5 + j * ParameterRowHeight, width - LabelWidth - DisplayWidth, ParameterRowHeight - 2);
+      names[j]->setBounds (0, 5 + j * ParameterRowHeight, LabelWidth, ParameterRowHeight - 2);
+   }
+   
+   PluginEditorComponent::resized();
 }
 
 //==============================================================================

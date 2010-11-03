@@ -50,6 +50,8 @@ VstPluginWindow::VstPluginWindow (PluginEditorWindowHolder* owner_,
 {
     DBG ("VstPluginWindow::VstPluginWindow");
 
+   setResizable(true, true);
+   
     // add to desktop
     addToDesktop (getDesktopWindowStyleFlags());
 
