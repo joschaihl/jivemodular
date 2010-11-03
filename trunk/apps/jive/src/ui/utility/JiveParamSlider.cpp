@@ -377,7 +377,7 @@ void MidiBindingsEditor::buttonClicked (Button* button)
    if (button == addButton)
    {
       // set up a new binding similar to the current one.. could do more here
-      int curTrig = 1;
+      int curTrig = 0;
       NoteBindingMode curMode = Controller;
       MidiBinding* bp = parameter->getBinding(currentBinding);
       if (bp)
@@ -405,7 +405,7 @@ void ParamSlider::mouseDown(const MouseEvent& e)
    {
       PopupMenu menu = managedParam->generateMidiPopupMenu();
 
-      menu.addItem (3, "Bindings...", true);
+      menu.addItem (3, "Edit Bindings...", true);
 
       int result = menu.showAt (e.getScreenX(), e.getScreenY());
 
@@ -417,6 +417,6 @@ void ParamSlider::mouseDown(const MouseEvent& e)
          DialogWindow::showModalDialog(String("Edit Parameter Bindings"), &ed, 0, Colours::green, true);
       }
    }
-
-   Slider::mouseDown (e);
+   else
+      Slider::mouseDown (e);
 }
