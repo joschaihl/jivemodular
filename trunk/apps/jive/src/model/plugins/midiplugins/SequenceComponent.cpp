@@ -98,7 +98,7 @@ NoteEditComponent::NoteEditComponent(MidiSequencePlugin* _plugin, Transport* _tr
    pianoGrid->setTimeDivision (transport->getTimeDenominator());
    pianoGrid->setSnapQuantize (plugin->getIntValue (PROP_SEQNOTESNAP, 4));
    pianoGrid->setNumBars (plugin->getIntValue (PROP_SEQBAR, transport->getNumBars()));
-   pianoGrid->setBarWidth (plugin->getIntValue (PROP_SEQCOLSIZE, 120));
+   pianoGrid->setBarWidth (plugin->getIntValue (PROP_SEQCOLSIZE, 80));
    pianoGrid->setRowsOffset (plugin->getIntValue (PROP_SEQROWOFFSET, 0));
    pianoGrid->setListener (plugin);
 
@@ -313,7 +313,7 @@ AutomationEditComponent::AutomationEditComponent(MidiSequencePlugin* _plugin, Tr
     automationGrid->setTimeDivision (transport->getTimeDenominator());
     automationGrid->setSnapQuantize (plugin->getIntValue (PROP_SEQNOTESNAP, 4));
     automationGrid->setNumBars (plugin->getIntValue (PROP_SEQBAR, transport->getNumBars()));
-    automationGrid->setBarWidth (plugin->getIntValue (PROP_SEQCOLSIZE, 130));
+    automationGrid->setBarWidth (plugin->getIntValue (PROP_SEQCOLSIZE, 80));
     automationGrid->setListener (plugin);
 
     addAndMakeVisible (automationViewport = new Viewport (String::empty));
@@ -668,10 +668,10 @@ void SequenceComponent::updateParameters ()
       ccEnabledSlider->setValue(sequencer->getParameterReal(0), false);
 
    if (barSlider)
-      barSlider->setValue(sequencer->getIntValue(PROP_SEQBAR, 4), false);
+      barSlider->setValue(sequencer->getIntValue(PROP_SEQBAR, 4), true);
 
    if (zoomSlider)
-      zoomSlider->setValue(sequencer->getIntValue (PROP_SEQCOLSIZE, 120), false);
+      zoomSlider->setValue(sequencer->getIntValue (PROP_SEQCOLSIZE, 80), false);
    
    if (noteEditor) 
    {
