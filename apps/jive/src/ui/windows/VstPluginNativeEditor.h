@@ -66,6 +66,8 @@ public:
     /** Paint method */
     void paint (Graphics& g);
 
+   void resized();
+   
     //==============================================================================
     /** Get last width */
     int getLastWidth ();

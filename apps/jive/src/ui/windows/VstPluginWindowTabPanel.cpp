@@ -60,7 +60,7 @@ VstPluginWindowTabPanel::VstPluginWindowTabPanel (PluginEditorWindowHolder* owne
     if (nativeEditor)
     {
         viewport = new Viewport (String::empty);
-        viewport->setScrollBarsShown (true, false);
+        viewport->setScrollBarsShown (true, true);
         viewport->setViewedComponent (nativeEditor);
         addTab (T("Parameters"), backgroundColour, viewport, true);
     }
@@ -128,4 +128,13 @@ void VstPluginWindowTabPanel::currentTabChanged (const int newCurrentTabIndex,
         // save property
         plugin->setValue (PROP_WINDOWPAGE, lastPageIndex);
     }
+}
+
+void VstPluginWindowTabPanel::resized()
+{  
+   int sb = viewport->getScrollBarThickness();
+   int w = getWidth() - sb;
+   int h = getHeight() - sb;
+   nativeEditor->setSize(w >= 400 ? w : 400, h >= 24 ? h : 24);
+   TabbedComponent::resized();
 }
