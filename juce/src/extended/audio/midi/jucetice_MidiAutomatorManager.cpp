@@ -305,29 +305,35 @@ PopupMenu MidiAutomatable::generateMidiPopupMenu()
 {
    PopupMenu menu, ccSubMenu, noteSubMenu;
 
-   const int controllerNumber = getControllerNumber ();
-   const int noteNumber = getNoteNumber ();
+   std::vector<int> curCCs;
+   std::vector<int> curNotes;
+   for (int i=0; i<getNumBindings(); i++)
+   {
+      MidiBinding* b = getBinding(i);
+      if (b)
+      {
+         if (b->getCC() != -1)
+            curCCs.push_back(b->getCC());
+         else if (b->getNote() != -1)
+            curNotes.push_back(b->getNote());
+      }
+   }
 
    for (int i = 0; i < 128; i++)
    {
       ccSubMenu.addItem (i + 1000,
                          "CC# " + String(i) + " " + MidiMessage::getControllerName (i),
                          true,
-                         controllerNumber == i);
+                         find(curCCs.begin(), curCCs.end(), i) != curCCs.end());
       noteSubMenu.addItem (i + 2000,
                          "Note# " + String(i) + " " + MidiMessage::getMidiNoteName (i, true, true, 4),
                          true,
-                         noteNumber == i);
+                         find(curNotes.begin(), curNotes.end(), i) != curNotes.end());
    }
 
-// to do summarise multiple bindings
-//   menu.addItem (-1, getBinding(0).getDescription(), false);
-//   menu.addSeparator ();
-
    menu.addItem (1, "Midi Learn");
-   menu.addSubMenu ("Set CC", ccSubMenu);
-   menu.addSubMenu ("Set Note", noteSubMenu);
-   menu.addItem (2, "Reset", (controllerNumber != -1) || (noteNumber != -1 ));
+   menu.addSubMenu ("Add CC", ccSubMenu);
+   menu.addSubMenu ("Add Note", noteSubMenu);
 
    return menu;
 }
@@ -338,26 +344,19 @@ bool MidiAutomatable::processMidiPopupMenu(int result)
     switch (result)
     {
     case 1:
-        setControllerNumber (-1);
-        setNoteNumber (-1);
         activateLearning ();
-        weHandledIt = true;
-        break;
-    case 2:
-        setControllerNumber (-1);
-        setNoteNumber (-1);
         weHandledIt = true;
         break;
 
    default:
       if (result >= 1000 && result < 1128)
       {
-         setControllerNumber (result - 1000);
+         addControllerNumber (result - 1000);
          weHandledIt = true;
       }
       else if (result >= 2000 && result < 2128)
       {
-         setNoteNumber (result - 2000);
+         addNoteNumber (result - 2000);
          weHandledIt = true;
       }
    }
@@ -380,8 +379,6 @@ MidiAutomatorManager::MidiAutomatorManager ()
 {
     for (int i = 0; i < 128; i++)
         controllers.add (new TriggerValBindingMap);
-//    for (int i = 0; i < 128; i++)
-//        notes.add (new VoidArray);
     for (int i = 0; i < 128; i++)
         notes.add (new TriggerValBindingMap);
     for (int i = 0; i < 128; i++)
@@ -412,22 +409,18 @@ void MidiAutomatorManager::registerMidiAutomatable (MidiAutomatable* object, int
       if (bindingOpts.getCC () != -1)
       {
          TriggerValBindingMap* array = controllers.getUnchecked (bindingOpts.getCC ());
-//         array->add (object);
          array->insert(TriggerValBinding(object, bindingNum));
       }
       else if (bindingOpts.getNote () != -1)
       {
          if (bindingOpts.getMode() == NoteHeld || bindingOpts.getMode() == NoteOn)
          {
-   //         VoidArray* array = notes.getUnchecked (bindingOpts.getNoteNumber ());      
-   //         array->add (object);
             TriggerValBindingMap* array = notes.getUnchecked (bindingOpts.getNote ());      
             array->insert(TriggerValBinding(object, bindingNum));
          }
          if (bindingOpts.getMode() == NoteHeld || bindingOpts.getMode() == NoteOff)
          {
             TriggerValBindingMap* array = noteOffs.getUnchecked (bindingOpts.getNote());      
-//            array->add (object);
             array->insert(TriggerValBinding(object, bindingNum));
          }
       }
@@ -469,7 +462,6 @@ void MidiAutomatorManager::clearMidiAutomatableFromCC (const int ccNumber)
 {
     jassert (ccNumber >= 0 && ccNumber < 128)
 
-//    VoidArray* array = controllers.getUnchecked (ccNumber);
    TriggerValBindingMap* array = controllers.getUnchecked (ccNumber);
     array->clear();
 }
@@ -478,8 +470,6 @@ void MidiAutomatorManager::clearMidiAutomatableFromNote (const int note)
 {
     jassert (note >= 0 && note < 128)
 
-//    VoidArray* array = notes.getUnchecked (note);
-//    array->clear();
    TriggerValBindingMap* array = notes.getUnchecked (note);
    array->clear();
 
