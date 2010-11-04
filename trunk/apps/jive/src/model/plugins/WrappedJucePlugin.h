@@ -40,7 +40,7 @@ class WrappedJucePlugin : public BasePlugin
 public:
 
     //==============================================================================
-    WrappedJucePlugin (PluginDescription* descToLoad);
+    WrappedJucePlugin (PluginDescription* descToLoad, bool isInternal=false);
     ~WrappedJucePlugin ();
 
     //==============================================================================
@@ -91,10 +91,13 @@ public:
     AudioPluginInstance* getAudioPluginInstance() { return instance; };
     const PluginDescription& getPluginDescription() { return pluginDescription; };
 
+   bool isInternal() const { return isInternalPlugin; };
+
 private:
 
    PluginDescription pluginDescription;
    AudioPluginInstance* instance;
+   bool isInternalPlugin;
 };
 
 #endif // __JUCETICE_JOSTWRAPPEDJUCEPLUGIN_HEADER__

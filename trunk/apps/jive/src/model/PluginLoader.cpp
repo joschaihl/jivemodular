@@ -146,7 +146,7 @@ BasePlugin* PluginLoader::getFromTypeID (const int typeID,
                                          BasePlugin* outputPlugin,
                                          const bool subChannelPlugin,
                                          ChannelPlugin* plug,
-										 HostFilterBase* base, KnownPluginList* pluginList)
+										 HostFilterBase* base)
 {
     DBG ("PluginLoader::getFromTypeID");
     
@@ -219,21 +219,7 @@ BasePlugin* PluginLoader::getFromTypeID (const int typeID,
         // Probably you have not keep in sync this function with handlePopupMenu one...
         break;
     }
-    
-   // Juce is gonna handle certain types of plugins for us..
-   if(typeID != JOST_PLUGINTYPE_WRAPPEDJUCEVST) // the id will be this on relaunch, so we need to ignore it (need to get save/load working for these plugins...)
-   {
-      int plugindex = pluginList->getIndexChosenByMenu(typeID);
-      PluginDescription* desc;
-      if (plugindex >= 0 && plugindex < pluginList->getNumTypes())
-      desc = pluginList->getType(plugindex);
-
-      if (desc != 0)
-      {
-         return new WrappedJucePlugin(desc); // WrappedJucePlugin is a class that has a juce vst/au plugin instance and implements all of Jost's BasePlugin
-      }
-   }
-    
+  
     return 0;
 }
 
@@ -241,7 +227,7 @@ BasePlugin* PluginLoader::getFromTypeID (const int typeID,
 BasePlugin* PluginLoader::handlePopupMenu (const bool subChannelPlugin,
                                            ChannelPlugin* plug,
                                            HostFilterBase* base, 
-                                         KnownPluginList* pluginList)
+                                         KnownPluginList* internalPluginList, KnownPluginList* pluginList)
 {
     DBG ("PluginLoader::handlePopupMenu");
 
@@ -249,15 +235,29 @@ BasePlugin* PluginLoader::handlePopupMenu (const bool subChannelPlugin,
     PopupMenu midiMenu;
     PopupMenu audioMenu;
     PopupMenu juceVSTAUMenu;
+    PopupMenu internalVSTMenu;
+    const int internalMenuOffset = 5000;
+    const int externalMenuOffset = 6000;
 
    {
-       KnownPluginList::SortMethod pluginSortMethod = (KnownPluginList::SortMethod) ApplicationProperties::getInstance()->getUserSettings()
-                            ->getIntValue (T("pluginSortMethod"), KnownPluginList::sortByManufacturer);
+//       KnownPluginList::SortMethod pluginSortMethod = (KnownPluginList::SortMethod) ApplicationProperties::getInstance()->getUserSettings()
+//                            ->getIntValue (T("pluginSortMethod"), KnownPluginList::sortByManufacturer);
 
-      // add stuff to juceVSTAUMenu from the KnownPluginList
-//      addPluginsToMenu (juceVSTAUMenu);
-      pluginList->addToMenu(juceVSTAUMenu, pluginSortMethod);
+      for (int plugindex=0; plugindex<internalPluginList->getNumTypes(); plugindex++)
+      {
+         PluginDescription* desc;
+         desc = internalPluginList->getType(plugindex);
+         internalVSTMenu.addItem(internalMenuOffset + plugindex, desc->name, true, false);
+      }
 
+      // by adding to the menu ourselves we lose the nice manufacturer>plugin structure
+      // until we implement that! (soon!)
+      for (int plugindex=0; plugindex<pluginList->getNumTypes(); plugindex++)
+      {
+         PluginDescription* desc;
+         desc = pluginList->getType(plugindex);
+         internalVSTMenu.addItem(internalMenuOffset + plugindex, desc->name, true, false);
+      }
    }
 
     {
@@ -300,16 +300,35 @@ BasePlugin* PluginLoader::handlePopupMenu (const bool subChannelPlugin,
 
     menu.addSubMenu("Midi", midiMenu);
     menu.addSubMenu("Audio", audioMenu);
-    menu.addSubMenu("External", juceVSTAUMenu);
+    menu.addSubMenu("Internal VST", internalVSTMenu);
+    menu.addSubMenu("External VST", juceVSTAUMenu);
 
     BasePlugin* plugin = 0;
 
-    const int result = menu.show();
-    if (result)
-    {
-        plugin = PluginLoader::getFromTypeID (result, 0, 0, subChannelPlugin, plug, base, pluginList);
-    }
-        
+   const int result = menu.show();
+   if (result)
+   {
+      PluginDescription* desc;
+      if (result >= internalMenuOffset && result < externalMenuOffset)
+      {
+         int plugindex = result - internalMenuOffset;
+         if (plugindex >= 0 && plugindex < internalPluginList->getNumTypes())
+            desc = internalPluginList->getType(plugindex);
+         if (desc != 0)
+            plugin = new WrappedJucePlugin(desc, true);
+      }
+      else if (result >= externalMenuOffset)
+      {
+         int plugindex = result - externalMenuOffset;
+         if (plugindex >= 0 && plugindex < pluginList->getNumTypes())
+            desc = pluginList->getType(plugindex);
+         if (desc != 0)
+            plugin = new WrappedJucePlugin(desc);
+      }
+      else
+         plugin = PluginLoader::getFromTypeID (result, 0, 0, subChannelPlugin, plug, base);
+   }
+
     return plugin;
 }
 
