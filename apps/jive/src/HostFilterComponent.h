@@ -193,6 +193,7 @@ private:
 
 public: // yep, should be behind accessor and yep, should be in app config / state class!
     KnownPluginList knownPluginList;
+    KnownPluginList internalPluginList;
     KnownPluginList::SortMethod pluginSortMethod;
 };
 

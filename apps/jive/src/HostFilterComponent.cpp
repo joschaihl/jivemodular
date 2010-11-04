@@ -130,7 +130,7 @@ HostFilterComponent::HostFilterComponent (HostFilterBase* const ownerFilter_)
     File internalPluginFolder = File::getSpecialLocation(File::currentApplicationFile).getChildFile("../Plugins"); // plugin folder alongside app on other platforms.. for now
 #endif
     VSTPluginFormat vst;
-    PluginDirectoryScanner internalPluginScanner(knownPluginList, vst, FileSearchPath(internalPluginFolder.getFullPathName()), false, deadMansPedalFile);
+    PluginDirectoryScanner internalPluginScanner(internalPluginList, vst, FileSearchPath(internalPluginFolder.getFullPathName()), false, deadMansPedalFile);
     while (internalPluginScanner.scanNextFile(true)) {
        // keep looking
     }    
@@ -555,7 +555,7 @@ void HostFilterComponent::changeListenerCallback (void* source)
     }
     else if (source == &knownPluginList)
     {
-       // save the plugin list every time it gets chnaged, so that if we're scanning
+       // save the plugin list every time it gets changed, so that if we're scanning
        // and it crashes, we've still saved the previous ones
        XmlElement* const savedPluginList = knownPluginList.createXml();
 

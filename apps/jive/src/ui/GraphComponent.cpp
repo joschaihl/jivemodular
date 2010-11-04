@@ -236,7 +236,7 @@ void GraphComponent::mouseUp (const MouseEvent& e)
     else if (e.mods.isRightButtonDown ())
     {
         // try to open internal plugins
-        BasePlugin* newPlugin = PluginLoader::handlePopupMenu (false, 0, owner->getFilter(), &owner->knownPluginList);
+        BasePlugin* newPlugin = PluginLoader::handlePopupMenu (false, 0, owner->getFilter(), &owner->internalPluginList, &owner->knownPluginList);
 
         // now open plugin
         if (host && newPlugin)

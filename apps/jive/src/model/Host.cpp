@@ -650,7 +650,12 @@ void Host::saveToXml (XmlElement* xml)
          WrappedJucePlugin* vstPlug = dynamic_cast<WrappedJucePlugin*>(plugin);
          if (vstPlug)
          {
-            XmlElement* vstDescrElement = new XmlElement (T("jucevstau"));
+            XmlElement* vstDescrElement = 0;
+            if (vstPlug->isInternal())
+               vstDescrElement = new XmlElement (T("internaljucevst"));
+            else
+               vstDescrElement = new XmlElement (T("jucevstau"));
+            
             vstDescrElement->addChildElement (vstPlug->getPluginDescription().createXml());
             e->addChildElement(vstDescrElement);
          }
@@ -773,16 +778,25 @@ void Host::loadFromXml (XmlElement* xml)
 
            if (pluginUniqueType == JOST_PLUGINTYPE_WRAPPEDJUCEVST)
            {
+            bool isInternal = false;
             XmlElement* plugDescrXml;
             //XmlElement* vstDescrElement = new XmlElement (T("jucevstau"));
             plugDescrXml = e->getChildByName (T("jucevstau"));
-            plugDescrXml = plugDescrXml->getChildByName (T("PLUGIN"));
+            if (!plugDescrXml)
+            {
+               plugDescrXml = e->getChildByName (T("internaljucevst"));
+               if (plugDescrXml)
+                  isInternal = true;
+            }
+            if (plugDescrXml)
+               plugDescrXml = plugDescrXml->getChildByName (T("PLUGIN"));
+
             if (plugDescrXml)
             {
                PluginDescription plugDesc;
                plugDesc.loadFromXml(*plugDescrXml);
                
-               WrappedJucePlugin* gotIm = new WrappedJucePlugin(&plugDesc);
+               WrappedJucePlugin* gotIm = new WrappedJucePlugin(&plugDesc, isInternal);
                if (gotIm && gotIm->getAudioPluginInstance())
                {
                   plugin = gotIm;

@@ -30,16 +30,40 @@
 #include "HostFilterBase.h"
 
 //==============================================================================
-WrappedJucePlugin::WrappedJucePlugin (PluginDescription* desc)
+WrappedJucePlugin::WrappedJucePlugin (PluginDescription* desc, bool isInternal)
 :
-   instance(0)
+   instance(0),
+   isInternalPlugin(isInternal)
 {
    if (desc)
    {
       pluginDescription = *desc;
       String errorMessage;
-        
-      instance = AudioPluginFormatManager::getInstance()->createPluginInstance (pluginDescription, errorMessage);
+      
+      String oldPluginFilePath = pluginDescription.fileOrIdentifier;
+
+      // force path to be inside the app instead of wherever the plugin was in the saved session (so we don't depend on e.g. the debug version!)
+      if (isInternalPlugin)
+      {
+         // put this somewhere shared!
+         File internalPluginFolder = File::getSpecialLocation(File::currentApplicationFile).getChildFile("./Contents/PlugIns");
+         
+         File pluginFile = File(oldPluginFilePath);
+         File localToAppPluginFile = internalPluginFolder.getChildFile(pluginFile.getFileName());
+
+         pluginDescription.fileOrIdentifier = localToAppPluginFile.getFullPathName();
+
+         instance = AudioPluginFormatManager::getInstance()->createPluginInstance (pluginDescription, errorMessage);
+         if (!instance) // fall back to previous location!
+         {
+            pluginDescription.fileOrIdentifier = oldPluginFilePath;
+            instance = AudioPluginFormatManager::getInstance()->createPluginInstance (pluginDescription, errorMessage);
+            
+            std::cerr << "Internal plugin missing - using referred file instead - " << oldPluginFilePath.toUTF8() << std::endl;
+         }
+      }
+      else
+         instance = AudioPluginFormatManager::getInstance()->createPluginInstance (pluginDescription, errorMessage);
 
       loadPluginStuff();
    }

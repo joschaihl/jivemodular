@@ -159,7 +159,7 @@ public:
                                       BasePlugin* outputPlugin,
                                       const bool subChannelPlugin = false,
                                       ChannelPlugin* plug = 0,
-									  HostFilterBase* base = 0, KnownPluginList* pluginList = 0);
+									  HostFilterBase* base = 0);
 
     /** Loads an internal plugin from a popup menu selector
 
@@ -172,7 +172,7 @@ public:
     static BasePlugin* handlePopupMenu (const bool subChannelPlugin = false,
                                          ChannelPlugin* plug = 0,
                                          HostFilterBase* base = 0, 
-                                         KnownPluginList* pluginList = 0);
+                                         KnownPluginList* internalPluginList = 0, KnownPluginList* pluginList = 0);
 
 };
 
