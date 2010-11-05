@@ -65,6 +65,8 @@ void StemRenderingThread::stopRendering()
       for (StemWriterMap::iterator it=currentStemsInfo.begin(); it!=currentStemsInfo.end(); it++)
       {
          PluginStemInfo& info = it->second;
+         delete info.stemInfoLock;
+         info.stemInfoLock = 0;
          delete info.stemOutputBuffer;
          info.stemOutputBuffer = 0;
          delete info.stemFileWriter;
@@ -85,7 +87,9 @@ bool StemRenderingThread::isBufferedDataWaiting()
    return isDataLeft;
 }
 
+// These constants are working for me right now but there is plenty of scope for optimising this...
 const long MaxBufferSize = 88200*16;
+const long MinSamplesToWrite = 4096;
 
 void StemRenderingThread::openStemFileForPlugin(const BasePlugin* plugin, String uniquePrefix, int sampleRate)
 {
@@ -108,10 +112,11 @@ void StemRenderingThread::openStemFileForPlugin(const BasePlugin* plugin, String
          AudioFormatWriter* tmp = WavAudioFormat().createWriterFor (outputStream,
                                            sampleRate,
                                            nChan,
-                                           32, // aka floating point, good paranoid format for potentially clippy plugins!
+                                           16, // bit depth
                                            metadata,
                                            0);
-         AudioSampleBuffer* buf = new AudioSampleBuffer(nChan, MaxBufferSize); // nice big buffer!
+         AudioSampleBuffer* buf = new AudioSampleBuffer(nChan, MaxBufferSize);
+         currentStemsInfo[plugin].stemInfoLock = new ReadWriteLock();
          currentStemsInfo[plugin].stemFileWriter = tmp;
          currentStemsInfo[plugin].stemOutputBuffer = buf;
       }
@@ -129,18 +134,22 @@ void StemRenderingThread::appendSamplesToBuffer(const BasePlugin* plugin, const 
    if (cur)
    {
       {
-         ScopedWriteLock lck(StemBuffersLock);
-         PluginStemInfo& info = currentStemsInfo[plugin];
-         
-         if (info.stemOutputBuffer)
-         {
+         ScopedReadLock lck2(StemBuffersLock); 
 
-            int samplesToCopy = buffer.getNumSamples();
-            if (samplesToCopy + info.numSamples > MaxBufferSize)
-               samplesToCopy = MaxBufferSize - info.numSamples;
-            for (int i=0; samplesToCopy && info.stemOutputBuffer && i<plugin->getNumOutputs(); i++)
-               info.stemOutputBuffer->copyFrom(i, info.numSamples, buffer, i, 0, samplesToCopy);
-            info.numSamples += samplesToCopy;
+         PluginStemInfo& info = currentStemsInfo[plugin];
+         {      
+            ScopedWriteLock wlck(*(info.stemInfoLock));
+  
+            if (info.stemOutputBuffer)
+            {
+
+               int samplesToCopy = buffer.getNumSamples();
+               if (samplesToCopy + info.numSamples > MaxBufferSize)
+                  samplesToCopy = MaxBufferSize - info.numSamples;
+               for (int i=0; samplesToCopy && info.stemOutputBuffer && i<plugin->getNumOutputs(); i++)
+                  info.stemOutputBuffer->copyFrom(i, info.numSamples, buffer, i, 0, samplesToCopy);
+               info.numSamples += samplesToCopy;
+            }
          }
       }
    }
@@ -149,26 +158,32 @@ void StemRenderingThread::appendSamplesToBuffer(const BasePlugin* plugin, const 
 bool StemRenderingThread::useTimeSlice()
 {
    bool needMoreTime = false;
+   bool finalising = false; // true if we have stopped rendering and need to completely empty any buffers
    {
-      ScopedReadLock lck(CurrentlyRecordingLock);
+      ScopedReadLock rlck(CurrentlyRecordingLock);
       needMoreTime = needMoreTime || currentlyRecording;
+      finalising = !currentlyRecording;
    }
    
    {
-      ScopedWriteLock lck(StemBuffersLock);
+      ScopedReadLock lck(StemBuffersLock);
 
       for (StemWriterMap::iterator it=currentStemsInfo.begin(); it!=currentStemsInfo.end(); it++)
       {
          PluginStemInfo& info = it->second;
 
-         if (info.stemFileWriter && info.stemOutputBuffer && info.numSamples > 0)
+         if (info.stemFileWriter && info.stemOutputBuffer && (info.numSamples > (finalising ? 0 : MinSamplesToWrite)))
          {
             if (info.stemFileWriter)
                info.stemOutputBuffer->writeToAudioWriter(info.stemFileWriter, 0, info.numSamples);
             
             // "clear the buffer" as it has been written out
-            info.numSamples = 0;
-            
+            {
+               ScopedWriteLock lck((*info.stemInfoLock));
+               
+               info.numSamples = 0;
+            }
+
             // break here so the write thread is more granuley (only does one plugin each call)
             needMoreTime = true;
             break;
@@ -205,12 +220,16 @@ Host::Host (HostFilterBase* owner_,
     addPlugin (outputPlugin = new OutputPlugin (maxNumOutputChannels));
 
    stemRenderRunner.addTimeSliceClient(&stemRenderThread);
-   stemRenderRunner.startThread();
+   //int priority = 3; // default is 5, super important is 10, so let's leave lots of room for our audio thread
+   stemRenderRunner.startThread(); // use default priority until we demostrate the need for lower priority
 }
 
 Host::~Host()
 {
     DBG ("Host::~Host");
+    
+	// stop any stem render (i.e. if we quit while recording)
+    stemRenderThread.stopRendering();
 
     // free plugins
     closeAllPlugins (false);

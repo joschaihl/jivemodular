@@ -63,14 +63,16 @@ protected:
 
    struct PluginStemInfo
    {
-      PluginStemInfo() : stemOutputBuffer(NULL), stemFileWriter(NULL), numSamples(0) {};
+      PluginStemInfo() : stemOutputBuffer(NULL), stemFileWriter(NULL), numSamples(0), stemInfoLock(NULL) { };
    
+      ReadWriteLock* stemInfoLock;
+
       AudioSampleBuffer* stemOutputBuffer;
       AudioFormatWriter* stemFileWriter;
       int numSamples;
    };
    
-   typedef std::map<const BasePlugin*, PluginStemInfo> StemWriterMap;
+   typedef std::map<const BasePlugin*, PluginStemInfo> StemWriterMap; 
    StemWriterMap currentStemsInfo;
    bool currentlyRecording;
    
