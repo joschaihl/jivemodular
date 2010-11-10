@@ -937,7 +937,7 @@ bool GraphComponent::closeSelectedPlugins ()
 
     if (selectedNodes.getNumSelected () > 0)
     {
-        for (int i = 0; i < selectedNodes.getNumSelected (); i++)
+        for (int i =selectedNodes.getNumSelected ()-1; i >= 0 ; i--)
         {
             GraphNodeComponent* selected = selectedNodes.getSelectedItem (i);
 
