@@ -256,7 +256,7 @@ BasePlugin* PluginLoader::handlePopupMenu (const bool subChannelPlugin,
       {
          PluginDescription* desc;
          desc = pluginList->getType(plugindex);
-         internalVSTMenu.addItem(internalMenuOffset + plugindex, desc->name, true, false);
+         juceVSTAUMenu.addItem(externalMenuOffset + plugindex, desc->name, true, false);
       }
    }
 
