@@ -681,8 +681,6 @@ void MidiEditorTabContentComponent::updateParameters()
          {
             if (quantizeBox)
                quantizeBox->setSelectedId(sequencer->getIntValue (PROP_SEQNOTESNAP, 4) + 1, true);
-   //         double pianoGridTimeDivision =    pianoGrid->getTimeDivision ();
-   //         double pianoGridNoteLen =    pianoGrid->getNoteLengthInBeats ();
             double notelen = sequencer->getIntValue (PROP_SEQNOTELENGTH, 4);   
             if (noteEditor->getNoteLengthBox())
                noteEditor->getNoteLengthBox()->setSelectedId(notelen, true);
@@ -897,12 +895,9 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
    MidiSequencePlugin* seq = getPlugin();
    transport = seq->getParentHost()->getTransport();
 
-
    // connect up with plugin
-   {
-      seq->addChangeListener (this);
-      transport->addChangeListener (this);
-   }
+   seq->addChangeListener (this);
+   transport->addChangeListener (this);
    
    // configure tab bar for the different UI panes
    addAndMakeVisible(tabs = new TabbedComponent(TabbedButtonBar::TabsAtBottom));
@@ -910,96 +905,9 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
    tabs->addTab("Editor", Colours::aliceblue, editorTabContent, true, -1);
    configTabContent = new MidiSequencerConfigTabContentComponent(seq, transport);
    tabs->addTab("Options", Colours::bisque, configTabContent, true, -1);
-   
-   
-   // set up midi-edit UI components & set default state
-//   {
-//      // bar count slider
-//      addAndMakeVisible (barLabel = new Label (String::empty, "Bars:"));
-//      addAndMakeVisible (barSlider = new Slider (String::empty));
-//      barSlider->setRange (1, 999, 1);
-//      barSlider->setSliderStyle (Slider::IncDecButtons);
-//      barSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
-//      barSlider->setValue (transport->getNumBars (), false);
-//      barSlider->setTooltip (T("Bar count"));
-//      barSlider->addListener (this);
-//
-//      // quantize box
-//      addAndMakeVisible (quantizeLabel = new Label (String::empty, "Quantise:"));
-//      addAndMakeVisible (quantizeBox = new ComboBox (String::empty));
-//      quantizeBox->setEditableText (false);
-//      quantizeBox->setJustificationType (Justification::centredLeft);
-//      quantizeBox->addItem (T("off"), 1);
-//      quantizeBox->addItem (T("1 bar"), 2);
-//      quantizeBox->addItem (T("1/2 bar"), 3);
-//      quantizeBox->addItem (T("beat"), 5);
-//      quantizeBox->addItem (T("8th"), 9);
-//      quantizeBox->addItem (T("16th"), 17);
-//      quantizeBox->addItem (T("32th"), 33);
-//      quantizeBox->addItem (T("64th"), 65);
-//      quantizeBox->setTooltip (T("Snap"));
-//      quantizeBox->addListener (this);
-//
-//      quantizeBox->setSelectedId (seq->getIntValue (PROP_SEQNOTESNAP, 4) + 1);
-//
-//      myLayout.setItemLayout (0, -0.2, -0.9, -0.6); // piano/note editor 60% default
-//      myLayout.setItemLayout (1, 8, 8, 8); // resizer bar always 8 pixels
-//      myLayout.setItemLayout (2, -0.1, -0.8, -0.4); // controlller automation editor 40% default
-//
-//      addAndMakeVisible(layoutResizer = new StretchableLayoutResizerBar(&myLayout, 1, false));
-//
-//      addAndMakeVisible(noteEditor = new NoteEditComponent(seq, transport));
-//      noteEditor->getMidiKeyboard()->addChangeListener (this);
-//      noteEditor->getNoteLengthBox()->addListener (this);
-//
-//      MidiSequencePlugin* pluginAuto = dynamic_cast<MidiSequencePlugin*> (plugin_);
-//      if (pluginAuto)
-//         addAndMakeVisible(automationEditor = new AutomationEditComponent(pluginAuto, transport));
-//
-//      // zoom slider
-//      addAndMakeVisible (zoomLabel = new Label (String::empty, "Zoom:"));
-//      addAndMakeVisible (zoomSlider = new ImageSlider ("Zoom:"));
-//      zoomSlider->setOrientation (ImageSlider::LinearHorizontal);
-//      zoomSlider->setRange (10, 1024, 1);
-//      zoomSlider->setSkewFactor (0.5f);
-//      zoomSlider->setValue (noteEditor->getPianoGrid()->getBarWidth (), false);
-//      zoomSlider->setSliderStyle (Slider::LinearHorizontal);
-//      zoomSlider->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
-//      zoomSlider->setTooltip (T("Zoom factor"));
-//      zoomSlider->addListener (this);
-//   }
-
-   // set up config UI components & set default state
-   {
-      //	addAndMakeVisible (enabledButton = new ToggleButton(String("Enable")));
-      //	enabledButton->setToggleState(seq->getBoolValue(PROP_SEQENABLED, true), false);
-      //	enabledButton->addButtonListener (this);
-
-//      addAndMakeVisible (channelNumSlider = new Slider (String::empty));
-//      channelNumSlider->setRange (1, 16, 1);
-//      channelNumSlider->setSliderStyle (Slider::IncDecButtons);
-//      channelNumSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
-//      channelNumSlider->setValue (plugin_->getMidiChannel(), false);
-//      channelNumSlider->setTooltip (T("MIDI Channel"));
-//      channelNumSlider->addListener (this);
-//
-//      const int patternsPerPart = MAXPATTERNSPERPART;
-//      AudioParameter* theEnablyParameter = plugin->getParameterObject(0);
-//      addAndMakeVisible(ccEnabledSlider = new ParamSlider(plugin, theEnablyParameter, 0));
-//      ccEnabledSlider->setTextBoxIsEditable(false);
-//
-//      addAndMakeVisible(partPatternNumSlider = new Slider("Pattern Number"));
-//      partPatternNumSlider->setSliderStyle(Slider::IncDecButtons);
-//      partPatternNumSlider->setRange(0, patternsPerPart, 1);
-//      partPatternNumSlider->addListener(this);
-   }
-   
+      
    // set up UI with current plugin state
    updateParameters();
-
-//   // config our playhead UI refresh timer
-//   if (transport->isPlaying ())
-//      startTimer (1000 / 20); // 20 frames per seconds
 }
 
 SequenceComponent::~SequenceComponent ()
@@ -1014,28 +922,7 @@ void SequenceComponent::resized ()
 {
    int headHeight = 0;
 
-tabs->setBounds(0, headHeight, getWidth(), getHeight() - headHeight);
-
-   // header-left
-//   channelNumSlider->setBounds (0, 2, 50, 16);
-//   ccEnabledSlider->setBounds (60, 2, 40, 16);
-//   partPatternNumSlider->setBounds (100, 2, 75, 16);
-
-//   // header-centre
-//   quantizeLabel->setBounds (200, 2, 70, 16);
-//   quantizeBox->setBounds (275, 2, 60, 16);
-//
-//   // header-right
-//   barLabel->setBounds (getWidth () - 210, 2, 45, 16);
-//   barSlider->setBounds (getWidth () - 170, 2, 60, 16);
-//   zoomLabel->setBounds (getWidth () - 115, 2, 45, 16);
-//   zoomSlider->setBounds (getWidth () - 80, 2, 80, 16);
-//
-//   // content - 2 panes, top for note editor, bottom for automation editor
-//   Component* comps[] = { noteEditor, layoutResizer, automationEditor }; 
-//   myLayout.layOutComponents (comps, 3,
-//      0, headHeight, getWidth(), getHeight() - headHeight,
-//      true, true);
+   tabs->setBounds(0, headHeight, getWidth(), getHeight() - headHeight);
 }
 
 //==============================================================================
