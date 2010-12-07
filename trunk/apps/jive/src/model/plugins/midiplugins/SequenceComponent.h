@@ -37,13 +37,14 @@
 
 class NoteEditComponent;
 class AutomationEditComponent;
+class MidiEditorTabContentComponent;
+class MidiSequencerConfigTabContentComponent;
 
 //==============================================================================
 /**
     An editor for midi sequence + automation sequence plugin.
 */
 class SequenceComponent : public PluginEditorComponent,
-                          public Timer,
                           public ChangeListener,
                           public ButtonListener,
                           public ComboBoxListener,
@@ -88,8 +89,6 @@ public:
 
     //==============================================================================
     /** @internal */
-    void timerCallback ();
-    /** @internal */
     void mouseWheelMove (const MouseEvent& e, float incrementX, float incrementY);
     /** @internal */
     void resized ();
@@ -105,25 +104,9 @@ protected:
 
    Transport* transport;
 
-   Slider* channelNumSlider;
-
-   ToggleButton* enabledButton;
-   ParamSlider* ccEnabledSlider;
-   Slider* partPatternNumSlider;
-
-   Label* quantizeLabel;
-   ComboBox* quantizeBox;
-
-   Label* barLabel;
-   Slider* barSlider;
-   Label* zoomLabel;
-   ImageSlider* zoomSlider;
-
-   StretchableLayoutManager myLayout;
-   StretchableLayoutResizerBar* layoutResizer;
-
-   NoteEditComponent* noteEditor;
-   AutomationEditComponent* automationEditor;
+   TabbedComponent* tabs;
+   MidiEditorTabContentComponent* editorTabContent;
+   MidiSequencerConfigTabContentComponent* configTabContent;
 };
 
 
