@@ -16,6 +16,7 @@
 				D0BC2FCA114EF57A00CFD216 /* PBXTargetDependency */,
 				D0BC2FCC114EF57E00CFD216 /* PBXTargetDependency */,
 				D0BC2FCE114EF57E00CFD216 /* PBXTargetDependency */,
+				93FF1DC412DBE45800FD9957 /* PBXTargetDependency */,
 			);
 			name = "Jive Deploy";
 			productName = "Jive Deploy";
@@ -125,6 +126,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		93FF1DC112DBE45000FD9957 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 93FF1DBD12DBE45000FD9957 /* distressor.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D01CCD20486CAD60068D4B7;
+			remoteInfo = oppressor;
+		};
+		93FF1DC312DBE45800FD9957 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 93FF1DBD12DBE45000FD9957 /* distressor.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D01CCC60486CAD60068D4B7;
+			remoteInfo = oppressor;
+		};
 		D0BC2FC1114EF56400CFD216 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = D0BC2FBD114EF56400CFD216 /* lowlife.xcodeproj */;
@@ -346,6 +361,7 @@
 		93EE36331121537D00D1D0B6 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		93EE36341121537D00D1D0B6 /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		93EE36351121537D00D1D0B6 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		93FF1DBD12DBE45000FD9957 /* distressor.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = distressor.xcodeproj; path = ../../../../plugins/distressor/build/mac/distressor.xcodeproj; sourceTree = SOURCE_ROOT; };
 		D0AADB8611DAB0F700D323AB /* FaderPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = FaderPlugin.cpp; sourceTree = "<group>"; };
 		D0AADB8711DAB0F700D323AB /* FaderPlugin.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = FaderPlugin.h; sourceTree = "<group>"; };
 		D0BC2FBD114EF56400CFD216 /* lowlife.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = lowlife.xcodeproj; path = ../../../../plugins/lowlife/build/mac/lowlife.xcodeproj; sourceTree = SOURCE_ROOT; };
@@ -746,9 +762,18 @@
 			name = Libraries;
 			sourceTree = "<group>";
 		};
+		93FF1DBE12DBE45000FD9957 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				93FF1DC212DBE45000FD9957 /* HDistressor.vst */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		D0BC2FBB114EF55500CFD216 /* Plugin Projects */ = {
 			isa = PBXGroup;
 			children = (
+				93FF1DBD12DBE45000FD9957 /* distressor.xcodeproj */,
 				D0BC2FBD114EF56400CFD216 /* lowlife.xcodeproj */,
 				D0BC2FC3114EF56D00CFD216 /* xsynth.xcodeproj */,
 			);
@@ -799,10 +824,21 @@
 			isa = PBXProject;
 			buildConfigurationList = C01FCF4E08A954540054247B /* Build configuration list for PBXProject "Jive" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 29B97314FDCFA39411CA2CEA /* jost */;
 			projectDirPath = "";
 			projectReferences = (
+				{
+					ProductGroup = 93FF1DBE12DBE45000FD9957 /* Products */;
+					ProjectRef = 93FF1DBD12DBE45000FD9957 /* distressor.xcodeproj */;
+				},
 				{
 					ProductGroup = D0BC2FBE114EF56400CFD216 /* Products */;
 					ProjectRef = D0BC2FBD114EF56400CFD216 /* lowlife.xcodeproj */;
@@ -821,6 +857,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		93FF1DC212DBE45000FD9957 /* HDistressor.vst */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = JiveDistressor.vst;
+			remoteRef = 93FF1DC112DBE45000FD9957 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		D0BC2FC2114EF56400CFD216 /* JiveLowlife.vst */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
@@ -938,6 +981,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		93FF1DC412DBE45800FD9957 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = oppressor;
+			targetProxy = 93FF1DC312DBE45800FD9957 /* PBXContainerItemProxy */;
+		};
 		D0BC2FCA114EF57A00CFD216 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 8D1107260486CEB800E47090 /* Jive */;
