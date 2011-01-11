@@ -765,7 +765,7 @@
 		93FF1DBE12DBE45000FD9957 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				93FF1DC212DBE45000FD9957 /* HDistressor.vst */,
+				93FF1DC212DBE45000FD9957 /* JiveDistressor.vst */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -857,7 +857,7 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
-		93FF1DC212DBE45000FD9957 /* HDistressor.vst */ = {
+		93FF1DC212DBE45000FD9957 /* JiveDistressor.vst */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
 			path = JiveDistressor.vst;
