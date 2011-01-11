@@ -25,7 +25,7 @@
 
 #include "includes.h"
 #include "XSynthJuceFilter.h"
-#include "XSynthEditorComponent.h"
+//#include "XSynthEditorComponent.h"
 #include <iostream>
 
 //==============================================================================
@@ -471,7 +471,8 @@ void DemoJuceFilter::processBlock (AudioSampleBuffer& buffer,
 //==============================================================================
 AudioProcessorEditor* DemoJuceFilter::createEditor()
 {
-    return new DemoEditorComponent (this);
+//    return new DemoEditorComponent (this);
+return 0;
 }
 
 //==============================================================================

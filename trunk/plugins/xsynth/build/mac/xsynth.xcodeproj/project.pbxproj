@@ -21,7 +21,6 @@
 		84978759103561A60020003B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84978758103561A60020003B /* AudioToolbox.framework */; };
 		931AFBFC114CEA6C007CB9DE /* juce_VST_Wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 931AFBFA114CEA6C007CB9DE /* juce_VST_Wrapper.cpp */; };
 		931AFBFD114CEA6C007CB9DE /* juce_VST_Wrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 931AFBFB114CEA6C007CB9DE /* juce_VST_Wrapper.mm */; };
-		D0A0FA5610D993E60021F781 /* XSynthEditorComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D0A0FA5210D993E60021F781 /* XSynthEditorComponent.cpp */; };
 		D0A0FA5810D993E60021F781 /* XSynthJuceFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D0A0FA5410D993E60021F781 /* XSynthJuceFilter.cpp */; };
 		D0A0FAB410D999C20021F781 /* DssiPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D0A0FAB010D999C20021F781 /* DssiPlugin.cpp */; };
 		D0A0FAB610D999C20021F781 /* LadspaPlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D0A0FAB210D999C20021F781 /* LadspaPlugin.cpp */; };
@@ -117,8 +116,6 @@
 		8D01CCD20486CAD60068D4B7 /* JiveXSynth.vst */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JiveXSynth.vst; sourceTree = BUILT_PRODUCTS_DIR; };
 		931AFBFA114CEA6C007CB9DE /* juce_VST_Wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = juce_VST_Wrapper.cpp; path = "../../../../juce/extras/audio plugins/wrapper/VST/juce_VST_Wrapper.cpp"; sourceTree = SOURCE_ROOT; };
 		931AFBFB114CEA6C007CB9DE /* juce_VST_Wrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = juce_VST_Wrapper.mm; path = "../../../../juce/extras/audio plugins/wrapper/VST/juce_VST_Wrapper.mm"; sourceTree = SOURCE_ROOT; };
-		D0A0FA5210D993E60021F781 /* XSynthEditorComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XSynthEditorComponent.cpp; path = ../../src/XSynthEditorComponent.cpp; sourceTree = SOURCE_ROOT; };
-		D0A0FA5310D993E60021F781 /* XSynthEditorComponent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XSynthEditorComponent.h; path = ../../src/XSynthEditorComponent.h; sourceTree = SOURCE_ROOT; };
 		D0A0FA5410D993E60021F781 /* XSynthJuceFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XSynthJuceFilter.cpp; path = ../../src/XSynthJuceFilter.cpp; sourceTree = SOURCE_ROOT; };
 		D0A0FA5510D993E60021F781 /* XSynthJuceFilter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XSynthJuceFilter.h; path = ../../src/XSynthJuceFilter.h; sourceTree = SOURCE_ROOT; };
 		D0A0FAB010D999C20021F781 /* DssiPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = DssiPlugin.cpp; path = ../../../lib/DssiPlugin.cpp; sourceTree = SOURCE_ROOT; };
@@ -227,8 +224,6 @@
 		8437929D0EFBF08E002A2725 /* Filter */ = {
 			isa = PBXGroup;
 			children = (
-				D0A0FA5210D993E60021F781 /* XSynthEditorComponent.cpp */,
-				D0A0FA5310D993E60021F781 /* XSynthEditorComponent.h */,
 				D0A0FA5410D993E60021F781 /* XSynthJuceFilter.cpp */,
 				D0A0FA5510D993E60021F781 /* XSynthJuceFilter.h */,
 				843792A60EFBF14B002A2725 /* includes.h */,
@@ -445,7 +440,14 @@
 			isa = PBXProject;
 			buildConfigurationList = 3E4BA247089833B7007656EC /* Build configuration list for PBXProject "xsynth" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 089C166AFE841209C02AAC07 /* JuceDemoPlugin */;
 			projectDirPath = "";
 			projectReferences = (
@@ -514,7 +516,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				843792B00EFBF14B002A2725 /* juce_LibrarySource.mm in Sources */,
-				D0A0FA5610D993E60021F781 /* XSynthEditorComponent.cpp in Sources */,
 				D0A0FA5810D993E60021F781 /* XSynthJuceFilter.cpp in Sources */,
 				D0A0FAB410D999C20021F781 /* DssiPlugin.cpp in Sources */,
 				D0A0FAB610D999C20021F781 /* LadspaPlugin.cpp in Sources */,
