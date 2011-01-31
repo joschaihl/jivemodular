@@ -43,17 +43,25 @@ MidiSequencePlugin::MidiSequencePlugin()
    enableCCValue(0),
    partNumber(0)
 {
-   setNumParameters (1);
+   int numBaseParams = MIDISEQ_BASESEQUENCERPARAMCOUNT;
+   setNumParameters (numBaseParams + 1);
 
    AudioParameter* parameter = new AudioParameter ();
+   parameter->part (MIDISEQ_PARAMID_CURRENTCLIP);
+   parameter->name ("Current Clip");
+   parameter->get (MakeDelegate (this, &MidiSequencePluginBase::getParameterReal));
+   parameter->set (MakeDelegate (this, &MidiSequencePluginBase::setParameterReal));
+   parameter->text (MakeDelegate (this, &MidiSequencePluginBase::getParameterTextReal));
+   registerParameter (MIDISEQ_PARAMID_CURRENTCLIP, parameter);
 
-   parameter->part (0);
+
+   parameter = new AudioParameter ();
+   parameter->part (MIDISEQ_PARAMID_SEQENABLED);
    parameter->name ("Part Pattern Enabled CC");
    parameter->get (MakeDelegate (this, &MidiSequencePlugin::getParameterReal));
    parameter->set (MakeDelegate (this, &MidiSequencePlugin::setParameterReal));
    parameter->text (MakeDelegate (this, &MidiSequencePlugin::getParameterTextReal));
-
-   registerParameter (0, parameter);
+   registerParameter (MIDISEQ_PARAMID_SEQENABLED, parameter);
 }
 
 MidiSequencePlugin::~MidiSequencePlugin ()
@@ -88,27 +96,36 @@ void MidiSequencePlugin::loadPropertiesFromXml (XmlElement* xml)
 
 void MidiSequencePlugin::setParameterReal (int paramNumber, float value)
 {
-   if (paramNumber == 0)
+   if (paramNumber == MIDISEQ_PARAMID_SEQENABLED)
    {
       enableCCValue = value;
       isEnabledRightNow = (partNumber == 0) || (value >= enableCCMin && value < enableCCMax);
    }
+   else
+      MidiSequencePluginBase::setParameterReal(paramNumber, value);
 }
 
 float MidiSequencePlugin::getParameterReal (int paramNumber)
 {
-   if (paramNumber == 0)
+   if (paramNumber == MIDISEQ_PARAMID_SEQENABLED)
       return enableCCValue;
-   else return 0;
+   else 
+      return MidiSequencePluginBase::getParameterReal(paramNumber);
 }
 
 const String MidiSequencePlugin::getParameterTextReal (int paramNumber, float value)
 {
    String paramTxt("Off");
-   if (partNumber == 0)
-      paramTxt = String("Always");
-   else if ((paramNumber == 0) && (value >= enableCCMin) && (value < enableCCMax))
-      paramTxt = String("On");
+   if (paramNumber == MIDISEQ_PARAMID_SEQENABLED)
+   {
+      if (partNumber == 0)
+         paramTxt = String("Always");
+      else if ((paramNumber == 0) && (value >= enableCCMin) && (value < enableCCMax))
+         paramTxt = String("On");
+   }
+   else 
+      paramTxt = MidiSequencePluginBase::getParameterTextReal(paramNumber, value);
+
    return paramTxt;
 }
 
@@ -305,8 +322,13 @@ void MidiSequencePlugin::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mi
 
    MidiSequencePluginBase::processBlock(buffer, midiMessages);
 
-	MidiMessageSequence sourceMidi = *midiSequence;
-	
+   MidiMessageSequence sourceMidi;
+   {
+      ScopedReadLock seqlock(midiPlaybackSequenceLock);
+      if (midiSequence)
+         sourceMidi = MidiMessageSequence(*midiSequence);
+   }
+   
 	std::vector<int> doneTheseControllers;
 
     if (transport->isPlaying () && isEnabled() && midiBuffer)

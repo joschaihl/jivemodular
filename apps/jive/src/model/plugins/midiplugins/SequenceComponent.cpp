@@ -27,14 +27,12 @@
 */
 
 #include "SequenceComponent.h"
+#include "ui/utility/JiveClipListComponent.h"
 
 //==============================================================================
 // Subcomponent for the note/pianoroll editor, comprising the note grid and the piano keyboard.
 // In future may also contain a left pane for note editing controls (e.g. velocity etc).
-class NoteEditComponent 
-: 
-   public Component,
-   public ChangeListener
+class NoteEditComponent : public Component
 {
 public:
 	NoteEditComponent(MidiSequencePlugin* _plugin, Transport* _transport);
@@ -42,7 +40,7 @@ public:
 
 	PianoGridKeyboard* getMidiKeyboard() const { return midiKeyboard; };
 	PianoGrid* getPianoGrid() const { return pianoGrid; };
-
+	
     void  setGridLeftX (int x)               { gridLeftX = x; }
     int getGridLeftX () const               { return gridLeftX; }
 
@@ -51,9 +49,6 @@ public:
     int getMidiKeyboardWidth () const               { return 52; }
 
    ComboBox* getNoteLengthBox() {return noteLengthBox;};
-
-   void changeListenerCallback(void *objectThatHasChanged);
-
 protected:
     MidiSequencePlugin* plugin;
     Transport* transport;
@@ -122,7 +117,6 @@ NoteEditComponent::NoteEditComponent(MidiSequencePlugin* _plugin, Transport* _tr
    midiKeyboard->setKeyWidth (12); // fixed !
    midiKeyboard->setAvailableRange (0, 119);
    midiKeyboard->setScrollButtonsVisible (true);
-   midiKeyboard->addChangeListener (this);
 
    dropShadower = new DropShadower (0.4f, 2, 0, 2.5f);
    dropShadower->setOwner (midiKeyboard);
@@ -130,7 +124,6 @@ NoteEditComponent::NoteEditComponent(MidiSequencePlugin* _plugin, Transport* _tr
 
 NoteEditComponent::~NoteEditComponent()
 {
-   midiKeyboard->removeChangeListener (this);
     deleteAndZero (dropShadower);
 	deleteAllChildren ();
 }
@@ -152,18 +145,6 @@ void NoteEditComponent::resized ()
 
     pianoGrid->setSize (300, getHeight() - keysButtonHeight);
     pianoGrid->updateSize ();
-}
-
-void NoteEditComponent::changeListenerCallback(void *objectThatHasChanged)
-{
-    if (objectThatHasChanged == midiKeyboard)
-    {
-        pianoGrid->setRowsOffset (midiKeyboard->getLowestVisibleKey());
-        pianoGrid->resized ();
-
-        // update plugin
-        plugin->setValue (PROP_SEQROWOFFSET, midiKeyboard->getLowestVisibleKey());
-    }
 }
 
 //==============================================================================
@@ -605,7 +586,7 @@ MidiEditorTabContentComponent::MidiEditorTabContentComponent(MidiSequencePlugin*
       noteEditor->getMidiKeyboard()->addChangeListener (this);
       noteEditor->getNoteLengthBox()->addListener (this);
 
-      addAndMakeVisible(automationEditor = new AutomationEditComponent(plugin, transport));
+         addAndMakeVisible(automationEditor = new AutomationEditComponent(plugin, transport));
 
       // zoom slider
       addAndMakeVisible (zoomLabel = new Label (String::empty, "Zoom:"));
@@ -731,21 +712,28 @@ void MidiEditorTabContentComponent::timerCallback()
 
 void MidiEditorTabContentComponent::changeListenerCallback(void *objectThatHasChanged)
 {
-    if (objectThatHasChanged == transport)
-    {
-        if (transport->isPlaying ())
-        {
-            startTimer (1000 / 20); // 20 frames per seconds
-        }
-        else if (! transport->isPlaying ())
-        {
-            stopTimer ();
-        }
+   PianoGrid* pianoGrid = noteEditor->getPianoGrid();
+   if (objectThatHasChanged == transport)
+   {
+      if (transport->isPlaying ())
+         startTimer (1000 / 20); // 20 frames per seconds
+      else if (! transport->isPlaying ())
+         stopTimer ();
 
-         PianoGrid* pianoGrid = noteEditor->getPianoGrid();
-        pianoGrid->setIndicatorPosition (transport->getPositionAbsolute ());
-		automationEditor->getAutomationGrid()->setIndicatorPosition (transport->getPositionAbsolute ());
-    }
+      pianoGrid->setIndicatorPosition (transport->getPositionAbsolute ());
+      automationEditor->getAutomationGrid()->setIndicatorPosition (transport->getPositionAbsolute ());
+   }
+
+   PianoGridKeyboard* midiKeyboard = noteEditor->getMidiKeyboard();
+
+   if (objectThatHasChanged == midiKeyboard)
+   {
+      pianoGrid->setRowsOffset (midiKeyboard->getLowestVisibleKey());
+      pianoGrid->resized ();
+
+      // update plugin
+      plugin->setValue (PROP_SEQROWOFFSET, midiKeyboard->getLowestVisibleKey());
+   }
 }
 
 void MidiEditorTabContentComponent::sliderValueChanged (Slider* sliderThatWasMoved)
@@ -801,34 +789,45 @@ void MidiEditorTabContentComponent::comboBoxChanged (ComboBox* comboBoxThatHasCh
 class MidiSequencerConfigTabContentComponent
 : 
    public Component,
-   public SliderListener   
+   public SliderListener,
+   public ClipListListener
 {
 public:
-   MidiSequencerConfigTabContentComponent(MidiSequencePlugin* plugin_, Transport* transport_);
-
+   MidiSequencerConfigTabContentComponent(MidiSequencePlugin* plugin_, Transport* transport_, SequenceComponent* parentComponent_);
+   ~MidiSequencerConfigTabContentComponent();
+   
    void updateParameters();
 
    void sliderValueChanged(Slider* sliderThatWasMoved);
+   virtual void clipListChanged(ClipListComponent* ctrlThatHasChanged);
+   virtual void currentClipChanged(ClipListComponent* ctrlThatHasChanged);
+   virtual void clipFilesDropped(ClipListComponent* ctrlThatHasChanged, const StringArray& files);
+
    void resized();
 
 private:
    MidiSequencePlugin* plugin;
    Transport* transport;
+   SequenceComponent* sequenceUIComponent;
    
    Slider* channelNumSlider;
 
    ToggleButton* enabledButton;
    ParamSlider* ccEnabledSlider;
    Slider* partPatternNumSlider;
+   ClipListComponent* clipList;
+   ParamSlider* currentClipSlider;
 };
 
-MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(MidiSequencePlugin* plugin_, Transport* transport_)
+MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(MidiSequencePlugin* plugin_, Transport* transport_, SequenceComponent* parentComponent_)
 :
    plugin(plugin_),
    transport(transport_),
+   sequenceUIComponent(parentComponent_),
    channelNumSlider(0),
    ccEnabledSlider(0),
-   partPatternNumSlider(0)
+   partPatternNumSlider(0),
+   clipList(0)
 {
    addAndMakeVisible (channelNumSlider = new Slider (String::empty));
    channelNumSlider->setRange (1, 16, 1);
@@ -839,17 +838,32 @@ MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(M
    channelNumSlider->addListener (this);
 
    const int patternsPerPart = MAXPATTERNSPERPART;
-   AudioParameter* theEnablyParameter = plugin->getParameterObject(0);
-   addAndMakeVisible(ccEnabledSlider = new ParamSlider(plugin, theEnablyParameter, 0));
+   AudioParameter* theEnablyParameter = plugin->getParameterObject(MIDISEQ_PARAMID_SEQENABLED);
+   addAndMakeVisible(ccEnabledSlider = new ParamSlider(plugin, theEnablyParameter, MIDISEQ_PARAMID_SEQENABLED));
    ccEnabledSlider->setTextBoxIsEditable(false);
 
    addAndMakeVisible(partPatternNumSlider = new Slider("Pattern Number"));
    partPatternNumSlider->setSliderStyle(Slider::IncDecButtons);
    partPatternNumSlider->setRange(0, patternsPerPart, 1);
    partPatternNumSlider->addListener(this);
+   
+   addAndMakeVisible(clipList = new ClipListComponent("Clip list", "*.mid;*.midi"));
+   clipList->addListener(this);
+
+   AudioParameter* theCurrentClipParameter = plugin->getParameterObject(MIDISEQ_PARAMID_CURRENTCLIP);
+   addAndMakeVisible(currentClipSlider = new ParamSlider(plugin, theCurrentClipParameter, MIDISEQ_PARAMID_CURRENTCLIP));
+   currentClipSlider->setTextBoxIsEditable(false);
 }
 
-void MidiSequencerConfigTabContentComponent::updateParameters ()
+MidiSequencerConfigTabContentComponent::~MidiSequencerConfigTabContentComponent()
+{
+   clipList->removeListener(this);
+   channelNumSlider->removeListener(this);
+   partPatternNumSlider->removeListener(this);
+   deleteAllChildren();
+}
+
+void MidiSequencerConfigTabContentComponent::updateParameters()
 {
    if (channelNumSlider)
       channelNumSlider->setValue(plugin->getMidiChannel(), false);
@@ -857,15 +871,33 @@ void MidiSequencerConfigTabContentComponent::updateParameters ()
    if (partPatternNumSlider)
       partPatternNumSlider->setValue(plugin->getPatternNumberInPart(), false);
    if (ccEnabledSlider)
-      ccEnabledSlider->setValue(plugin->getParameterReal(0), false);
+      ccEnabledSlider->setValue(plugin->getParameterReal(MIDISEQ_PARAMID_SEQENABLED), false);
+      
+   if (currentClipSlider)
+      currentClipSlider->setValue(plugin->getParameterReal(MIDISEQ_PARAMID_CURRENTCLIP), false);
+   if (clipList)
+   {
+      for (int i=0; i<=plugin->getMaxUsedClipIndex(); i++)
+         clipList->setClipFile(i, plugin->getClipFile(i));
+      clipList->setCurrentClipIndex(plugin->getCurrentClipIndex(), false); // don't notify
+   }
 }
 
 void MidiSequencerConfigTabContentComponent::resized()
 {
-   // header-left
-   channelNumSlider->setBounds (0, 2, 50, 16);
-   ccEnabledSlider->setBounds (60, 2, 40, 16);
-   partPatternNumSlider->setBounds (100, 2, 75, 16);
+   int rowHeight = 32;
+   int curY = 2;
+
+   channelNumSlider->setBounds(10, curY, 50, 16);
+   curY += rowHeight;
+
+   ccEnabledSlider->setBounds(10, curY, 80, 16);
+   partPatternNumSlider->setBounds(100, curY, 75, 16);
+   curY += rowHeight;
+   
+   currentClipSlider->setBounds(10, curY, 80, 16);
+   clipList->setBounds (100, curY, 100, 16);
+   curY += rowHeight;
 }
 
 void MidiSequencerConfigTabContentComponent::sliderValueChanged (Slider* sliderThatWasMoved)
@@ -884,6 +916,24 @@ void MidiSequencerConfigTabContentComponent::sliderValueChanged (Slider* sliderT
 
 }
 
+void MidiSequencerConfigTabContentComponent::clipListChanged(ClipListComponent* ctrlThatHasChanged)
+{
+
+}
+
+void MidiSequencerConfigTabContentComponent::currentClipChanged(ClipListComponent* ctrlThatHasChanged)
+{
+   plugin->setCurrentClipIndex(ctrlThatHasChanged->getCurrentClipIndex()); 
+   sequenceUIComponent->getEditorTab()->updateParameters(); // get the new notes in the edit
+}
+
+void MidiSequencerConfigTabContentComponent::clipFilesDropped(ClipListComponent* ctrlThatHasChanged, const StringArray& files)
+{
+   plugin->importClipFiles(files);
+   updateParameters(); // get the new clips in the combo
+   sequenceUIComponent->getEditorTab()->updateParameters(); // get the new notes in the edit
+}
+
 //==============================================================================
 SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
   : PluginEditorComponent (plugin_),
@@ -895,7 +945,6 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
    MidiSequencePlugin* seq = getPlugin();
    transport = seq->getParentHost()->getTransport();
 
-   // connect up with plugin
    seq->addChangeListener (this);
    transport->addChangeListener (this);
    
@@ -903,9 +952,9 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
    addAndMakeVisible(tabs = new TabbedComponent(TabbedButtonBar::TabsAtBottom));
    editorTabContent = new MidiEditorTabContentComponent(seq, transport);
    tabs->addTab("Editor", Colours::aliceblue, editorTabContent, true, -1);
-   configTabContent = new MidiSequencerConfigTabContentComponent(seq, transport);
+   configTabContent = new MidiSequencerConfigTabContentComponent(seq, transport, this);
    tabs->addTab("Options", Colours::bisque, configTabContent, true, -1);
-      
+   
    // set up UI with current plugin state
    updateParameters();
 }
@@ -920,7 +969,7 @@ SequenceComponent::~SequenceComponent ()
 //==============================================================================
 void SequenceComponent::resized ()
 {
-   int headHeight = 0;
+   int headHeight = 32;
 
    tabs->setBounds(0, headHeight, getWidth(), getHeight() - headHeight);
 }
@@ -959,179 +1008,31 @@ returning soon!
 //==============================================================================
 void SequenceComponent::updateParameters ()
 {
-   MidiSequencePlugin* sequencer = getPlugin ();
-   
    editorTabContent->updateParameters();
    configTabContent->updateParameters();
-    
-//   if (channelNumSlider)
-//      channelNumSlider->setValue(sequencer->getMidiChannel(), false);
-//    
-//   if (partPatternNumSlider)
-//      partPatternNumSlider->setValue(sequencer->getPatternNumberInPart(), false);
-//   if (ccEnabledSlider)
-//      ccEnabledSlider->setValue(sequencer->getParameterReal(0), false);
-
-//   if (barSlider)
-//      barSlider->setValue(sequencer->getIntValue(PROP_SEQBAR, 4), true);
-//
-//   if (zoomSlider)
-//      zoomSlider->setValue(sequencer->getIntValue (PROP_SEQCOLSIZE, 80), false);
-//   
-//   if (noteEditor) 
-//   {
-//      PianoGrid* pianoGrid = noteEditor->getPianoGrid();
-//      if (pianoGrid)
-//      {
-//         if (quantizeBox)
-//            quantizeBox->setSelectedId(sequencer->getIntValue (PROP_SEQNOTESNAP, 4) + 1, true);
-////         double pianoGridTimeDivision =    pianoGrid->getTimeDivision ();
-////         double pianoGridNoteLen =    pianoGrid->getNoteLengthInBeats ();
-//         double notelen = sequencer->getIntValue (PROP_SEQNOTELENGTH, 4);   
-//         if (noteEditor->getNoteLengthBox())
-//            noteEditor->getNoteLengthBox()->setSelectedId(notelen, true);
-//
-//         pianoGrid->removeAllNotes (false);
-//         for (int i = 0; i < sequencer->getNumNoteOn (); i++)
-//         {
-//            int note = -1;
-//            float beat = -1;
-//            float length = 0.0f;
-//            sequencer->getNoteOnIndexed (i, note, beat, length);
-//
-//            if (length > 0.0f)
-//               pianoGrid->addNote (note, beat, length);
-//         }
-//
-//         pianoGrid->resized ();
-//      }
-//	}
-//	if (automationEditor)
-//	{
-//		automationEditor->clearCCs(false); // ensure the listener (seq) doesn't delete the real CC data!
-//		automationEditor->getAutomationGrid()->removeAllEvents(false);
-//		for (int i = 0; i < sequencer->getNumControllerEvents (); i++)
-//		{
-//			int controller = 1;
-//			double value = 0.0;
-//			double beat = -1;
-//			sequencer->getControllerIndexed (i, controller, value, beat);
-//
-//			automationEditor->addAutomationEvent(controller, value, beat);
-//		}
-//		automationEditor->setCurrentCC();
-//		automationEditor->resized ();
-//	}
 }
 
 //==============================================================================
 void SequenceComponent::changeListenerCallback (void *objectThatHasChanged)
 {
     MidiSequencePlugin* seq = getPlugin ();
-//	PianoGrid* pianoGrid = editorTabContent->getPianoGrid();
-//	PianoGridKeyboard* midiKeyboard = editorTabContent->getMidiKeyboard();
 
-//    if (objectThatHasChanged == midiKeyboard)
-//    {
-//        pianoGrid->setRowsOffset (midiKeyboard->getLowestVisibleKey());
-//        pianoGrid->resized ();
-//
-//        // update plugin
-//        seq->setValue (PROP_SEQROWOFFSET, midiKeyboard->getLowestVisibleKey());
-//    }
-//    else if (objectThatHasChanged == transport)
-//    {
-//        if (transport->isPlaying ())
-//        {
-//            startTimer (1000 / 20); // 20 frames per seconds
-//        }
-//        else if (! transport->isPlaying ())
-//        {
-//            stopTimer ();
-//        }
-//
-//        pianoGrid->setIndicatorPosition (transport->getPositionAbsolute ());
-//		automationEditor->getAutomationGrid()->setIndicatorPosition (transport->getPositionAbsolute ());
-//    }
-    //else 
     if (objectThatHasChanged == seq)
-    {
         updateParameters ();
-    }
 }
 
 void SequenceComponent::buttonClicked (Button* buttonThatWasClicked)
 {
-//    MidiSequencePlugin* seq = getPlugin ();
-//
-//	if (buttonThatWasClicked == enabledButton)
-//	{
-//		seq->setValue (PROP_SEQENABLED, enabledButton->getToggleState());
-//	}
+
 }
 
 void SequenceComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
-//	PianoGrid* pianoGrid = editorTabContent->getPianoGrid();
-//    MidiSequencePlugin* seq = getPlugin ();
-//
-//    if (comboBoxThatHasChanged == quantizeBox)
-//    {
-//         int snap = quantizeBox->getSelectedId () - 1;
-//        pianoGrid->setSnapQuantize (snap);
-//        automationEditor->getAutomationGrid()->setSnapQuantize (snap);
-//        seq->setValue(PROP_SEQNOTESNAP, snap);
-//    }
-//    else if (comboBoxThatHasChanged == noteEditor->getNoteLengthBox())
-//    {
-//        float noteLength = pianoGrid->getTimeDivision () / (float) noteEditor->getNoteLengthBox()->getSelectedId ();
-//
-//        pianoGrid->setNoteLengthInBeats (noteLength);
-//
-//        seq->setValue (PROP_SEQNOTELENGTH, noteEditor->getNoteLengthBox()->getSelectedId ());
-//    }
+
 }
 
 void SequenceComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 {
-    MidiSequencePlugin* seq = getPlugin ();
-//	PianoGrid* pianoGrid = editorTabContent->getPianoGrid();
-
-//    if (sliderThatWasMoved == zoomSlider)
-//    {
-//        const int newBarSize = roundFloatToInt (zoomSlider->getValue ());
-//        pianoGrid->setBarWidth (newBarSize);
-//        automationEditor->getAutomationGrid()->setBarWidth (newBarSize);
-//
-//        // update plugin
-//        seq->setValue (PROP_SEQCOLSIZE, newBarSize);
-//    }
-//    else 
-//    if (sliderThatWasMoved == barSlider)
-//    {
-//        const int newBarCount = roundFloatToInt (barSlider->getValue ());
-//        pianoGrid->setNumBars (newBarCount);
-//		automationEditor->getAutomationGrid()->setNumBars (newBarCount);
-//        pianoGrid->notifyListenersOfTimeSignatureChange ();
-//
-//        // update plugin
-//        seq->setValue (PROP_SEQBAR, newBarCount);
-//
-//        pianoGrid->resized();
-//		automationEditor->getAutomationGrid()->resized();
-//    }
-//   else 
-//   if (sliderThatWasMoved == partPatternNumSlider)
-//   {
-//      seq->setPatternNumberInPart(partPatternNumSlider->getValue());
-//      ccEnabledSlider->updateText();
-//   }
-//   if (sliderThatWasMoved == channelNumSlider)
-//   {
-//      seq->setValue(PROP_SEQMIDICHANNEL, channelNumSlider->getValue());
-//      if (seq->getMidiOutputChannel() != -1 && seq->getMidiOutputChannel() != seq->getMidiChannel())
-//         seq->setMidiOutputChannelFilter(seq->getMidiChannel());
-//   }
 
 }
 

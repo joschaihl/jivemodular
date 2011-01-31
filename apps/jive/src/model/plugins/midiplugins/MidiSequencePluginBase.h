@@ -44,7 +44,14 @@
 #define PROP_SEQBAR                           T("sNbar")
 #define PROP_SEQENABLED                       T("sEnabled")
 #define PROP_SEQMIDICHANNEL                   T("sMidiChan")
+#define PROP_SEQCURRENTCLIP                   T("sCurrentClip")
+#define PROP_SEQCLIPFILES                   T("sClipFiles")
+#define PROP_SEQCLIPITEM                   T("sClipItem")
+#define PROP_SEQCLIPINDEX                   T("sClipIndex")
+#define PROP_SEQCLIPFILE                   T("sClipFile")
 
+#define MIDISEQ_BASESEQUENCERPARAMCOUNT 1
+#define MIDISEQ_PARAMID_CURRENTCLIP 0
 
 //==============================================================================
 /**
@@ -143,11 +150,28 @@ public:
 
     //==============================================================================
     /* Set the midi sequence being played by the sequencer */
-	void setSequence(const MidiMessageSequence* mseq);
+	void setSequence(const MidiMessageSequence* mseq, int clipNumber = -1);
 
     /* Get the midi sequence being played by the sequencer */
 	MidiMessageSequence* getSequence() { return midiSequence; };
 
+    //==============================================================================
+    void setParameterReal (int paramNumber, float value);
+    float getParameterReal (int paramNumber);
+    const String getParameterTextReal (int paramNumber, float value);
+
+   //==============================================================================
+
+   int getMaxUsedClipIndex();
+
+   String getClipFile(int clipIndex) const;
+
+   int getCurrentClipIndex();
+   void setCurrentClipIndex(int index, bool forceImportEvenIfSameAsCurrent=false);
+
+   void importClipFiles(const StringArray& files);
+   void setClipMidiSequence(const MidiMessageSequence& seqClip, int clipIndex);
+   
     //==============================================================================
 	/* Get the number of loops that have played since transport time zero (used for looping) */
 	int getLoopRepeatIndex();
@@ -189,6 +213,10 @@ public:
     void setChunk (const MemoryBlock& mb);
 
 protected:
+   
+   // at the moment the only way to set up clipFiles and midi correctly is via importClipFiles
+   // so.. this routine is not for public use!
+   void importMidiFileToClip(const File& file, int clipIndex);
 
 	// internal, used when rendering midi events to ensure loops render appropriately and note offs don't get lost
 
@@ -205,13 +233,22 @@ protected:
                              const int midiChan);
 
 	void cleanUpNoteOffs(double fromTime, double toTime);
+    
+    void pushCurrentEditedClipToAllClipsSequence(int oldClipIndex);
+    void getCurrentEditClipFromAllClipsSequence(int newClipIndex);
+   void moveClipFromIndexToIndex(int cur, int newIndex);
 
 	MidiMessageSequence noteOffs;
 
     Transport* transport;
 
+   ReadWriteLock midiPlaybackSequenceLock;
     MidiMessageSequence* midiSequence;
     MidiMessageSequence recordingSequence;
+    MidiMessageSequence* allClipsByChannelSequence;
+    
+    StringArray clipFiles;
+    int currentClip;
 
     bool doAllNotesOff;
     MidiMessage allNotesOff;

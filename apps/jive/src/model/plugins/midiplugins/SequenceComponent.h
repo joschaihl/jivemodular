@@ -97,6 +97,9 @@ public:
     /** @internal */
     bool isInterestedInFileDrag (const StringArray& files);
 
+   MidiEditorTabContentComponent* getEditorTab() { return editorTabContent; };
+   MidiSequencerConfigTabContentComponent* getConfigTab() { return configTabContent; };
+
 protected:
 
    /** Handy function that returns the type casted plugin */

@@ -109,6 +109,8 @@
 		93BE7803114C792900741452 /* JiveAbout.png in Resources */ = {isa = PBXBuildFile; fileRef = 93BE7802114C792900741452 /* JiveAbout.png */; };
 		93BEBA8B107358DE008B87F2 /* MidiSequencePlugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEBA87107358DE008B87F2 /* MidiSequencePlugin.cpp */; };
 		93BEBA8C107358DE008B87F2 /* MidiSequencePluginBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93BEBA89107358DE008B87F2 /* MidiSequencePluginBase.cpp */; };
+		93C10EFA12EEC9AA00B2D793 /* JiveClipListComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93C10EF812EEC9A500B2D793 /* JiveClipListComponent.cpp */; };
+		93D396D112F694770084931E /* MidiBindingsEditor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93D396CF12F694770084931E /* MidiBindingsEditor.cpp */; };
 		93EE35CA11214E7900D1D0B6 /* WrappedJuceVSTWindow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93EE35C811214E7800D1D0B6 /* WrappedJuceVSTWindow.cpp */; };
 		93EE36361121537D00D1D0B6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EE362A1121537D00D1D0B6 /* Cocoa.framework */; };
 		93EE36371121537D00D1D0B6 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 93EE362B1121537D00D1D0B6 /* Carbon.framework */; };
@@ -347,6 +349,10 @@
 		93BEBA88107358DE008B87F2 /* MidiSequencePlugin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiSequencePlugin.h; path = midiplugins/MidiSequencePlugin.h; sourceTree = "<group>"; };
 		93BEBA89107358DE008B87F2 /* MidiSequencePluginBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MidiSequencePluginBase.cpp; path = midiplugins/MidiSequencePluginBase.cpp; sourceTree = "<group>"; };
 		93BEBA8A107358DE008B87F2 /* MidiSequencePluginBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MidiSequencePluginBase.h; path = midiplugins/MidiSequencePluginBase.h; sourceTree = "<group>"; };
+		93C10EF812EEC9A500B2D793 /* JiveClipListComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JiveClipListComponent.cpp; sourceTree = "<group>"; };
+		93C10EF912EEC9A500B2D793 /* JiveClipListComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JiveClipListComponent.h; sourceTree = "<group>"; };
+		93D396CF12F694770084931E /* MidiBindingsEditor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MidiBindingsEditor.cpp; sourceTree = "<group>"; };
+		93D396D012F694770084931E /* MidiBindingsEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MidiBindingsEditor.h; sourceTree = "<group>"; };
 		93EE35C811214E7800D1D0B6 /* WrappedJuceVSTWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WrappedJuceVSTWindow.cpp; sourceTree = "<group>"; };
 		93EE35C911214E7900D1D0B6 /* WrappedJuceVSTWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WrappedJuceVSTWindow.h; sourceTree = "<group>"; };
 		93EE362A1121537D00D1D0B6 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
@@ -722,8 +728,12 @@
 			isa = PBXGroup;
 			children = (
 				938AD0EE103A4ECC00DFCCCF /* AudioBufferDisplay.h */,
+				93C10EF812EEC9A500B2D793 /* JiveClipListComponent.cpp */,
+				93C10EF912EEC9A500B2D793 /* JiveClipListComponent.h */,
 				938766B01150B22B004AA104 /* JiveParamSlider.cpp */,
 				938766B11150B22B004AA104 /* JiveParamSlider.h */,
+				93D396CF12F694770084931E /* MidiBindingsEditor.cpp */,
+				93D396D012F694770084931E /* MidiBindingsEditor.h */,
 			);
 			path = utility;
 			sourceTree = "<group>";
@@ -975,6 +985,8 @@
 				93B0FA60112CEE8E003C3402 /* PatternMatrixPlugin.cpp in Sources */,
 				938766B21150B22B004AA104 /* JiveParamSlider.cpp in Sources */,
 				D0AADB8811DAB0F700D323AB /* FaderPlugin.cpp in Sources */,
+				93C10EFA12EEC9AA00B2D793 /* JiveClipListComponent.cpp in Sources */,
+				93D396D112F694770084931E /* MidiBindingsEditor.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
