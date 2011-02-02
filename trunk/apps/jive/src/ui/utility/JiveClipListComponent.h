@@ -2,7 +2,7 @@
 #ifndef JIVECLIPLISTCOMPONENT_H
 #define JIVECLIPLISTCOMPONENT_H
 
-#include "Config.h"
+#include "StandardHeader.h"
 
 class ClipListComponent;
 
