@@ -830,7 +830,7 @@ MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(M
    clipList(0)
 {
    addAndMakeVisible (channelNumSlider = new Slider (String::empty));
-   channelNumSlider->setRange (1, 16, 1);
+   channelNumSlider->setRange (0, 16, 1);
    channelNumSlider->setSliderStyle (Slider::IncDecButtons);
    channelNumSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
    channelNumSlider->setValue (plugin_->getMidiChannel(), false);
@@ -888,7 +888,7 @@ void MidiSequencerConfigTabContentComponent::resized()
    int rowHeight = 32;
    int curY = 2;
 
-   channelNumSlider->setBounds(10, curY, 50, 16);
+   channelNumSlider->setBounds(10, curY, 80, 16);
    curY += rowHeight;
 
    ccEnabledSlider->setBounds(10, curY, 80, 16);
