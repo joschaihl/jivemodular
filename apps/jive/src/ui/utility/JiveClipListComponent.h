@@ -28,8 +28,7 @@ class ClipListComponent
 : 
    public Component,
    public FileDragAndDropTarget,
-   public ComboBoxListener, 
-   public AudioParameterListener
+   public ComboBoxListener
 {
 public:
    ClipListComponent(String componentName, String fileBrowserWildcard);
@@ -57,7 +56,6 @@ public:
    // Component
    void resized();
    void paintOverChildren(Graphics& g);
-//   void mouseDown(const MouseEvent& e);
    
    // FileDragAndDropTarget
    bool isInterestedInFileDrag (const StringArray& files);
@@ -68,9 +66,6 @@ public:
    // ComboBoxListener
    virtual void comboBoxChanged(ComboBox* comboBoxThatHasChanged);
    
-   // AudioParameterListener
-   void parameterChanged (AudioParameter* newParameter, const int index);
-
    // broadcasting our changes
    void sendClipListChangedMessage();
    void sendCurrentClipChangedMessage();
