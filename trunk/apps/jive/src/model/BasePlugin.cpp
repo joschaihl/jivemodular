@@ -184,7 +184,7 @@ void BasePlugin::loadPropertiesFromXml (XmlElement* xml)
          int trigval = bindingElement->getIntAttribute(MIDIBINDING_TRIGVAL_ATTRIB, -1);
          int mode = bindingElement->getIntAttribute(MIDIBINDING_MODE_ATTRIB, -1);
          AudioParameter* param = getParameterObject(paramid);
-         if (param && trigval >= 0 && trigval <= 127 && mode >= NoteOff && mode <= Controller && paramid >= 0 && paramid <= getNumParameters())
+         if (param && trigval >= 0 && trigval <= 127 && mode >= MinimumBindingMode && mode <= MaximumBindingMode && paramid >= 0 && paramid <= getNumParameters())
          {
             int dex = -1;
             if (mode == Controller)
