@@ -119,7 +119,7 @@ public:
       else if (slider == incrAmount)
       {
          int realMax = incrAmount->getSelectedId();
-         incrMax->setRange(1, realMax, 1);
+         incrMax->setRange(0, realMax, 1);
          //incrMax->setValue(realMax);
          if (realMax < incrMax->getValue())
             incrMax->setValue(realMax);
