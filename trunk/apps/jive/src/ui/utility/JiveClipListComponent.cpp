@@ -142,11 +142,6 @@ void ClipListComponent::setCurrentClipIndex(int index, bool notifyObservers)
    clipsCombo->addListener(this);
 }
 
-void ClipListComponent::parameterChanged(AudioParameter* newParameter, const int index)
-{
-//   setValue(newParameter->getValueMapped (), false);
-}
-
 void ClipListComponent::resized()
 {
    // all combo for now!
