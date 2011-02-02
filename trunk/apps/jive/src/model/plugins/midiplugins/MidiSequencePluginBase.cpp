@@ -662,7 +662,7 @@ void MidiSequencePluginBase::savePropertiesToXml (XmlElement* xml)
     xml->setAttribute (PROP_SEQCURRENTCLIP,          getCurrentClipIndex());
     
    XmlElement* clipsElement = new XmlElement(PROP_SEQCLIPFILES);
-   for (int i=0; i<jmin(clipFiles.size(), DEFAULT_MAXIMUM_CLIPS); i++)
+   for (int i=0; i<jmin(getMaxUsedClipIndex(), DEFAULT_MAXIMUM_CLIPS); i++)
    {
       XmlElement* clipEl = new XmlElement(PROP_SEQCLIPITEM);
       clipEl->setAttribute(PROP_SEQCLIPINDEX, i);
