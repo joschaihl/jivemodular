@@ -22,6 +22,7 @@
 		84978759103561A60020003B /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 84978758103561A60020003B /* AudioToolbox.framework */; };
 		9353B9BB114CF65500769E30 /* juce_VST_Wrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 9353B9B9114CF65500769E30 /* juce_VST_Wrapper.cpp */; };
 		9353B9BC114CF65500769E30 /* juce_VST_Wrapper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9353B9BA114CF65500769E30 /* juce_VST_Wrapper.mm */; };
+		93B55F8312F9026A00DD2276 /* JiveClipListComponent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 93B55F8112F9026A00DD2276 /* JiveClipListComponent.cpp */; };
 		93CA487511250A7400F9BB2C /* fluid_conv.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47D311250A7400F9BB2C /* fluid_conv.c */; };
 		93CA487611250A7400F9BB2C /* fluid_defsfont.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47D511250A7400F9BB2C /* fluid_defsfont.c */; };
 		93CA487711250A7400F9BB2C /* fluid_io.c in Sources */ = {isa = PBXBuildFile; fileRef = 93CA47D711250A7400F9BB2C /* fluid_io.c */; };
@@ -150,6 +151,8 @@
 		8D01CCD20486CAD60068D4B7 /* JiveLowlife.vst */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JiveLowlife.vst; sourceTree = BUILT_PRODUCTS_DIR; };
 		9353B9B9114CF65500769E30 /* juce_VST_Wrapper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = juce_VST_Wrapper.cpp; path = "../../../../juce/extras/audio plugins/wrapper/VST/juce_VST_Wrapper.cpp"; sourceTree = SOURCE_ROOT; };
 		9353B9BA114CF65500769E30 /* juce_VST_Wrapper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = juce_VST_Wrapper.mm; path = "../../../../juce/extras/audio plugins/wrapper/VST/juce_VST_Wrapper.mm"; sourceTree = SOURCE_ROOT; };
+		93B55F8112F9026A00DD2276 /* JiveClipListComponent.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = JiveClipListComponent.cpp; path = ../../../../apps/jive/src/ui/utility/JiveClipListComponent.cpp; sourceTree = SOURCE_ROOT; };
+		93B55F8212F9026A00DD2276 /* JiveClipListComponent.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = JiveClipListComponent.h; path = ../../../../apps/jive/src/ui/utility/JiveClipListComponent.h; sourceTree = SOURCE_ROOT; };
 		93CA47C311250A7400F9BB2C /* audio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = audio.h; sourceTree = "<group>"; };
 		93CA47C411250A7400F9BB2C /* event.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = event.h; sourceTree = "<group>"; };
 		93CA47C511250A7400F9BB2C /* fluidsynth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fluidsynth.h; sourceTree = "<group>"; };
@@ -316,6 +319,7 @@
 		08FB77ADFE841716C02AAC07 /* Source */ = {
 			isa = PBXGroup;
 			children = (
+				93B55F8012F9025F00DD2276 /* Utility code from Jive */,
 				8437929D0EFBF08E002A2725 /* Filter */,
 				93CA47C0112509F900F9BB2C /* highlife */,
 				8437929E0EFBF098002A2725 /* Wrapper Code */,
@@ -479,6 +483,15 @@
 			name = PublicUtility;
 			path = Extras/CoreAudio/PublicUtility;
 			sourceTree = DEVELOPER_DIR;
+		};
+		93B55F8012F9025F00DD2276 /* Utility code from Jive */ = {
+			isa = PBXGroup;
+			children = (
+				93B55F8112F9026A00DD2276 /* JiveClipListComponent.cpp */,
+				93B55F8212F9026A00DD2276 /* JiveClipListComponent.h */,
+			);
+			name = "Utility code from Jive";
+			sourceTree = "<group>";
 		};
 		93CA47C0112509F900F9BB2C /* highlife */ = {
 			isa = PBXGroup;
@@ -721,7 +734,14 @@
 			isa = PBXProject;
 			buildConfigurationList = 3E4BA247089833B7007656EC /* Build configuration list for PBXProject "lowlife" */;
 			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
 			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
 			mainGroup = 089C166AFE841209C02AAC07 /* JuceDemoPlugin */;
 			projectDirPath = "";
 			projectReferences = (
@@ -834,6 +854,7 @@
 				93CA4D2B11260B2700F9BB2C /* LowlifeEditorComponent.cpp in Sources */,
 				9353B9BB114CF65500769E30 /* juce_VST_Wrapper.cpp in Sources */,
 				9353B9BC114CF65500769E30 /* juce_VST_Wrapper.mm in Sources */,
+				93B55F8312F9026A00DD2276 /* JiveClipListComponent.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -908,6 +929,7 @@
 				GCC_VERSION = 4.0;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../src\"",
 					"\"$(SRCROOT)/../../src/highlife/Vorbis\"",
 					"\"$(SRCROOT)/../../src/highlife\"",
 					"\"$(SRCROOT)/../../../../gitjuce_tip\"",
@@ -934,6 +956,7 @@
 				GCC_VERSION = 4.0;
 				GENERATE_PKGINFO_FILE = YES;
 				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../../src\"",
 					"\"$(SRCROOT)/../../src/highlife/Vorbis\"",
 					"\"$(SRCROOT)/../../src/highlife\"",
 					"\"$(SRCROOT)/../../../../gitjuce_tip\"",
