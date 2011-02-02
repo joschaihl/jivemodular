@@ -47,7 +47,7 @@ void MidiBinding::setCC(int m)
 
 void MidiBinding::setMode(int noteOnMode)
 {
-   if (noteOnMode < NoteOff || noteOnMode > Controller) 
+   if (noteOnMode < MinimumBindingMode || noteOnMode > MaximumBindingMode) 
       noteOnMode = NoteOn; 
 
    mode = static_cast<NoteBindingMode>(noteOnMode); 
@@ -65,9 +65,21 @@ void MidiBinding::setStepMode(BindingStepMode bidirectional_)
    hitMin = false;
 };
 
-float MidiBinding::applyCC(float val)
+float MidiBinding::applyCC(float paramVal, float ccval)
 {
-   return (maximum - minimum) * val + minimum;
+   float paramOutVal = paramVal;
+
+   // if this is a "CC Button" i.e. a button that sends CC big/small for button down/up,
+   // then divert to button handling method, with full "velocity"
+   if (mode == Controller)
+      paramOutVal = (maximum - minimum) * ccval + minimum;
+   else if (mode == CCButtonOn && ccval > 0.5)
+      paramOutVal = applyNoteIncrement(paramVal, true, 1.0);
+   else if (mode == CCButtonOff && ccval < 0.5)
+      paramOutVal = applyNoteIncrement(paramVal, false, 1.0);
+   
+
+   return paramOutVal;
 }
 
 float MidiBinding::applyNoteIncrement(float val, bool isNoteOn, float velocityValue)
@@ -502,7 +514,7 @@ bool MidiAutomatorManager::handleMidiMessage (const MidiMessage& message)
         }
         else
         {
-            TriggerValBindingMap* mappy = controllers.getUnchecked(message.getNoteNumber ());
+            TriggerValBindingMap* mappy = controllers.getUnchecked(message.getControllerNumber ());
             for (TriggerValBindingMap::iterator it = mappy->begin(); it != mappy->end(); it++)
                messageWasHandled |= it->first->handleMidiMessage(message, it->second);
         }
