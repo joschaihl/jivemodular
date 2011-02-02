@@ -840,6 +840,8 @@ void MidiSequencePluginBase::setClipMidiSequence(const MidiMessageSequence& seqC
       MidiMessageSequence::MidiEventHolder* event = seqClip.getEventPointer(i);
       event->message.setChannel(clipChan);
    }
+   allClipsByChannelSequence->deleteMidiChannelMessages(clipChan);
+   allClipsByChannelSequence->addSequence(seqClip, 0, 0, DBL_MAX);
 }
 
 void MidiSequencePluginBase::importMidiFileToClip(const File& file, int clipIndex)
