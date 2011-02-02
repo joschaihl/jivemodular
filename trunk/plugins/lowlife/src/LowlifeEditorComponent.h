@@ -27,9 +27,15 @@
 #define LOWLIFEPLUGINEDITOR_H
 
 #include "DemoJuceFilter.h"
+#include "JiveClipListComponent.h"
 
 // a component for editing a single slot
-class LowlifeSlotEditComponent : public Component, public SliderListener, public FilenameComponentListener, public ButtonListener
+class LowlifeSlotEditComponent
+: 
+   public Component, 
+   public SliderListener, 
+   public ClipListListener,
+   public ButtonListener
 {
 public:
    LowlifeSlotEditComponent(DemoJuceFilter* filter, int slot);
@@ -37,11 +43,15 @@ public:
    
    void updateParametersFromFilter();
    void sliderValueChanged (Slider* sl);
-   void filenameComponentChanged(FilenameComponent* filec);
    void buttonClicked(Button* button);
+   
+   virtual void clipListChanged(ClipListComponent* ctrlThatHasChanged);
+   virtual void currentClipChanged(ClipListComponent* ctrlThatHasChanged);
+   virtual void clipFilesDropped(ClipListComponent* ctrlThatHasChanged, const StringArray& files);
+   
    void resized();
 
-FilenameComponent* sampleFile;
+ClipListComponent* clipList;
 ToggleButton* syncButton;
 Slider* syncTicksSlider;
 Slider* faderSlider;

@@ -28,6 +28,15 @@
 #include "DemoJuceFilter.h"
 #include "LowlifeEditorComponent.h"
 
+#define LOWLIFE_PLUGIN_STATE T("LowlifeState")
+#define LOWLIFE_HIGHLIFE_STATE T("HighlifeState")
+#define LOWLIFE_ZONESLOT_STATE                  T("llZoneslot")
+#define LOWLIFE_ZONESLOT_CURCLIP                  T("llCurrentClip")
+#define LOWLIFE_CLIPFILES                   T("llClipFiles")
+#define LOWLIFE_CLIPITEM                   T("llClipItem")
+#define LOWLIFE_CLIPINDEX                   T("llClipIndex")
+#define LOWLIFE_CLIPFILE                   T("llClipFile")
+
 //==============================================================================
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
@@ -37,10 +46,15 @@ AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 //==============================================================================
 DemoJuceFilter::DemoJuceFilter()
 {
-    lastUIWidth = 400;
-    lastUIHeight = 300;
-    
-    getHProgramRef().ply_mode = 2;
+   lastUIWidth = 400;
+   lastUIHeight = 300;
+
+   getHProgramRef().ply_mode = 2;
+
+   for (int i=0; i<NUM_ZONESLOTS; i++)
+   {
+      slotCurrentClip[i] = 0;      
+   }
 }
 
 DemoJuceFilter::~DemoJuceFilter()
@@ -92,6 +106,9 @@ float DemoJuceFilter::getNormedParam(int slot, int paramId)
 //      case FilterType:
 //         paramVal = paramVal; // let highlife do the work of mapping 0-1 to filter types!
 //         break;
+      case CurrentClip:
+         paramVal = paramVal / DEFAULT_MAXIMUM_CLIPS;
+         break;
    }
    return paramVal;
 }
@@ -121,6 +138,9 @@ void DemoJuceFilter::setNormedParam(int slot, int paramId, float val)
 //      case FilterType:
 //         val = val; // let highlife do the work of mapping 0-1 to filter types!
 //         break;
+      case CurrentClip:
+         val = floor(val * DEFAULT_MAXIMUM_CLIPS);
+         break;
       default:
          break;
    }
@@ -206,6 +226,9 @@ const String DemoJuceFilter::getParameterName (int index)
       case FilterResonance:
          slotName += String("Resonance");
       break;
+      case CurrentClip:
+         slotName += String("Sample");
+      break;
    }
 
    return slotName;
@@ -232,6 +255,11 @@ const String DemoJuceFilter::getParameterText (int index)
       else
          paramVal = "Bandstop";
     }
+
+   if (index == CurrentClip)
+   {
+      paramVal = String(paramVal + String(" ") + File(getZoneslotClipFile(slot, paramValue)).getFileNameWithoutExtension().toUTF8());
+   }
     
    return paramVal;
 }
@@ -285,6 +313,9 @@ float DemoJuceFilter::getRawParam(int slot, int paramId)
          break;
       case FilterResonance:
          value = pz->flt_res_amt.value;
+         break;
+      case CurrentClip:
+         value = getZoneslotCurrentClip(slot);
          break;
       default:
          break;
@@ -341,6 +372,9 @@ void DemoJuceFilter::setRawParam(int slot, int paramId, float value)
       case FilterResonance:
          pz->flt_res_amt.value = value;
          break;
+      case CurrentClip:
+         setZoneslotCurrentClip(slot, value);
+         break;
       default:
          break;
       }
@@ -382,24 +416,68 @@ void DemoJuceFilter::setNumZoneslots(int newslots)
    }
 }
 
-File DemoJuceFilter::getZoneslotSample(int slot)
+String DemoJuceFilter::getZoneslotSample(int slot)
 {
-   HIGHLIFE_ZONE* zo = getHZone(slot);
-   File samfile;
-   if (zo)
-      samfile = File(zo->path);
-   return samfile;
+   return getZoneslotClipFile(slot, slotCurrentClip[slot]);
 }
 
-void DemoJuceFilter::setZoneslotSample(int slot, const File sampleFile)
+void DemoJuceFilter::setZoneslotSample(int slot, const String sampleFile)
+{
+   // by default newly added samples get set as the zeroth clip (top of the list)
+   setZoneslotClipFile(slot, 0, sampleFile);
+   // and loaded up straight away
+   setZoneslotCurrentClip(slot, 0);
+}
+
+void DemoJuceFilter::setZoneslotCurrentPlayingSample(int slot, const File sampleFile)
 {
    HIGHLIFE_ZONE* pz = getHZone(slot);
    if (pz)
    {
       highlifeInstance.tool_delete_wave (pz);
       highlifeInstance.tool_load_sample(pz, sampleFile);
+      
+      // TODO: look for settings file alongside sampleFile, and auto-apply settings for file - especially SyncTicks
    }
    sendChangeMessage (this);
+}
+
+int DemoJuceFilter::getZoneslotNumClips(int zoneslot)
+{
+   int numClips = slotClipFiles[zoneslot].size();
+   return numClips >= DEFAULT_MAXIMUM_CLIPS ? DEFAULT_MAXIMUM_CLIPS : numClips;
+}
+
+String DemoJuceFilter::getZoneslotClipFile(int zoneslot, int clipIndex)
+{
+   String fileName;
+   if (getZoneslotNumClips(zoneslot) > clipIndex)
+      fileName = slotClipFiles[zoneslot][clipIndex];
+   return fileName;
+}
+
+void DemoJuceFilter::setZoneslotClipFile(int zoneslot, int clipIndex, const String sampleFile)
+{
+   if (sampleFile != slotClipFiles[zoneslot][clipIndex])
+      slotClipFiles[zoneslot].insert(clipIndex, sampleFile);
+
+   // trunc any clips exceeding our capacity
+   for (int i=slotClipFiles[zoneslot].size()-1; i>=DEFAULT_MAXIMUM_CLIPS; i--)
+      slotClipFiles[zoneslot].remove(i);
+}
+
+int DemoJuceFilter::getZoneslotCurrentClip(int zoneslot)
+{
+   return slotCurrentClip[zoneslot];
+}
+
+void DemoJuceFilter::setZoneslotCurrentClip(int zoneslot, int clipIndex)
+{
+   if (clipIndex >= 0 && clipIndex < DEFAULT_MAXIMUM_CLIPS)
+   {
+      slotCurrentClip[zoneslot] = clipIndex;
+      setZoneslotCurrentPlayingSample(zoneslot, File(getZoneslotClipFile(zoneslot, clipIndex)));
+   }
 }
 
 int DemoJuceFilter::getPolyMode()
@@ -528,66 +606,78 @@ XmlElement* ruaGetXmlFromBinary (const void* data,
     return 0;
 }
 */
-void DemoJuceFilter::getStateInformation (MemoryBlock& highLifeState)
+void DemoJuceFilter::getStateInformation (MemoryBlock& lowlifeState)
 {
-    // you can store your parameters as binary data if you want to or if you've got
-    // a load of binary to put in there, but if you're not doing anything too heavy,
-    // XML is a much cleaner way of doing it - here's an example of how to store your
-    // params as XML..
+   MemoryBlock highLifeState;
 
-//    // create an outer XML element..
-//    XmlElement xmlState (T("MYPLUGINSETTINGS"));
-//
-//    // add some attributes to it..
-//    xmlState.setAttribute (T("pluginVersion"), 1);
-//    xmlState.setAttribute (T("gainLevel"), gain);
-//    xmlState.setAttribute (T("uiWidth"), lastUIWidth);
-//    xmlState.setAttribute (T("uiHeight"), lastUIHeight);
-//    
-//
+   // create an outer XML element..
+   XmlElement xmlState(LOWLIFE_PLUGIN_STATE);
+
+   // add some attributes to it..
+   highlifeInstance.getStateInformation(highLifeState);
+   XmlElement* chunk = new XmlElement (LOWLIFE_HIGHLIFE_STATE);
+   chunk->addTextElement(highLifeState.toBase64Encoding());
+   xmlState.addChildElement(chunk);
+
+
+   for (int slot=0; slot<NUM_ZONESLOTS; slot++)
+   {
+      XmlElement* slotElement = new XmlElement(LOWLIFE_ZONESLOT_STATE);
+      XmlElement* clipsElement = new XmlElement(LOWLIFE_CLIPFILES);
+//      for (int i=0; i<jmin(slotClipFiles[slot].size(), DEFAULT_MAXIMUM_CLIPS); i++)
+      for (int i=jmin(slotClipFiles[slot].size(), DEFAULT_MAXIMUM_CLIPS)-1; i>=0; i--) // ... so in the meantime we will persist in reverse order!
+      {
+         XmlElement* clipEl = new XmlElement(LOWLIFE_CLIPITEM);
+         clipEl->setAttribute(LOWLIFE_CLIPINDEX, i); // persisting the clip index is a little bit worthless, as we only really support insertion of clips (at position zero)..
+         clipEl->setAttribute(LOWLIFE_CLIPFILE, slotClipFiles[slot][i]);
+         clipsElement->addChildElement(clipEl);
+      }
+      slotElement->addChildElement(clipsElement);
+      slotElement->setAttribute(LOWLIFE_ZONESLOT_CURCLIP, slotCurrentClip[slot]);
+      xmlState.addChildElement(slotElement);
+   }
    
-      // for now, we are not saving our real params, but we are saving the highlife state _instead_
-      // this is because I am too lazy _right_now_ to deal with xml + binary blob issues!
-      // really what is important now is tweaking the save/load of the highlife state so it doesn't save sample data 
-      // (just saves file path)
-      // when this is crankin, we can sort out saving our own params (if we have any)..
-      // ..or only save the parameters from highlife that we want to save, via xml
-      // MemoryBlock::toBase64Encoding would do it ;)
-      
-    // you could also add as many child elements as you need to here..
-//    MemoryBlock highLifeState;
-   //for (int i=0;i<getMaxZoneslots(); i++)
-    highlifeInstance.getStateInformation(highLifeState);
-
-    // then use this helper function to stuff it into the binary blob and return it..
-//    copyXmlToBinary (xmlState, highLifeState);
+   // then use this helper function to stuff it into the binary blob and return it..
+   copyXmlToBinary (xmlState, lowlifeState);
 }
 
 void DemoJuceFilter::setStateInformation (const void* data, int sizeInBytes)
 {
    setNumZoneslots(0);
-   //for (int i=0;i<getMaxZoneslots(); i++)
-    highlifeInstance.setStateInformation(data, sizeInBytes);
 
- //   // use this helper function to get the XML from this binary blob..
-//    XmlElement* const xmlState = getXmlFromBinary (data, sizeInBytes);
-//
-//    if (xmlState != 0)
-//    {
-//        // check that it's the right type of xml..
-//        if (xmlState->hasTagName (T("MYPLUGINSETTINGS")))
-//        {
-//            // ok, now pull out our parameters..
-//            gain = (float) xmlState->getDoubleAttribute (T("gainLevel"), gain);
-//
-//            lastUIWidth = xmlState->getIntAttribute (T("uiWidth"), lastUIWidth);
-//            lastUIHeight = xmlState->getIntAttribute (T("uiHeight"), lastUIHeight);
-//
-//            sendChangeMessage (this);
-//        }
-//
-//        delete xmlState;
-//    }
+   // use this helper function to get the XML from this binary blob..
+   XmlElement* const xmlState = getXmlFromBinary (data, sizeInBytes);
+
+   if (xmlState)
+   {
+      // ok, now pull out our parameters..
+      XmlElement* highlifeState = xmlState->getChildByName(LOWLIFE_HIGHLIFE_STATE);
+      MemoryBlock highlifeBlock;
+      highlifeBlock.fromBase64Encoding(highlifeState->getAllSubText ());
+      highlifeInstance.setStateInformation(highlifeBlock.getData(), highlifeBlock.getSize());
+
+      // for each zoneslot
+      int curSlot = 0;
+      forEachXmlChildElementWithTagName (*xmlState, slotElement, LOWLIFE_ZONESLOT_STATE)
+      {
+         // for each clip file tag
+         XmlElement* clipslist = slotElement->getChildByName(LOWLIFE_CLIPFILES);
+         if (clipslist)
+            forEachXmlChildElementWithTagName (*clipslist, clipEl, LOWLIFE_CLIPITEM)
+            {
+               int clipIndex = clipEl->getIntAttribute(LOWLIFE_ZONESLOT_CURCLIP);
+               String clipFile = clipEl->getStringAttribute(LOWLIFE_CLIPFILE);
+
+               if (clipIndex >= 0 && clipIndex < DEFAULT_MAXIMUM_CLIPS && clipFile.isNotEmpty())
+                  setZoneslotClipFile(curSlot, clipIndex, clipFile);
+            }
+            
+         setZoneslotCurrentClip(curSlot, slotElement->getIntAttribute(LOWLIFE_ZONESLOT_CURCLIP, 0));
+         curSlot++;
+      }
+
+      delete xmlState;
+   }
    
    // count the zoneslots in the loaded file
 //   jassert(zoneslotCount == 0);

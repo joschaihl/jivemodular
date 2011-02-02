@@ -28,6 +28,10 @@
 
 #include "Highlife.h"
 
+#define NUM_ZONESLOTS 8
+
+#define DEFAULT_MAXIMUM_CLIPS 16
+
 //==============================================================================
 // A wrapper Juce filter that calls through to a Highlife instance to do processing, 
 // and exposes a few of highlife's parameters.
@@ -92,12 +96,20 @@ public:
     juce_UseDebuggingNewOperator
     
    //==============================================================================
-   int getMaxZoneslots() { return 8; }; // fuc it for dynamic params, up to 8 slots only !
+   int getMaxZoneslots() { return NUM_ZONESLOTS; }; // fuc it for dynamic params, up to 8 slots only !
    int getNumZoneslots();
    void setNumZoneslots(int newslots);
    
-   File getZoneslotSample(int slot);
-   void setZoneslotSample(int slot, const File sampleFile);
+   String getZoneslotSample(int slot);
+   void setZoneslotSample(int slot, const String sampleFile);
+   
+   int getZoneslotNumClips(int zoneslot);
+   String getZoneslotClipFile(int zoneslot, int clipIndex);
+   void setZoneslotClipFile(int zoneslot, int clipIndex, const String sampleFile);
+   
+   int getZoneslotCurrentClip(int zoneslot);
+   void setZoneslotCurrentClip(int zoneslot, int clipIndex);
+
    int getPolyMode();
    void setPolyMode(int m);
 
@@ -125,6 +137,7 @@ public:
        FilterType, // 0 = off, 1=lowpass, 2=highpass, 3=bandpass, 4=bandreject
        FilterCutoff,
        FilterResonance,
+       CurrentClip,
        LowlifeParameterCount
     };
    enum { paramsPerSlot = LowlifeParameterCount }; 
@@ -142,6 +155,8 @@ public:
 //   static const int MaxFilterType;
 
 private:
+   void setZoneslotCurrentPlayingSample(int slot, const File sampleFile);
+
    HIGHLIFE_PROGRAM& getHProgramRef(int zoneslot = 0) // don't care baout zoneslot anymore!!
    {
       return highlifeInstance.highlife_program[0]; // only use the first program
@@ -159,6 +174,9 @@ private:
       }
       return zo;
    }
+
+   int slotCurrentClip[NUM_ZONESLOTS];   
+   StringArray slotClipFiles[NUM_ZONESLOTS];
    
 private:
     float gain;

@@ -25,9 +25,10 @@
 
 #include "includes.h"
 #include "LowlifeEditorComponent.h"
+
 LowlifeSlotEditComponent::LowlifeSlotEditComponent(DemoJuceFilter* filter, int slot)
 :
-   sampleFile(0),
+   clipList(0),
    syncButton(0),
    syncTicksSlider(0),
    faderSlider(0),
@@ -37,8 +38,9 @@ LowlifeSlotEditComponent::LowlifeSlotEditComponent(DemoJuceFilter* filter, int s
    mySlot(slot)
 {
    jassert(filter);
-   addAndMakeVisible(sampleFile = new FilenameComponent("sample", filter->getZoneslotSample(slot), false, false, false, "*.wav", String::empty, "drop sample here"));
-   sampleFile->addListener(this);
+
+   addAndMakeVisible(clipList = new ClipListComponent("Sample clip list", "*.wav"));
+   clipList->addListener(this);
 
    addAndMakeVisible(faderSlider = new Slider(T("fader")));
    faderSlider->addListener (this);
@@ -69,6 +71,7 @@ LowlifeSlotEditComponent::LowlifeSlotEditComponent(DemoJuceFilter* filter, int s
 
 LowlifeSlotEditComponent::~LowlifeSlotEditComponent()
 {
+   clipList->removeListener(this);
     deleteAllChildren();
 }
 
@@ -82,7 +85,7 @@ void LowlifeSlotEditComponent::resized()
    h = h / numRowsOfThings;
    int curh = 0;
 
-   sampleFile->setBounds(0, curh, w, h);
+   clipList->setBounds(0, curh, w, h);
 
    curh+=h;
 
@@ -99,7 +102,13 @@ void LowlifeSlotEditComponent::updateParametersFromFilter()
 {
    if (myFilter)
    {
-      sampleFile->setCurrentFile(myFilter->getZoneslotSample(mySlot), true, false);
+      if (clipList)
+      {
+         for (int i=0; i<=myFilter->getZoneslotNumClips(mySlot); i++)
+            clipList->setClipFile(i, myFilter->getZoneslotClipFile(mySlot, i));
+         clipList->setCurrentClipIndex(myFilter->getZoneslotCurrentClip(mySlot), false); // don't notify
+      }
+      
       syncButton->setToggleState(myFilter->getRawParam(mySlot, DemoJuceFilter::BPMSync), false);
       syncTicksSlider->setValue(myFilter->getRawParam(mySlot, DemoJuceFilter::SyncTicks), false);
       keySlider->setMinValue(myFilter->getRawParam(mySlot, DemoJuceFilter::KeyLow), false);
@@ -108,6 +117,26 @@ void LowlifeSlotEditComponent::updateParametersFromFilter()
       tuneSlider->setValue(myFilter->getRawParam(mySlot, DemoJuceFilter::Tune), false);
       faderSlider->setValue(myFilter->getRawParam(mySlot, DemoJuceFilter::Fader), false);
    }
+}
+
+void LowlifeSlotEditComponent::clipListChanged(ClipListComponent* ctrlThatHasChanged)
+{
+
+}
+
+void LowlifeSlotEditComponent::currentClipChanged(ClipListComponent* ctrlThatHasChanged)
+{
+   myFilter->setZoneslotCurrentClip(mySlot, ctrlThatHasChanged->getCurrentClipIndex()); 
+}
+
+void LowlifeSlotEditComponent::clipFilesDropped(ClipListComponent* ctrlThatHasChanged, const StringArray& files)
+{
+   for (int i=0; i<files.size(); i++)
+   {
+      if (files[i].isNotEmpty())
+         myFilter->setZoneslotClipFile(mySlot, i, files[i]);
+   }
+   updateParametersFromFilter(); // get the new clips in the combo
 }
 
 void LowlifeSlotEditComponent::sliderValueChanged(Slider* sl)
@@ -129,15 +158,6 @@ void LowlifeSlotEditComponent::sliderValueChanged(Slider* sl)
 
       else if (sl == faderSlider) 
          myFilter->setRawParam(mySlot, DemoJuceFilter::Fader, sl->getValue());
-   }
-}
-
-void LowlifeSlotEditComponent::filenameComponentChanged(FilenameComponent* filec)
-{
-   if (myFilter)
-   {
-      if (filec == sampleFile) 
-         myFilter->setZoneslotSample(mySlot, filec->getCurrentFile());
    }
 }
 
