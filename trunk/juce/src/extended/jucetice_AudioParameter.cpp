@@ -271,12 +271,12 @@ bool AudioParameter::handleMidiMessage (const MidiMessage& message, int bindingN
    {
       MidiBinding& bd = *bp;
    
+      float cur = plugin->getParameter(index);
       // may yet replace this with MidiBinding :: mutateValue(cur)..
       if (message.isController())
-         plugin->setParameter (index, bd.applyCC(message.getControllerValue () * float_MidiScaler));
+         plugin->setParameter (index, bd.applyCC(cur, message.getControllerValue () * float_MidiScaler));
       else if (message.isNoteOnOrOff())
       {
-         float cur = plugin->getParameter(index);
          float velocityScaling = 1.0;
          if (message.isNoteOn())
             velocityScaling = message.getFloatVelocity();

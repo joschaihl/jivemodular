@@ -18,6 +18,8 @@ public:
       modeCombo->addItem("Note on", 2);
       modeCombo->addItem("Note held", 3);
       modeCombo->addItem("Controller", 4);
+      modeCombo->addItem("CC button off", 6);
+      modeCombo->addItem("CC button on", 5);
 
       addAndMakeVisible(rangeMaxLabel = new Label("RangeMax", "Range max:")); // checkbox coming here
       addAndMakeVisible(rangeMinLabel = new Label("RangeMin", "Range min:")); // checkbox coming here
@@ -289,6 +291,12 @@ void MidiBindingsEditor::paintCell (Graphics& g,
             case Controller:
                string = "CC";
                break;
+            case CCButtonOn:
+               string = "CCButtonOn";
+               break;
+            case CCButtonOff:
+               string = "CCButtonOff";
+               break;
          }
       }
       else if (columnId == TriggerVal)
@@ -350,7 +358,9 @@ void MidiBindingsEditor::buttonClicked (Button* button)
    {
       parameter->removeBinding(currentBinding);
    }
-   bindingsList->updateContent();   
+   bindingsList->updateContent();
+   bindingEditor->setVisible(false);
+   showCurBindingOpts();
 }
 
 

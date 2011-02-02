@@ -43,7 +43,15 @@ enum NoteBindingMode
    NoteOff = 0, // bound to note-off only
    NoteOn = 1, // bound to note-on only
    NoteHeld = 2, // parameter is max when note is down, otherwise min
-   Controller = 3 // the classic CC binding!
+   Controller = 3, // the classic CC binding!
+   CCButtonOn = 4, // a button that sends > 64 for note on and < 64 for note off
+   CCButtonOff = 5, // a button that sends > 64 for note on and < 64 for note off
+
+   MinimumNoteMode = NoteOff,
+   MaximumNoteMode = NoteHeld,
+
+   MinimumBindingMode = NoteOff,
+   MaximumBindingMode = CCButtonOff,
 };
 
 enum BindingStepMode
@@ -81,7 +89,7 @@ public:
    void setCC(int m);
    void setMode(int m);
 
-   bool isNoteBinding() const { return mode != Controller; };
+   bool isNoteBinding() const { return mode >= MinimumNoteMode && mode <= MaximumNoteMode; };
 
    int getNote() const { return isNoteBinding() ? triggerVal : -1; };
    int getCC() const { return !isNoteBinding() ? triggerVal : -1; };  
@@ -109,7 +117,7 @@ public:
    void setStepMin(float incrMax_) { incrMin = incrMax_; };
    
    float applyNoteIncrement(float val, bool isNoteOn = false, float velocityValue = 1.0);
-   float applyCC(float val);
+   float applyCC(float paramVal, float ccval);
 
    float getVelocityScaling() const { return velocityScaling; } ;
    void setVelocityScaling(float scale_) { velocityScaling = scale_ < 0.1 ? 0 : scale_ > 1.0 ? 1 : scale_; };
