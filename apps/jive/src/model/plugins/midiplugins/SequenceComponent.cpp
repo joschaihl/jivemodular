@@ -501,6 +501,7 @@ class MidiEditorTabContentComponent
 {
 public:
    MidiEditorTabContentComponent(MidiSequencePlugin* plugin_, Transport* transport_);
+   ~MidiEditorTabContentComponent();
 
    PianoGrid* getPianoGrid();
    PianoGridKeyboard* getMidiKeyboard();
@@ -606,6 +607,13 @@ MidiEditorTabContentComponent::MidiEditorTabContentComponent(MidiSequencePlugin*
    // config our playhead UI refresh timer
    if (transport->isPlaying ())
       startTimer (1000 / 20); // 20 frames per seconds
+
+   transport->addChangeListener(this);
+}
+
+MidiEditorTabContentComponent::~MidiEditorTabContentComponent()
+{
+   transport->removeChangeListener(this);
 }
 
 PianoGrid* MidiEditorTabContentComponent::getPianoGrid()
@@ -946,7 +954,6 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
    transport = seq->getParentHost()->getTransport();
 
    seq->addChangeListener (this);
-   transport->addChangeListener (this);
    
    // configure tab bar for the different UI panes
    addAndMakeVisible(tabs = new TabbedComponent(TabbedButtonBar::TabsAtBottom));
@@ -961,8 +968,6 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
 
 SequenceComponent::~SequenceComponent ()
 {
-    transport->removeChangeListener (this);
-
     deleteAllChildren ();
 }
 
