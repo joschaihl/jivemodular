@@ -793,6 +793,8 @@ void MidiSequencePluginBase::getCurrentEditClipFromAllClipsSequence(int newClipI
 {
    MidiMessageSequence newSeq;
    allClipsByChannelSequence->extractMidiChannelMessages(newClipIndex + 1, newSeq, false);
+   for (int i=0; i<newSeq.getNumEvents(); i++)
+      newSeq.getEventPointer(i)->message.setChannel(getMidiChannel());
    newSeq.updateMatchedPairs();
 
    if (transport->isPlaying ())
