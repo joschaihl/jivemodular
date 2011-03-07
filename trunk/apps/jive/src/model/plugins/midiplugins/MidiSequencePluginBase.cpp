@@ -395,8 +395,8 @@ bool MidiSequencePluginBase::noteRemoved (const int noteNumber,
 
             DBG ("Removed:" + String (eventIndex) + " > " + String (noteNumber) + " @ " + String (beatNumber));
 
-            if (transport->isPlaying ())
-                doAllNotesOff = true;
+//            if (transport->isPlaying ())
+//                doAllNotesOff = true;
 
             return true;
         }
@@ -449,8 +449,8 @@ bool MidiSequencePluginBase::noteMoved (const int oldNote,
                           + String (oldNote) + " @ " + String (oldBeat) + " to "
                           + String (noteNumber) + " @ " + String (beatNumber));
 
-            if (transport->isPlaying ())
-                doAllNotesOff = true;
+//            if (transport->isPlaying ())
+//                doAllNotesOff = true;
 
             return true;
         }
@@ -500,8 +500,8 @@ bool MidiSequencePluginBase::noteResized (const int noteNumber,
             DBG ("Resized:" + String (eventIndex) + " > "
                              + String (noteNumber) + " @ " + String (beatNumber) + " to " + String (noteLength));
 
-            if (transport->isPlaying ())
-                doAllNotesOff = true;
+//            if (transport->isPlaying ())
+//                doAllNotesOff = true;
 
             return true;
         }
