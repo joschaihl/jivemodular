@@ -137,6 +137,7 @@ void LowlifeSlotEditComponent::clipFilesDropped(ClipListComponent* ctrlThatHasCh
          myFilter->setZoneslotClipFile(mySlot, i, files[i]);
    }
    updateParametersFromFilter(); // get the new clips in the combo
+   myFilter->setZoneslotCurrentClip(mySlot, ctrlThatHasChanged->getCurrentClipIndex()); 
 }
 
 void LowlifeSlotEditComponent::sliderValueChanged(Slider* sl)
