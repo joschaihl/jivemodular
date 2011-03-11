@@ -55,6 +55,7 @@ public:
    
    const StringArray getClipList() const;
    void setClipList(const StringArray& filenames);
+   void clearClipList() { clipFiles.clear(); currentClip = 0; };
 
    void addListener(ClipListListener* const listener) throw();
    void removeListener(ClipListListener* const listener) throw();
@@ -88,10 +89,6 @@ StringArray clipFiles;
 String fileBrowserWildcard;
 ComboBox* clipsCombo;
 bool isFileDragOver;
-
-//AudioProcessor* ownerPlugin;
-//AudioParameter* managedParam; 
-//const int paramIndex;
 
 SortedSet<void*> listeners;
 

@@ -885,6 +885,7 @@ void MidiSequencerConfigTabContentComponent::updateParameters()
       currentClipSlider->setValue(plugin->getParameterReal(MIDISEQ_PARAMID_CURRENTCLIP), false);
    if (clipList)
    {
+      clipList->clearClipList(); 
       for (int i=0; i<=plugin->getMaxUsedClipIndex(); i++)
          clipList->setClipFile(i, plugin->getClipFile(i));
       clipList->setCurrentClipIndex(plugin->getCurrentClipIndex(), false); // don't notify

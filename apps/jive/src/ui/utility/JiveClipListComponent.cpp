@@ -228,7 +228,7 @@ void ClipListEditor::paintCell (Graphics& g,
    if (columnId == Clip && rowNumber >= 0 && rowNumber < newClipOrder.size())
    {
       if (newClipOrder[rowNumber] >= 0 && newClipOrder[rowNumber] < clipList.size())
-         string = clipList[newClipOrder[rowNumber]];
+         string = File(clipList[newClipOrder[rowNumber]]).getFileNameWithoutExtension();
    }
    g.setColour(Colours::black);
    g.drawText(string, 0, 0, width, height, Justification(Justification::horizontallyCentred | Justification::verticallyCentred), true);
@@ -241,7 +241,12 @@ void ClipListEditor::selectedRowsChanged (int lastRowSelected)
    
 void ClipListEditor::buttonClicked (Button* button)
 {
-
+   if (button == removeButton)
+   {
+      int movedRow = clipsListTable->getSelectedRow(); // only one thing at a time for now..
+      newClipOrder.erase(newClipOrder.begin()+movedRow);
+      clipsListTable->updateContent();
+   }
 }
 
 ClipListComponent::ClipListComponent(String componentName, String _fileBrowserWildcard)
