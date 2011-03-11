@@ -104,6 +104,7 @@ void LowlifeSlotEditComponent::updateParametersFromFilter()
    {
       if (clipList)
       {
+         clipList->clearClipList();
          for (int i=0; i<myFilter->getZoneslotNumClips(mySlot); i++)
             clipList->setClipFile(i, myFilter->getZoneslotClipFile(mySlot, i));
          clipList->setCurrentClipIndex(myFilter->getZoneslotCurrentClip(mySlot), false); // don't notify
