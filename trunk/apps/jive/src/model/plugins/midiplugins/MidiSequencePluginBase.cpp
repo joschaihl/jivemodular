@@ -662,7 +662,7 @@ void MidiSequencePluginBase::savePropertiesToXml (XmlElement* xml)
     xml->setAttribute (PROP_SEQCURRENTCLIP,          getCurrentClipIndex());
     
    XmlElement* clipsElement = new XmlElement(PROP_SEQCLIPFILES);
-   for (int i=0; i<jmin(getMaxUsedClipIndex(), DEFAULT_MAXIMUM_CLIPS); i++)
+   for (int i=0; i<jmin(getMaxUsedClipIndex()+1, DEFAULT_MAXIMUM_CLIPS); i++)
    {
       XmlElement* clipEl = new XmlElement(PROP_SEQCLIPITEM);
       clipEl->setAttribute(PROP_SEQCLIPINDEX, i);
@@ -777,6 +777,8 @@ void MidiSequencePluginBase::setCurrentClipIndex(int index, bool forceImportEven
       // copy requested clip to play/edit/view sequence
       getCurrentEditClipFromAllClipsSequence(newClipIndex);
    }
+
+   sendChangeMessage (this);
 }
 
 void MidiSequencePluginBase::pushCurrentEditedClipToAllClipsSequence(int oldClipIndex)
@@ -807,6 +809,40 @@ void MidiSequencePluginBase::getCurrentEditClipFromAllClipsSequence(int newClipI
       midiSequence = new MidiMessageSequence(newSeq);
       midiSequence->updateMatchedPairs();
    }
+}
+
+void MidiSequencePluginBase::handleEditedClipList(StringArray newClipList, std::vector<int> changeInfo)
+{
+   // ensure any edits to current clip get saved
+   pushCurrentEditedClipToAllClipsSequence(currentClip);
+
+   MidiMessageSequence* newAllSequence = new MidiMessageSequence();
+
+   int newCurrentClip = 0;
+   for (int i=0; i<changeInfo.size(); i++) // for each position in the new order
+   {
+      MidiMessageSequence tmp;
+      // get oldChan sequence
+      allClipsByChannelSequence->extractMidiChannelMessages(changeInfo[i]+1, tmp, false); // get events from old channel
+      // change to use new midi channel
+      for (int j=0; j<tmp.getNumEvents(); j++)
+         tmp.getEventPointer(j)->message.setChannel(i+1); 
+      // copy to everything sequence
+      newAllSequence->addSequence(tmp, 0, 0, DBL_MAX);
+      
+      if (changeInfo[i] == currentClip)
+         newCurrentClip = changeInfo[i];
+   }
+   
+   newAllSequence->updateMatchedPairs();
+   MidiMessageSequence* oldall = allClipsByChannelSequence;
+   allClipsByChannelSequence = newAllSequence;
+   delete oldall;
+   clipFiles = newClipList;
+
+   currentClip = newCurrentClip;
+   getCurrentEditClipFromAllClipsSequence(newCurrentClip);
+   sendChangeMessage(this);
 }
 
 void MidiSequencePluginBase::moveClipFromIndexToIndex(int cur, int newIndex)

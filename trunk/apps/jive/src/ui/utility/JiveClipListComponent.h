@@ -9,11 +9,17 @@ class ClipListComponent;
 class  ClipListListener
 {
 public:
-    virtual ~ClipListListener() {};
+   virtual ~ClipListListener() {};
 
-    virtual void clipListChanged(ClipListComponent* ctrlThatHasChanged) = 0;
-    virtual void currentClipChanged(ClipListComponent* ctrlThatHasChanged) = 0;
-    virtual void clipFilesDropped(ClipListComponent* ctrlThatHasChanged, const StringArray& files) = 0;
+   enum ChangeInfoConsts {
+      ItemDeleted = -1,
+      ItemAdded = -2,
+      // valid indices indicate item is reordered
+   };
+   virtual void clipListChanged(ClipListComponent* ctrlThatHasChanged, StringArray newClipList, std::vector<int> changeInfo) = 0; // going to need the string list too?
+
+   virtual void currentClipChanged(ClipListComponent* ctrlThatHasChanged) = 0;
+   virtual void clipFilesDropped(ClipListComponent* ctrlThatHasChanged, const StringArray& files) = 0;
 };
 
 
@@ -67,10 +73,9 @@ public:
    virtual void comboBoxChanged(ComboBox* comboBoxThatHasChanged);
    
    // broadcasting our changes
-   void sendClipListChangedMessage();
+   void sendClipListChangedMessage(StringArray newClipList, std::vector<int> changeInfo);
    void sendCurrentClipChangedMessage();
    void sendFilesDroppedMessage(const StringArray& files);
-   
    
 //==============================================================================
 juce_UseDebuggingNewOperator

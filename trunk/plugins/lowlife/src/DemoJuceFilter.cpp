@@ -442,6 +442,11 @@ void DemoJuceFilter::setZoneslotCurrentPlayingSample(int slot, const File sample
    sendChangeMessage (this);
 }
 
+void DemoJuceFilter::clearZoneslotClips(int zoneslot)
+{
+   slotClipFiles[zoneslot].clear();
+}
+
 int DemoJuceFilter::getZoneslotNumClips(int zoneslot)
 {
    int numClips = slotClipFiles[zoneslot].size();
@@ -458,7 +463,7 @@ String DemoJuceFilter::getZoneslotClipFile(int zoneslot, int clipIndex)
 
 void DemoJuceFilter::setZoneslotClipFile(int zoneslot, int clipIndex, const String sampleFile)
 {
-   if (sampleFile != slotClipFiles[zoneslot][clipIndex])
+   if (sampleFile.isNotEmpty() && sampleFile != slotClipFiles[zoneslot][clipIndex])
       slotClipFiles[zoneslot].insert(clipIndex, sampleFile);
 
    // trunc any clips exceeding our capacity

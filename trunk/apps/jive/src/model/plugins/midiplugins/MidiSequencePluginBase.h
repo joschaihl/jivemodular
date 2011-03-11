@@ -170,6 +170,7 @@ public:
    void setCurrentClipIndex(int index, bool forceImportEvenIfSameAsCurrent=false);
 
    void importClipFiles(const StringArray& files);
+   void handleEditedClipList(StringArray newClipList, std::vector<int> changeInfo);
    void setClipMidiSequence(const MidiMessageSequence& seqClip, int clipIndex);
    
     //==============================================================================
