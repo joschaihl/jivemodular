@@ -212,7 +212,7 @@ void PianoGridNote::mouseDown (const MouseEvent& e)
    SelectedItemSet<MidiGridItem*> selection = owner->getLassoSelection ();
    if (! selection.isSelected (this))
    {
-      owner->selectNote (this, true);
+      owner->selectNote (this, !e.mods.isShiftDown());
       selection = owner->getLassoSelection();
    }
 
