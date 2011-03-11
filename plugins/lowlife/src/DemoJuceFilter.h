@@ -103,6 +103,7 @@ public:
    String getZoneslotSample(int slot);
    void setZoneslotSample(int slot, const String sampleFile);
    
+   void clearZoneslotClips(int zoneslot);
    int getZoneslotNumClips(int zoneslot);
    String getZoneslotClipFile(int zoneslot, int clipIndex);
    void setZoneslotClipFile(int zoneslot, int clipIndex, const String sampleFile);

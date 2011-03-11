@@ -807,7 +807,7 @@ public:
    void updateParameters();
 
    void sliderValueChanged(Slider* sliderThatWasMoved);
-   virtual void clipListChanged(ClipListComponent* ctrlThatHasChanged);
+   virtual void clipListChanged(ClipListComponent* ctrlThatHasChanged, StringArray newClipList, std::vector<int> changeInfo);
    virtual void currentClipChanged(ClipListComponent* ctrlThatHasChanged);
    virtual void clipFilesDropped(ClipListComponent* ctrlThatHasChanged, const StringArray& files);
 
@@ -924,15 +924,19 @@ void MidiSequencerConfigTabContentComponent::sliderValueChanged (Slider* sliderT
 
 }
 
-void MidiSequencerConfigTabContentComponent::clipListChanged(ClipListComponent* ctrlThatHasChanged)
+void MidiSequencerConfigTabContentComponent::clipListChanged(ClipListComponent* ctrlThatHasChanged, StringArray newClipList, std::vector<int> changeInfo)
 {
-
+   plugin->handleEditedClipList(newClipList, changeInfo);
+   plugin->setCurrentClipIndex(ctrlThatHasChanged->getCurrentClipIndex()); 
+//   updateParameters(); // update the CC slider and the clip popup
+//   sequenceUIComponent->getEditorTab()->updateParameters(); // get the new notes in the edit
 }
 
 void MidiSequencerConfigTabContentComponent::currentClipChanged(ClipListComponent* ctrlThatHasChanged)
 {
-   plugin->setCurrentClipIndex(ctrlThatHasChanged->getCurrentClipIndex()); 
-   sequenceUIComponent->getEditorTab()->updateParameters(); // get the new notes in the edit
+   plugin->setCurrentClipIndex(ctrlThatHasChanged->getCurrentClipIndex()); // causes an update
+//   updateParameters(); // update the CC slider and the clip popup
+//   sequenceUIComponent->getEditorTab()->updateParameters(); // get the new notes in the edit
 }
 
 void MidiSequencerConfigTabContentComponent::clipFilesDropped(ClipListComponent* ctrlThatHasChanged, const StringArray& files)

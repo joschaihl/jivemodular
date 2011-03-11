@@ -104,7 +104,7 @@ void LowlifeSlotEditComponent::updateParametersFromFilter()
    {
       if (clipList)
       {
-         for (int i=0; i<=myFilter->getZoneslotNumClips(mySlot); i++)
+         for (int i=0; i<myFilter->getZoneslotNumClips(mySlot); i++)
             clipList->setClipFile(i, myFilter->getZoneslotClipFile(mySlot, i));
          clipList->setCurrentClipIndex(myFilter->getZoneslotCurrentClip(mySlot), false); // don't notify
       }
@@ -119,9 +119,17 @@ void LowlifeSlotEditComponent::updateParametersFromFilter()
    }
 }
 
-void LowlifeSlotEditComponent::clipListChanged(ClipListComponent* ctrlThatHasChanged)
+void LowlifeSlotEditComponent::clipListChanged(ClipListComponent* ctrlThatHasChanged, StringArray newClipList, std::vector<int> changeInfo)
 {
-
+   myFilter->clearZoneslotClips(mySlot);
+   for (int i=0; i<newClipList.size(); i++)
+   {
+      String clipFile;
+      clipFile = newClipList[i];
+      myFilter->setZoneslotClipFile(mySlot, i, clipFile);
+   }
+   updateParametersFromFilter(); // get the new clips in the combo
+   myFilter->setZoneslotCurrentClip(mySlot, ctrlThatHasChanged->getCurrentClipIndex()); 
 }
 
 void LowlifeSlotEditComponent::currentClipChanged(ClipListComponent* ctrlThatHasChanged)

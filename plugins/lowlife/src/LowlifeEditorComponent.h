@@ -45,7 +45,7 @@ public:
    void sliderValueChanged (Slider* sl);
    void buttonClicked(Button* button);
    
-   virtual void clipListChanged(ClipListComponent* ctrlThatHasChanged);
+   virtual void clipListChanged(ClipListComponent* ctrlThatHasChanged, StringArray newClipList, std::vector<int> changeInfo);
    virtual void currentClipChanged(ClipListComponent* ctrlThatHasChanged);
    virtual void clipFilesDropped(ClipListComponent* ctrlThatHasChanged, const StringArray& files);
    
