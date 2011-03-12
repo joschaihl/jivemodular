@@ -31,8 +31,8 @@
 
 #define Jive_ManufacturerString  "Jive"
 #define Jive_ManufacturerCode    'Jive'
-#define Jive_VersionCode         0x00000204
-#define Jive_VersionString       "0.2.4"
-#define Jive_VersionGetInfoString   "Jive 0.2.4"
+#define Jive_VersionCode         0x00000205
+#define Jive_VersionString       "0.2.5"
+#define Jive_VersionGetInfoString   "Jive 0.2.5"
 
 #endif
