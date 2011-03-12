@@ -506,6 +506,9 @@ public:
    PianoGrid* getPianoGrid();
    PianoGridKeyboard* getMidiKeyboard();
    ComboBox* getNoteLengthBox();
+   
+   void nudgeSelected(double beats);
+   void nudgeSelectedPitch(int semitones);
 
    void updateParameters();
 
@@ -792,6 +795,20 @@ void MidiEditorTabContentComponent::comboBoxChanged (ComboBox* comboBoxThatHasCh
 
         plugin->setValue (PROP_SEQNOTELENGTH, noteEditor->getNoteLengthBox()->getSelectedId ());
     }
+}
+
+void MidiEditorTabContentComponent::nudgeSelected(double beats)
+{
+   PianoGrid* pianoGrid = noteEditor->getPianoGrid();
+   pianoGrid->nudgeSelected(beats);
+   pianoGrid->resized ();
+}
+
+void MidiEditorTabContentComponent::nudgeSelectedPitch(int semitones)
+{
+   PianoGrid* pianoGrid = noteEditor->getPianoGrid();
+   pianoGrid->nudgeSelectedPitch(semitones);
+   pianoGrid->resized ();
 }
 
 class MidiSequencerConfigTabContentComponent
@@ -1196,5 +1213,36 @@ void SequenceComponent::importMidiSequence(const MidiMessageSequence* midiSeq)
 #endif
 	}
    
+}
+
+bool SequenceComponent::keyPressed (const KeyPress& key)
+{
+   const double nudge = 1.0 / 128.0; // 128th of a beat!
+   const double tinyNudge = nudge / 16.0; // even less
+   const int noteNudge = 1; // no microtonal nudges thanks, semitone at a time
+   
+   double nudgeAmount = key.getModifiers().isAltDown() ? tinyNudge : nudge;
+   bool jandled = false;
+   if (key.isKeyCode(KeyPress::leftKey))
+   {
+      jandled = true;
+      editorTabContent->nudgeSelected(-nudgeAmount);
+   }
+   else if (key.isKeyCode(KeyPress::rightKey))
+   {
+      jandled = true;
+      editorTabContent->nudgeSelected(nudgeAmount);
+   }
+   else if (key.isKeyCode(KeyPress::downKey))
+   {
+      jandled = true;
+      editorTabContent->nudgeSelectedPitch(-noteNudge);
+   }
+   else if (key.isKeyCode(KeyPress::upKey))
+   {
+      jandled = true;
+      editorTabContent->nudgeSelectedPitch(noteNudge);
+   }
+   return jandled;
 }
 

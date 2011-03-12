@@ -269,6 +269,8 @@ public:
     void resizeNote (PianoGridNote* note, const float beatNumber, const float length);
     void changeNoteVelocity (PianoGridNote* note, const float newVelocity);
     void removeNote (PianoGridNote* note, const bool alsoFreeObject = true);
+   void nudgeSelected(double beats);
+   void nudgeSelectedPitch(int semitones);
 
     //==============================================================================
     int getNoteIndex (const int noteNumber, const float beatNumber);
