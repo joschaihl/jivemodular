@@ -560,6 +560,34 @@ void PianoGrid::moveNote (PianoGridNote* note, const int newNote, const float ne
     }
 }
 
+void PianoGrid::nudgeSelected(double beats)
+{
+   for (int i=0; i<selectedNotes.getNumSelected(); i++)
+   {
+      PianoGridNote* tm = dynamic_cast<PianoGridNote*>(selectedNotes.getSelectedItem(i));
+      if (tm)
+      {
+         float beat = tm->getBeat();
+         beat += beats;
+         moveNote(tm, tm->getNote(), beat);
+      }
+   }
+}
+
+void PianoGrid::nudgeSelectedPitch(int semitones)
+{
+   for (int i=0; i<selectedNotes.getNumSelected(); i++)
+   {
+      PianoGridNote* tm = dynamic_cast<PianoGridNote*>(selectedNotes.getSelectedItem(i));
+      if (tm)
+      {
+         int note = tm->getNote();
+         note += semitones;
+         moveNote(tm, note, tm->getBeat());
+      }
+   }
+}
+
 void PianoGrid::resizeNote (PianoGridNote* note, const float beatNumber, const float newLength)
 {
 	PianoGridListener* listener = getListener();

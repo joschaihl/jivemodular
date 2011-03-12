@@ -96,6 +96,8 @@ public:
     void filesDropped (const StringArray &files, int x, int y);
     /** @internal */
     bool isInterestedInFileDrag (const StringArray& files);
+    /** @internal */
+    bool keyPressed (const KeyPress& key);
 
    MidiEditorTabContentComponent* getEditorTab() { return editorTabContent; };
    MidiSequencerConfigTabContentComponent* getConfigTab() { return configTabContent; };
