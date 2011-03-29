@@ -17,6 +17,7 @@
 				D0BC2FCC114EF57E00CFD216 /* PBXTargetDependency */,
 				D0BC2FCE114EF57E00CFD216 /* PBXTargetDependency */,
 				93FF1DC412DBE45800FD9957 /* PBXTargetDependency */,
+				9305423E1341BCE80010C30F /* PBXTargetDependency */,
 			);
 			name = "Jive Deploy";
 			productName = "Jive Deploy";
@@ -128,6 +129,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		9305423A1341BCD50010C30F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 930542361341BCD50010C30F /* gate.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 8D01CCD20486CAD60068D4B7 /* JiveGate.vst */;
+			remoteInfo = JiveGate;
+		};
+		9305423D1341BCE80010C30F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 930542361341BCD50010C30F /* gate.xcodeproj */;
+			proxyType = 1;
+			remoteGlobalIDString = 8D01CCC60486CAD60068D4B7 /* JiveGate */;
+			remoteInfo = JiveGate;
+		};
 		93FF1DC112DBE45000FD9957 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 93FF1DBD12DBE45000FD9957 /* distressor.xcodeproj */;
@@ -185,6 +200,7 @@
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
 		8D1107320486CEB800E47090 /* Jive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Jive.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		930542361341BCD50010C30F /* gate.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = gate.xcodeproj; path = ../../../../plugins/gate/build/mac/gate.xcodeproj; sourceTree = SOURCE_ROOT; };
 		9324B487112369E7001437D2 /* GenericJuceVSTEditor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GenericJuceVSTEditor.cpp; sourceTree = "<group>"; };
 		9324B488112369E7001437D2 /* GenericJuceVSTEditor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenericJuceVSTEditor.h; sourceTree = "<group>"; };
 		933028B51072A63500FD4BF2 /* AudioSpecMeterPlugin.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = AudioSpecMeterPlugin.cpp; path = meters/AudioSpecMeterPlugin.cpp; sourceTree = "<group>"; };
@@ -468,6 +484,14 @@
 				1058C7A2FEA54F0111CA2CBB /* Other Frameworks */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		930542371341BCD50010C30F /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9305423B1341BCD50010C30F /* JiveGate.vst */,
+			);
+			name = Products;
 			sourceTree = "<group>";
 		};
 		933028F51072A72600FD4BF2 /* effects */ = {
@@ -783,6 +807,7 @@
 		D0BC2FBB114EF55500CFD216 /* Plugin Projects */ = {
 			isa = PBXGroup;
 			children = (
+				930542361341BCD50010C30F /* gate.xcodeproj */,
 				93FF1DBD12DBE45000FD9957 /* distressor.xcodeproj */,
 				D0BC2FBD114EF56400CFD216 /* lowlife.xcodeproj */,
 				D0BC2FC3114EF56D00CFD216 /* xsynth.xcodeproj */,
@@ -850,6 +875,10 @@
 					ProjectRef = 93FF1DBD12DBE45000FD9957 /* distressor.xcodeproj */;
 				},
 				{
+					ProductGroup = 930542371341BCD50010C30F /* Products */;
+					ProjectRef = 930542361341BCD50010C30F /* gate.xcodeproj */;
+				},
+				{
 					ProductGroup = D0BC2FBE114EF56400CFD216 /* Products */;
 					ProjectRef = D0BC2FBD114EF56400CFD216 /* lowlife.xcodeproj */;
 				},
@@ -867,6 +896,13 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		9305423B1341BCD50010C30F /* JiveGate.vst */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = JiveGate.vst;
+			remoteRef = 9305423A1341BCD50010C30F /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		93FF1DC212DBE45000FD9957 /* JiveDistressor.vst */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.cfbundle;
@@ -993,6 +1029,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		9305423E1341BCE80010C30F /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = JiveGate;
+			targetProxy = 9305423D1341BCE80010C30F /* PBXContainerItemProxy */;
+		};
 		93FF1DC412DBE45800FD9957 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = oppressor;
