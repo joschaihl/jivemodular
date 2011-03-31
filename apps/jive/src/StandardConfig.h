@@ -47,10 +47,16 @@
 //#define JUCE_USE_XSHM  1
 #define JUCE_PLUGINHOST_VST  1
 #define JUCE_PLUGINHOST_AU  1
-#define JUCE_BUILD_EXT_CLASSES  1
+//#define JUCE_BUILD_EXT_CLASSES  1
 //#define JUCE_CHECK_MEMORY_LEAKS  1
 //#define JUCE_CATCH_UNHANDLED_EXCEPTIONS  1
 #define JUCE_STRINGS_ARE_UNICODE  1
+
+// Have turned off JUCE+ / jucetice_ / juce-extended by default. 
+// Jive host needs these classes.
+// Ideally moving Jive source away from depending on forked Juce, and just depend on Juce directly, 
+// with extended classes as separate lib (if this is possible).
+#define JUCE_BUILD_EXT_CLASSES 1
 
 #ifdef _WIN32
 //#ifdef JUCE_WIN32 // not sure why I am having problems seeing the defn of JUCE_WIN32 but anyway..
