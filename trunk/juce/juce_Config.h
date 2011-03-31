@@ -230,7 +230,7 @@
     the JUCETICE (JUCE+) project.
 */
 #ifndef JUCE_BUILD_EXT_CLASSES
-  #define JUCE_BUILD_EXT_CLASSES 1
+  #define JUCE_BUILD_EXT_CLASSES 0
 #endif
 
 /** This lets you disable building of the WebBrowserComponent, if it's not required.
