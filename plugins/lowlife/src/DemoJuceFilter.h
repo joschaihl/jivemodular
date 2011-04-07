@@ -139,6 +139,7 @@ public:
        FilterCutoff,
        FilterResonance,
        CurrentClip,
+       CueSlices,
        LowlifeParameterCount
     };
    enum { paramsPerSlot = LowlifeParameterCount }; 
@@ -152,11 +153,14 @@ public:
    static const int MaxPolyMode;
    static const int MinSyncTicks;
    static const int MaxSyncTicks;
+   static const int MinSliceExponent;
+   static const int MaxSliceExponent;
 //   static const int MinFilterType;
 //   static const int MaxFilterType;
 
 private:
    void setZoneslotCurrentPlayingSample(int slot, const File sampleFile);
+   void setZoneslotCueSlices(int slot, int numSlices);
 
    HIGHLIFE_PROGRAM& getHProgramRef(int zoneslot = 0) // don't care baout zoneslot anymore!!
    {
