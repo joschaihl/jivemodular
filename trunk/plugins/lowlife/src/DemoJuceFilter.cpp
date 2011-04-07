@@ -79,6 +79,8 @@ const int DemoJuceFilter::MinSyncTicks = 0;
 const int DemoJuceFilter::MaxSyncTicks = 999; // ticks are 16th notes
 //const int DemoJuceFilter::MinFilterType = 0;
 //const int DemoJuceFilter::MaxFilterType = 4; 
+const int DemoJuceFilter::MinSliceExponent = 0;
+const int DemoJuceFilter::MaxSliceExponent = 6; // up to 64 slices
 
 float DemoJuceFilter::getNormedParam(int slot, int paramId)
 {
@@ -108,6 +110,8 @@ float DemoJuceFilter::getNormedParam(int slot, int paramId)
 //         break;
       case CurrentClip:
          paramVal = paramVal / DEFAULT_MAXIMUM_CLIPS;
+      case CueSlices:
+         paramVal = (sqrt(paramVal) - MinSliceExponent) / (MaxSliceExponent - MinSliceExponent);
          break;
    }
    return paramVal;
@@ -140,6 +144,9 @@ void DemoJuceFilter::setNormedParam(int slot, int paramId, float val)
 //         break;
       case CurrentClip:
          val = floor(val * DEFAULT_MAXIMUM_CLIPS);
+         break;
+      case CueSlices:
+         val = pow(2, floor(val * (1 + MaxSliceExponent - MinSliceExponent)) + MinSliceExponent);
          break;
       default:
          break;
@@ -229,6 +236,9 @@ const String DemoJuceFilter::getParameterName (int index)
       case CurrentClip:
          slotName += String("Sample");
       break;
+      case CueSlices:
+         slotName += String("Slices");
+      break;
    }
 
    return slotName;
@@ -317,6 +327,9 @@ float DemoJuceFilter::getRawParam(int slot, int paramId)
       case CurrentClip:
          value = getZoneslotCurrentClip(slot);
          break;
+      case CueSlices:
+         value = pz->num_cues;
+         break;
       default:
          break;
       }
@@ -375,6 +388,9 @@ void DemoJuceFilter::setRawParam(int slot, int paramId, float value)
       case CurrentClip:
          setZoneslotCurrentClip(slot, value);
          break;
+      case CueSlices:
+         setZoneslotCueSlices(slot, value);
+         break;
       default:
          break;
       }
@@ -423,6 +439,8 @@ String DemoJuceFilter::getZoneslotSample(int slot)
 
 void DemoJuceFilter::setZoneslotSample(int slot, const String sampleFile)
 {
+   // NOTHING USES THIS MUCH ANYMORE, SEE CLIP!
+   
    // by default newly added samples get set as the zeroth clip (top of the list)
    setZoneslotClipFile(slot, 0, sampleFile);
    // and loaded up straight away
@@ -437,9 +455,25 @@ void DemoJuceFilter::setZoneslotCurrentPlayingSample(int slot, const File sample
       highlifeInstance.tool_delete_wave (pz);
       highlifeInstance.tool_load_sample(pz, sampleFile);
       
-      // TODO: look for settings file alongside sampleFile, and auto-apply settings for file - especially SyncTicks
+      setZoneslotCueSlices(slot, pz->num_cues);
+
+      // TODO: look for settings file alongside sampleFile, and auto-apply settings for file - especially SyncTicks?
    }
    sendChangeMessage (this);
+}
+
+void DemoJuceFilter::setZoneslotCueSlices(int slot, int numSlices)
+{
+   HIGHLIFE_ZONE* pz = getHZone(slot);
+   pz->num_cues = 0;
+   if (pz && numSlices > 0)
+   {
+      for (int i=0; i<numSlices; i++)
+      {
+         pz->cue_pos[pz->num_cues]=i * float(pz->num_samples / numSlices);
+         pz->num_cues++;
+      }
+   }
 }
 
 void DemoJuceFilter::clearZoneslotClips(int zoneslot)
