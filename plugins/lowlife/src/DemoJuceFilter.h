@@ -140,6 +140,9 @@ public:
        FilterResonance,
        CurrentClip,
        CueSlices,
+       LoopMode,
+       LoopStart,
+       LoopEnd,
        LowlifeParameterCount
     };
    enum { paramsPerSlot = LowlifeParameterCount }; 
@@ -155,6 +158,7 @@ public:
    static const int MaxSyncTicks;
    static const int MinSliceExponent;
    static const int MaxSliceExponent;
+   static const int MaxLoopMode;
 //   static const int MinFilterType;
 //   static const int MaxFilterType;
 
