@@ -81,6 +81,7 @@ const int DemoJuceFilter::MaxSyncTicks = 999; // ticks are 16th notes
 //const int DemoJuceFilter::MaxFilterType = 4; 
 const int DemoJuceFilter::MinSliceExponent = 0;
 const int DemoJuceFilter::MaxSliceExponent = 6; // up to 64 slices
+const int DemoJuceFilter::MaxLoopMode = 4;
 
 float DemoJuceFilter::getNormedParam(int slot, int paramId)
 {
@@ -112,6 +113,9 @@ float DemoJuceFilter::getNormedParam(int slot, int paramId)
          paramVal = paramVal / DEFAULT_MAXIMUM_CLIPS;
       case CueSlices:
          paramVal = (sqrt(paramVal) - MinSliceExponent) / (MaxSliceExponent - MinSliceExponent);
+         break;
+      case LoopMode:
+         paramVal = (paramVal / MaxLoopMode);
          break;
    }
    return paramVal;
@@ -147,6 +151,9 @@ void DemoJuceFilter::setNormedParam(int slot, int paramId, float val)
          break;
       case CueSlices:
          val = pow(2, floor(val * (1 + MaxSliceExponent - MinSliceExponent)) + MinSliceExponent);
+         break;
+      case LoopMode:
+         val = floor((val * (MaxLoopMode+1)));
          break;
       default:
          break;
@@ -239,6 +246,15 @@ const String DemoJuceFilter::getParameterName (int index)
       case CueSlices:
          slotName += String("Slices");
       break;
+      case LoopMode:
+         slotName += String("Loop Mode");
+      break;
+      case LoopStart:
+         slotName += String("Loop Start");
+      break;
+      case LoopEnd:
+         slotName += String("Loop End");
+      break;
    }
 
    return slotName;
@@ -264,6 +280,20 @@ const String DemoJuceFilter::getParameterText (int index)
          paramVal = "Bandpass";
       else
          paramVal = "Bandstop";
+    }
+
+   if (index == LoopMode)
+   {
+      if (paramValue < 1)
+         paramVal = "Off";
+      else if (paramValue < 2)
+         paramVal = "Forward";
+      else if (paramValue < 3)
+         paramVal = "Bidirectional";
+      else if (paramValue < 4)
+         paramVal = "Backward";
+      else
+         paramVal = "Sustained";
     }
 
    if (index == CurrentClip)
@@ -330,6 +360,15 @@ float DemoJuceFilter::getRawParam(int slot, int paramId)
       case CueSlices:
          value = pz->num_cues;
          break;
+      case LoopMode:
+         value = pz->loop_mode;
+         break;
+      case LoopStart:
+         value = pz->loop_start / static_cast<double>(pz->num_samples);
+         break;
+      case LoopEnd:
+         value = pz->loop_end / static_cast<double>(pz->num_samples);
+         break;
       default:
          break;
       }
@@ -390,6 +429,15 @@ void DemoJuceFilter::setRawParam(int slot, int paramId, float value)
          break;
       case CueSlices:
          setZoneslotCueSlices(slot, value);
+         break;
+      case LoopMode:
+         pz->loop_mode = value;
+         break;
+      case LoopStart:
+         pz->loop_start = value * pz->num_samples;
+         break;
+      case LoopEnd:
+         pz->loop_end = value * pz->num_samples;
          break;
       default:
          break;
