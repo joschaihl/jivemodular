@@ -114,7 +114,6 @@ NoteEditComponent::NoteEditComponent(MidiSequencePlugin* _plugin, Transport* _tr
    midiKeyboard->setMidiChannelsToDisplay (1 << 0);
    midiKeyboard->setKeyPressBaseOctave (3);
    midiKeyboard->setLowestVisibleKey (pianoGrid->getRowsOffset());
-   midiKeyboard->setKeyWidth (12); // fixed !
    midiKeyboard->setAvailableRange (0, 119);
    midiKeyboard->setScrollButtonsVisible (true);
 
@@ -689,6 +688,10 @@ void MidiEditorTabContentComponent::updateParameters()
                   pianoGrid->addNote (note, beat, length);
             }
 
+            int rowHeight = sequencer->getIntValue (PROP_SEQROWHEIGHT, 4);
+            pianoGrid->setRowHeight(rowHeight);
+            getMidiKeyboard()->setKeyWidth((rowHeight * 11) / 7.0); // need to rejig the key width so octave gets divided up evenly
+
             pianoGrid->resized ();
          }
        }
@@ -842,6 +845,8 @@ private:
    Slider* partPatternNumSlider;
    ClipListComponent* clipList;
    ParamSlider* currentClipSlider;
+   Array<ParamSlider*> parameterSliders;
+   Array<Label*> parameterLabels;
 };
 
 MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(MidiSequencePlugin* plugin_, Transport* transport_, SequenceComponent* parentComponent_)
@@ -854,7 +859,7 @@ MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(M
    partPatternNumSlider(0),
    clipList(0)
 {
-   addAndMakeVisible (channelNumSlider = new Slider (String::empty));
+   addAndMakeVisible (channelNumSlider = new Slider ("MIDI Channel"));
    channelNumSlider->setRange (0, 16, 1);
    channelNumSlider->setSliderStyle (Slider::IncDecButtons);
    channelNumSlider->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
@@ -878,6 +883,22 @@ MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(M
    AudioParameter* theCurrentClipParameter = plugin->getParameterObject(MIDISEQ_PARAMID_CURRENTCLIP);
    addAndMakeVisible(currentClipSlider = new ParamSlider(plugin, theCurrentClipParameter, MIDISEQ_PARAMID_CURRENTCLIP));
    currentClipSlider->setTextBoxIsEditable(false);
+   
+   // generically add sliders for other parameters
+   for (int i=MIDISEQ_PARAMID_NUMROWS; i<MIDISEQ_PARAMID_NEXTAVAILABLE; i++)
+   {
+      AudioParameter* curParam = plugin->getParameterObject(i);
+      ParamSlider* curSlider = new ParamSlider(plugin, curParam, i);
+      channelNumSlider->setRange (0, 1, 0.01);
+      addAndMakeVisible(curSlider);
+      curSlider->setTextBoxIsEditable(false);   
+      parameterSliders.add(curSlider);
+
+      String paramName = plugin->getParameterName(i);
+      Label* curLabel = new Label(paramName, paramName);
+      addAndMakeVisible(curLabel);
+      parameterLabels.add(curLabel);
+   }
 }
 
 MidiSequencerConfigTabContentComponent::~MidiSequencerConfigTabContentComponent()
@@ -912,18 +933,36 @@ void MidiSequencerConfigTabContentComponent::updateParameters()
 void MidiSequencerConfigTabContentComponent::resized()
 {
    int rowHeight = 32;
-   int curY = 2;
+   int curY = 10;
+   int controlLeft = 100;
+   int labelWidth = 80;
+   int labelLeft = 10;
+   int width = getWidth() - (controlLeft + 20);
 
-   channelNumSlider->setBounds(10, curY, 80, 16);
+   channelNumSlider->setBounds(controlLeft, curY, width, 16);
    curY += rowHeight;
 
-   ccEnabledSlider->setBounds(10, curY, 80, 16);
-   partPatternNumSlider->setBounds(100, curY, 75, 16);
+   ccEnabledSlider->setBounds(controlLeft, curY, width, 16);
+   partPatternNumSlider->setBounds(labelLeft, curY, labelWidth, 16);
    curY += rowHeight;
    
-   currentClipSlider->setBounds(10, curY, 80, 16);
-   clipList->setBounds (100, curY, 100, 16);
+   currentClipSlider->setBounds(labelLeft, curY, labelWidth, 16);
+   clipList->setBounds (controlLeft, curY, width, 16);
    curY += rowHeight;
+   
+   for (int i=0; i<parameterSliders.size(); i++)
+   {
+      ParamSlider* curSlider = parameterSliders.getUnchecked(i);
+      if (curSlider)
+         curSlider->setBounds(controlLeft, curY, width, 16);
+
+      Label* curLabel = parameterLabels.getUnchecked(i);
+      if (curLabel)
+         curLabel->setBounds(labelLeft, curY, labelWidth, 16);
+
+      curY += rowHeight;
+   }
+   
 }
 
 void MidiSequencerConfigTabContentComponent::sliderValueChanged (Slider* sliderThatWasMoved)

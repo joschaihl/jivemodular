@@ -660,6 +660,7 @@ void MidiSequencePluginBase::savePropertiesToXml (XmlElement* xml)
     xml->setAttribute (PROP_SEQENABLED,              getBoolValue (PROP_SEQENABLED, true));
     xml->setAttribute (PROP_SEQMIDICHANNEL,          getIntValue (PROP_SEQMIDICHANNEL, 1));
     xml->setAttribute (PROP_SEQCURRENTCLIP,          getCurrentClipIndex());
+    xml->setAttribute (PROP_SEQROWHEIGHT,          getIntValue (PROP_SEQROWHEIGHT, 10));
     
    XmlElement* clipsElement = new XmlElement(PROP_SEQCLIPFILES);
    for (int i=0; i<jmin(getMaxUsedClipIndex()+1, DEFAULT_MAXIMUM_CLIPS); i++)
@@ -684,6 +685,7 @@ void MidiSequencePluginBase::loadPropertiesFromXml (XmlElement* xml)
     setValue (PROP_SEQENABLED,                       xml->getBoolAttribute (PROP_SEQENABLED, true));
     setValue (PROP_SEQMIDICHANNEL,                   xml->getIntAttribute (PROP_SEQMIDICHANNEL, 1));
     currentClip = xml->getIntAttribute (PROP_SEQCURRENTCLIP, 0);
+    setValue (PROP_SEQROWHEIGHT,                   xml->getIntAttribute (PROP_SEQROWHEIGHT, 10));
 
    XmlElement* clipsElement = xml->getChildByName(PROP_SEQCLIPFILES);
    if (clipsElement)
@@ -931,6 +933,8 @@ void MidiSequencePluginBase::importClipFiles(const StringArray& files)
 
 
 //==============================================================================
+const int maxPx = 108; 
+const int minPx = 8;
 
 void MidiSequencePluginBase::setParameterReal (int paramNumber, float value)
 {
@@ -941,6 +945,18 @@ void MidiSequencePluginBase::setParameterReal (int paramNumber, float value)
          newClipIndex = 0;
       setCurrentClipIndex(newClipIndex);
    }
+   
+   if (paramNumber == MIDISEQ_PARAMID_NUMROWS)
+   {
+   }
+   if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
+   {
+   }
+   if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
+   {
+      setValue (PROP_SEQROWHEIGHT, minPx + value * (maxPx-minPx));
+   }
+   sendChangeMessage (this);
 }
 
 float MidiSequencePluginBase::getParameterReal (int paramNumber)
@@ -948,17 +964,36 @@ float MidiSequencePluginBase::getParameterReal (int paramNumber)
    float value = 0.0f;
    if (paramNumber == MIDISEQ_PARAMID_CURRENTCLIP)
       value = static_cast<double>(currentClip) / DEFAULT_MAXIMUM_CLIPS;
+   if (paramNumber == MIDISEQ_PARAMID_NUMROWS)
+   {
+   }
+   if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
+   {
+   }
+   if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
+   {
+      int tmp = getIntValue(PROP_SEQROWHEIGHT, 10);
+      value = (getIntValue(PROP_SEQROWHEIGHT, 10) - minPx) / static_cast<float>(maxPx-minPx);
+   }
    return value;
 }
 
 const String MidiSequencePluginBase::getParameterTextReal (int paramNumber, float value)
 {
-   String paramTxt("");
+   String paramTxt;//(String(getParameterReal(paramNumber, value));
    if (paramNumber == MIDISEQ_PARAMID_CURRENTCLIP)
    {
       int newClipIndex = round(value * DEFAULT_MAXIMUM_CLIPS);
       paramTxt = String(String(newClipIndex) + String(" ") + File(getClipFile(newClipIndex)).getFileNameWithoutExtension());
    }
+//   if (paramNumber == MIDISEQ_PARAMID_NUMROWS)
+//   {
+//   }
+//   if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
+//   {
+//   }
+   if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
+      paramTxt = String(getIntValue(PROP_SEQROWHEIGHT, 10));
 
    return paramTxt;
 }
