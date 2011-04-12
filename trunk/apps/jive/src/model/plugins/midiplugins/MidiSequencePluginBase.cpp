@@ -217,6 +217,13 @@ void MidiSequencePluginBase::newRenderEvents(
       if (!midiMessage || !midiMessage->isNoteOnOrOff()) // we only sequence note events - not a fully generic rec-play sequencer
          continue;
          
+      // filter notes that are hidden from view
+      int noteNumber = midiMessage->getNoteNumber();
+      int minNote = getIntValue (PROP_SEQBOTTOMROW, 0);
+      int maxNote = minNote + getIntValue (PROP_SEQNUMROWS, 127) - 1;
+      if (noteNumber < minNote || noteNumber > maxNote)
+         continue;
+         
       // determine whether the event is one that we need to play in this time chunk..
       double beatsTime = sourceMidiBuffer.getEventTime(i);
       // we care about note offs after the end of the loop (in case the user has resized loop and cut off the end of a note)
@@ -661,6 +668,8 @@ void MidiSequencePluginBase::savePropertiesToXml (XmlElement* xml)
     xml->setAttribute (PROP_SEQMIDICHANNEL,          getIntValue (PROP_SEQMIDICHANNEL, 1));
     xml->setAttribute (PROP_SEQCURRENTCLIP,          getCurrentClipIndex());
     xml->setAttribute (PROP_SEQROWHEIGHT,          getIntValue (PROP_SEQROWHEIGHT, 10));
+    xml->setAttribute (PROP_SEQBOTTOMROW,          getIntValue (PROP_SEQBOTTOMROW, 0));
+    xml->setAttribute (PROP_SEQNUMROWS,          getIntValue (PROP_SEQNUMROWS, 127));
     
    XmlElement* clipsElement = new XmlElement(PROP_SEQCLIPFILES);
    for (int i=0; i<jmin(getMaxUsedClipIndex()+1, DEFAULT_MAXIMUM_CLIPS); i++)
@@ -686,6 +695,8 @@ void MidiSequencePluginBase::loadPropertiesFromXml (XmlElement* xml)
     setValue (PROP_SEQMIDICHANNEL,                   xml->getIntAttribute (PROP_SEQMIDICHANNEL, 1));
     currentClip = xml->getIntAttribute (PROP_SEQCURRENTCLIP, 0);
     setValue (PROP_SEQROWHEIGHT,                   xml->getIntAttribute (PROP_SEQROWHEIGHT, 10));
+    setValue (PROP_SEQBOTTOMROW,                   xml->getIntAttribute (PROP_SEQBOTTOMROW, 0));
+    setValue (PROP_SEQNUMROWS,                   xml->getIntAttribute (PROP_SEQNUMROWS, 127));
 
    XmlElement* clipsElement = xml->getChildByName(PROP_SEQCLIPFILES);
    if (clipsElement)
@@ -947,16 +958,11 @@ void MidiSequencePluginBase::setParameterReal (int paramNumber, float value)
    }
    
    if (paramNumber == MIDISEQ_PARAMID_NUMROWS)
-   {
-   }
+      setValue (PROP_SEQNUMROWS, 1 + value * 126.0);
    if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
-   {
-   }
+      setValue (PROP_SEQBOTTOMROW, value * 127.0);
    if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
-   {
       setValue (PROP_SEQROWHEIGHT, minPx + value * (maxPx-minPx));
-   }
-   sendChangeMessage (this);
 }
 
 float MidiSequencePluginBase::getParameterReal (int paramNumber)
@@ -964,17 +970,13 @@ float MidiSequencePluginBase::getParameterReal (int paramNumber)
    float value = 0.0f;
    if (paramNumber == MIDISEQ_PARAMID_CURRENTCLIP)
       value = static_cast<double>(currentClip) / DEFAULT_MAXIMUM_CLIPS;
+
    if (paramNumber == MIDISEQ_PARAMID_NUMROWS)
-   {
-   }
+      value = (getIntValue(PROP_SEQNUMROWS, 127) - 1) / 126.0;
    if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
-   {
-   }
+      value = getIntValue(PROP_SEQBOTTOMROW, 0) / 127.0;
    if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
-   {
-      int tmp = getIntValue(PROP_SEQROWHEIGHT, 10);
       value = (getIntValue(PROP_SEQROWHEIGHT, 10) - minPx) / static_cast<float>(maxPx-minPx);
-   }
    return value;
 }
 
@@ -986,12 +988,10 @@ const String MidiSequencePluginBase::getParameterTextReal (int paramNumber, floa
       int newClipIndex = round(value * DEFAULT_MAXIMUM_CLIPS);
       paramTxt = String(String(newClipIndex) + String(" ") + File(getClipFile(newClipIndex)).getFileNameWithoutExtension());
    }
-//   if (paramNumber == MIDISEQ_PARAMID_NUMROWS)
-//   {
-//   }
-//   if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
-//   {
-//   }
+   if (paramNumber == MIDISEQ_PARAMID_NUMROWS)
+      paramTxt = String(getIntValue(PROP_SEQNUMROWS, 127));
+   if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
+      paramTxt = String(getIntValue(PROP_SEQBOTTOMROW, 0));
    if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
       paramTxt = String(getIntValue(PROP_SEQROWHEIGHT, 10));
 

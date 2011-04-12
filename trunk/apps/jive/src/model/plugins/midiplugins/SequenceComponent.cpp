@@ -688,9 +688,17 @@ void MidiEditorTabContentComponent::updateParameters()
                   pianoGrid->addNote (note, beat, length);
             }
 
-            int rowHeight = sequencer->getIntValue (PROP_SEQROWHEIGHT, 4);
+            PianoGridKeyboard* keys = getMidiKeyboard();
+
+            int rowHeight = sequencer->getIntValue (PROP_SEQROWHEIGHT, 10);
             pianoGrid->setRowHeight(rowHeight);
-            getMidiKeyboard()->setKeyWidth((rowHeight * 11) / 7.0); // need to rejig the key width so octave gets divided up evenly
+            keys->setKeyWidth((rowHeight * 11) / 7.0); // rejig the key width so octave gets divided up evenly
+
+            int bottomNote = sequencer->getIntValue (PROP_SEQBOTTOMROW, 0);
+            int numNotes = sequencer->getIntValue (PROP_SEQNUMROWS, 127) - 1;
+            pianoGrid->setRowsOffset(bottomNote);
+            pianoGrid->setNumRows(numNotes);
+            keys->setAvailableRange(bottomNote, bottomNote+numNotes);
 
             pianoGrid->resized ();
          }
@@ -892,6 +900,7 @@ MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(M
       channelNumSlider->setRange (0, 1, 0.01);
       addAndMakeVisible(curSlider);
       curSlider->setTextBoxIsEditable(false);   
+      curSlider->addListener(this);
       parameterSliders.add(curSlider);
 
       String paramName = plugin->getParameterName(i);
@@ -906,6 +915,9 @@ MidiSequencerConfigTabContentComponent::~MidiSequencerConfigTabContentComponent(
    clipList->removeListener(this);
    channelNumSlider->removeListener(this);
    partPatternNumSlider->removeListener(this);
+   for (int i=0; i<parameterSliders.size(); i++)
+      parameterSliders.getUnchecked(i)->removeListener(this);
+      
    deleteAllChildren();
 }
 
@@ -978,7 +990,10 @@ void MidiSequencerConfigTabContentComponent::sliderValueChanged (Slider* sliderT
       if (plugin->getMidiOutputChannel() != -1 && plugin->getMidiOutputChannel() != plugin->getMidiChannel())
          plugin->setMidiOutputChannelFilter(plugin->getMidiChannel());
    }
-
+   else
+   {
+      sequenceUIComponent->updateParameters();
+   }
 }
 
 void MidiSequencerConfigTabContentComponent::clipListChanged(ClipListComponent* ctrlThatHasChanged, StringArray newClipList, std::vector<int> changeInfo)
