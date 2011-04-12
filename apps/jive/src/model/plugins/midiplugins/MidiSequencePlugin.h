@@ -31,7 +31,7 @@
 
 #include "MidiSequencePluginBase.h"
 
-#define MIDISEQ_PARAMID_SEQENABLED MIDISEQ_PARAMID_CURRENTCLIP + 1
+#define MIDISEQ_PARAMID_SEQENABLED MIDISEQ_PARAMID_NEXTAVAILABLE + 0
 
 //==============================================================================
 // properties - 

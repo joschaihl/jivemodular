@@ -49,9 +49,14 @@
 #define PROP_SEQCLIPITEM                   T("sClipItem")
 #define PROP_SEQCLIPINDEX                   T("sClipIndex")
 #define PROP_SEQCLIPFILE                   T("sClipFile")
+#define PROP_SEQROWHEIGHT                   T("sRowHeight")
 
-#define MIDISEQ_BASESEQUENCERPARAMCOUNT 1
+#define MIDISEQ_BASESEQUENCERPARAMCOUNT 4
 #define MIDISEQ_PARAMID_CURRENTCLIP 0
+#define MIDISEQ_PARAMID_NUMROWS 1
+#define MIDISEQ_PARAMID_BOTTOMROWNOTE 2
+#define MIDISEQ_PARAMID_ROWHEIGHT 3
+#define MIDISEQ_PARAMID_NEXTAVAILABLE 4
 
 //==============================================================================
 /**

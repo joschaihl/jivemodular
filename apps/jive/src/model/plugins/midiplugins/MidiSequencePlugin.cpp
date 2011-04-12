@@ -54,6 +54,31 @@ MidiSequencePlugin::MidiSequencePlugin()
    parameter->text (MakeDelegate (this, &MidiSequencePluginBase::getParameterTextReal));
    registerParameter (MIDISEQ_PARAMID_CURRENTCLIP, parameter);
 
+   parameter = new AudioParameter ();
+   parameter->part (MIDISEQ_PARAMID_NUMROWS);
+   parameter->name ("Grid Rows");
+   parameter->get (MakeDelegate (this, &MidiSequencePluginBase::getParameterReal));
+   parameter->set (MakeDelegate (this, &MidiSequencePluginBase::setParameterReal));
+   parameter->text (MakeDelegate (this, &MidiSequencePluginBase::getParameterTextReal));
+   registerParameter (MIDISEQ_PARAMID_NUMROWS, parameter);
+   
+   parameter = new AudioParameter ();
+   parameter->part (MIDISEQ_PARAMID_BOTTOMROWNOTE);
+   parameter->name ("Lowest Note");
+   parameter->get (MakeDelegate (this, &MidiSequencePluginBase::getParameterReal));
+   parameter->set (MakeDelegate (this, &MidiSequencePluginBase::setParameterReal));
+   parameter->text (MakeDelegate (this, &MidiSequencePluginBase::getParameterTextReal));
+   registerParameter (MIDISEQ_PARAMID_BOTTOMROWNOTE, parameter);
+   
+   parameter = new AudioParameter ();
+   parameter->part (MIDISEQ_PARAMID_ROWHEIGHT);
+   parameter->name ("Row Height");
+   parameter->get (MakeDelegate (this, &MidiSequencePluginBase::getParameterReal));
+   parameter->set (MakeDelegate (this, &MidiSequencePluginBase::setParameterReal));
+   parameter->text (MakeDelegate (this, &MidiSequencePluginBase::getParameterTextReal));
+   registerParameter (MIDISEQ_PARAMID_ROWHEIGHT, parameter);         
+
+// parameters managed here start at 
 
    parameter = new AudioParameter ();
    parameter->part (MIDISEQ_PARAMID_SEQENABLED);
