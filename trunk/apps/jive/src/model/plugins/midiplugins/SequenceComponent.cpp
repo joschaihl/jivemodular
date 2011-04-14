@@ -716,7 +716,7 @@ void MidiEditorTabContentComponent::updateParameters()
             // this means it's not aligned with the grid, so for this reason have removed the keyboard widget from the ui
             // (also a simpler/cleaner UI!)
             int bottomNote = sequencer->getIntValue (PROP_SEQBOTTOMROW, 0);
-            int numNotes = sequencer->getIntValue (PROP_SEQNUMROWS, 127) - 1;
+            int numNotes = sequencer->getIntValue (PROP_SEQNUMROWS, 127);
             pianoGrid->setRowsOffset(bottomNote);
             pianoGrid->setNumRows(numNotes);
             if (keys)
@@ -1021,7 +1021,8 @@ void MidiSequencerConfigTabContentComponent::sliderValueChanged (Slider* sliderT
    }
    else
    {
-      sequenceUIComponent->updateParameters();
+      // visual params of note edit grid changed, get it updated
+      sequenceUIComponent->getEditorTab()->updateParameters();
    }
 }
 
