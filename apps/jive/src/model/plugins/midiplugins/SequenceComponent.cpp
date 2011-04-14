@@ -148,7 +148,7 @@ void NoteEditComponent::resized ()
    pianoViewport->setBounds(gridLeftX, 0, noteGridW, noteGridH);
 
    // note the magic formula for how big a pianogrid is ... height-1!
-   int gridHeight = pianoGrid->getNumRows() * (pianoGrid->getRowHeight()-1) + pianoGrid->getHeaderHeight();
+   int gridHeight = plugin->getIntValue (PROP_SEQNUMROWS, 127) * (pianoGrid->getRowHeight()-1) + pianoGrid->getHeaderHeight();
    pianoGrid->setSize (10, gridHeight); // width doesn't matter...
    pianoGrid->updateSize (); // ...is auto-setup by updateSize
 }
@@ -719,12 +719,12 @@ void MidiEditorTabContentComponent::updateParameters()
             int bottomNote = sequencer->getIntValue (PROP_SEQBOTTOMROW, 0);
             int numNotes = sequencer->getIntValue (PROP_SEQNUMROWS, 127);
             pianoGrid->setRowsOffset(bottomNote);
-            pianoGrid->setNumRows(numNotes);
+            pianoGrid->setNumRows(numNotes + bottomNote);
             if (keys)
                keys->setAvailableRange(bottomNote, bottomNote+numNotes);
             
             // note the magic formula for how big a pianogrid is ... height-1!
-            int gridHeight = pianoGrid->getNumRows() * (pianoGrid->getRowHeight()-1) + pianoGrid->getHeaderHeight();
+            int gridHeight = numNotes * (pianoGrid->getRowHeight()-1) + pianoGrid->getHeaderHeight();
             pianoGrid->setSize (10, gridHeight); // width doesn't matter...
             pianoGrid->updateSize (); // ...is auto-setup by updateSize
             pianoGrid->resized ();
