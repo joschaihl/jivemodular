@@ -104,18 +104,19 @@ NoteEditComponent::NoteEditComponent(MidiSequencePlugin* _plugin, Transport* _tr
    pianoGrid->setListener (plugin);
 
    addAndMakeVisible (pianoViewport = new Viewport (String::empty));
-   pianoViewport->setScrollBarsShown (false, true);
+   pianoViewport->setScrollBarsShown (true, true); // midi keyboard is a little too inflexible for us with row height/count customisation - so we'll just use normal scrollbars
    pianoViewport->setScrollBarThickness (12);
    pianoViewport->setViewedComponent (pianoGrid);
 
+   // disabling midi keyboard - when grid rows are small and scrolling is not needed, the lack of scroll buttons on the piano means the piano is misaligned with the grid
    // midi keyboard
-   addAndMakeVisible (midiKeyboard = new PianoGridKeyboard (plugin->getKeyboardState ()));
-   midiKeyboard->setMidiChannel (1);
-   midiKeyboard->setMidiChannelsToDisplay (1 << 0);
-   midiKeyboard->setKeyPressBaseOctave (3);
-   midiKeyboard->setLowestVisibleKey (pianoGrid->getRowsOffset());
-   midiKeyboard->setAvailableRange (0, 119);
-   midiKeyboard->setScrollButtonsVisible (true);
+//   addAndMakeVisible (midiKeyboard = new PianoGridKeyboard (plugin->getKeyboardState ()));
+//   midiKeyboard->setMidiChannel (1);
+//   midiKeyboard->setMidiChannelsToDisplay (1 << 0);
+//   midiKeyboard->setKeyPressBaseOctave (3);
+//   midiKeyboard->setLowestVisibleKey (pianoGrid->getRowsOffset());
+//   midiKeyboard->setAvailableRange (0, 119);
+//   midiKeyboard->setScrollButtonsVisible (true);
 
    dropShadower = new DropShadower (0.4f, 2, 0, 2.5f);
    dropShadower->setOwner (midiKeyboard);
@@ -133,10 +134,15 @@ void NoteEditComponent::resized ()
     int keysButtonHeight = 12;
 
     // content
-    noteLengthLabel->setBounds (0, 0, 60, 16);
-    noteLengthBox->setBounds (0, 16, 60, 16);
+    noteLengthLabel->setBounds (0, 0, 40, 16);
+    noteLengthBox->setBounds (42, 0, 71, 16);
+    
+   PianoGridKeyboard* pgkb = getMidiKeyboard();
+   if (pgkb)
+      pgkb->setBounds (gridLeftX - keysWidth, 0, keysWidth, getHeight());
+   else
+       keysButtonHeight = 0; // now that we have removed the piano keyboard, no need to allow space for its scroll buttons
 
-    midiKeyboard->setBounds (gridLeftX - keysWidth, 0, keysWidth, getHeight());
     pianoViewport->setBounds (gridLeftX,
                               0,
                               getWidth () - gridLeftX,
@@ -586,7 +592,9 @@ MidiEditorTabContentComponent::MidiEditorTabContentComponent(MidiSequencePlugin*
       addAndMakeVisible(layoutResizer = new StretchableLayoutResizerBar(&myLayout, 1, false));
 
       addAndMakeVisible(noteEditor = new NoteEditComponent(plugin, transport));
-      noteEditor->getMidiKeyboard()->addChangeListener (this);
+      PianoGridKeyboard* pgkb = noteEditor->getMidiKeyboard();
+      if (pgkb)
+         pgkb->addChangeListener (this);
       noteEditor->getNoteLengthBox()->addListener (this);
 
          addAndMakeVisible(automationEditor = new AutomationEditComponent(plugin, transport));
@@ -635,17 +643,26 @@ ComboBox* MidiEditorTabContentComponent::getNoteLengthBox()
 
 void MidiEditorTabContentComponent::resized()
 {
-   int headHeight = 32;
+   int headHeight = 22;
 
+   const int kLabelGap = 2;
+   const int kControlGap = 8;
+   int left = 0;
+   
    // header-centre
-   quantizeLabel->setBounds (200, 2, 70, 16);
-   quantizeBox->setBounds (275, 2, 60, 16);
+   quantizeLabel->setBounds (left, 2, 70, 16);
+   left += 70 + kLabelGap;
+   quantizeBox->setBounds (left, 2, 70, 16);
+   left += 70 + kControlGap;
 
    // header-right
-   barLabel->setBounds (getWidth () - 210, 2, 45, 16);
-   barSlider->setBounds (getWidth () - 170, 2, 60, 16);
-   zoomLabel->setBounds (getWidth () - 115, 2, 45, 16);
-   zoomSlider->setBounds (getWidth () - 80, 2, 80, 16);
+   barLabel->setBounds (left, 2, 46, 16);
+   left += 46 + kLabelGap;
+   barSlider->setBounds (left, 2, 70, 16);
+   left += 70 + kControlGap;
+   zoomLabel->setBounds (left, 2, 46, 16);
+   left += 46 + kLabelGap;
+   zoomSlider->setBounds (left, 2, getWidth() - left - kLabelGap, 16);
 
    // content - 2 panes, top for note editor, bottom for automation editor
    Component* comps[] = { noteEditor, layoutResizer, automationEditor }; 
@@ -692,13 +709,18 @@ void MidiEditorTabContentComponent::updateParameters()
 
             int rowHeight = sequencer->getIntValue (PROP_SEQROWHEIGHT, 10);
             pianoGrid->setRowHeight(rowHeight);
-            keys->setKeyWidth((rowHeight * 11) / 7.0); // rejig the key width so octave gets divided up evenly
+            if (keys)
+               keys->setKeyWidth((rowHeight * 11) / 7.0); // rejig the key width so octave gets divided up evenly
 
+            // this works nicely except that the keyboard repositions key zero if it doesn't need scroll buttons;
+            // this means it's not aligned with the grid, so for this reason have removed the keyboard widget from the ui
+            // (also a simpler/cleaner UI!)
             int bottomNote = sequencer->getIntValue (PROP_SEQBOTTOMROW, 0);
             int numNotes = sequencer->getIntValue (PROP_SEQNUMROWS, 127) - 1;
             pianoGrid->setRowsOffset(bottomNote);
             pianoGrid->setNumRows(numNotes);
-            keys->setAvailableRange(bottomNote, bottomNote+numNotes);
+            if (keys)
+               keys->setAvailableRange(bottomNote, bottomNote+numNotes);
 
             pianoGrid->resized ();
          }
@@ -939,6 +961,13 @@ void MidiSequencerConfigTabContentComponent::updateParameters()
       for (int i=0; i<=plugin->getMaxUsedClipIndex(); i++)
          clipList->setClipFile(i, plugin->getClipFile(i));
       clipList->setCurrentClipIndex(plugin->getCurrentClipIndex(), false); // don't notify
+   }
+
+   for (int i=0; i<parameterSliders.size(); i++)
+   {
+      ParamSlider* curSlider = parameterSliders.getUnchecked(i);
+      if (curSlider)
+         curSlider->setValue(plugin->getParameterReal(MIDISEQ_PARAMID_NUMROWS+i), false);
    }
 }
 
