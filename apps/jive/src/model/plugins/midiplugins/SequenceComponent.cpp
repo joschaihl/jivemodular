@@ -143,13 +143,14 @@ void NoteEditComponent::resized ()
    else
        keysButtonHeight = 0; // now that we have removed the piano keyboard, no need to allow space for its scroll buttons
 
-    pianoViewport->setBounds (gridLeftX,
-                              0,
-                              getWidth () - gridLeftX,
-                              getHeight() - keysButtonHeight);
+   int noteGridW = getWidth() - gridLeftX;
+   int noteGridH = getHeight() - keysButtonHeight;
+   pianoViewport->setBounds(gridLeftX, 0, noteGridW, noteGridH);
 
-    pianoGrid->setSize (300, getHeight() - keysButtonHeight);
-    pianoGrid->updateSize ();
+   // note the magic formula for how big a pianogrid is ... height-1!
+   int gridHeight = pianoGrid->getNumRows() * (pianoGrid->getRowHeight()-1) + pianoGrid->getHeaderHeight();
+   pianoGrid->setSize (10, gridHeight); // width doesn't matter...
+   pianoGrid->updateSize (); // ...is auto-setup by updateSize
 }
 
 //==============================================================================
@@ -721,8 +722,13 @@ void MidiEditorTabContentComponent::updateParameters()
             pianoGrid->setNumRows(numNotes);
             if (keys)
                keys->setAvailableRange(bottomNote, bottomNote+numNotes);
-
+            
+            // note the magic formula for how big a pianogrid is ... height-1!
+            int gridHeight = pianoGrid->getNumRows() * (pianoGrid->getRowHeight()-1) + pianoGrid->getHeaderHeight();
+            pianoGrid->setSize (10, gridHeight); // width doesn't matter...
+            pianoGrid->updateSize (); // ...is auto-setup by updateSize
             pianoGrid->resized ();
+            pianoGrid->repaint();
          }
        }
        if (automationEditor)
