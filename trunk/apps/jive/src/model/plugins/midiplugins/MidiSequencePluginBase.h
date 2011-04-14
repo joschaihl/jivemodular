@@ -52,13 +52,15 @@
 #define PROP_SEQROWHEIGHT                   T("sRowHeight")
 #define PROP_SEQBOTTOMROW                   T("sBottomRow")
 #define PROP_SEQNUMROWS                   T("sNumRows")
+#define PROP_SEQTRIGGERSYNCHEDTOGLOBAL                   T("sSyncToGlobal") // parameter controlling whether trigger "unmutes" or starts sequence from zero
 
 #define MIDISEQ_BASESEQUENCERPARAMCOUNT 4
 #define MIDISEQ_PARAMID_CURRENTCLIP 0
 #define MIDISEQ_PARAMID_NUMROWS 1
 #define MIDISEQ_PARAMID_BOTTOMROWNOTE 2
 #define MIDISEQ_PARAMID_ROWHEIGHT 3
-#define MIDISEQ_PARAMID_NEXTAVAILABLE 4
+#define MIDISEQ_PARAMID_TRIGGERSYNCHED 4
+#define MIDISEQ_PARAMID_NEXTAVAILABLE 5
 
 //==============================================================================
 /**
@@ -262,6 +264,7 @@ protected:
     MidiMessage allNotesOff;
 
    double uptoBeatReloopHack;
+   double loopPhaseInBeats;
 };
 
 

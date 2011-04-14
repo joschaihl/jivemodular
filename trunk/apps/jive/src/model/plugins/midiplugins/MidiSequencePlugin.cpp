@@ -78,6 +78,14 @@ MidiSequencePlugin::MidiSequencePlugin()
    parameter->text (MakeDelegate (this, &MidiSequencePluginBase::getParameterTextReal));
    registerParameter (MIDISEQ_PARAMID_ROWHEIGHT, parameter);         
 
+   parameter = new AudioParameter ();
+   parameter->part (MIDISEQ_PARAMID_TRIGGERSYNCHED);
+   parameter->name ("Lock Loop");
+   parameter->get (MakeDelegate (this, &MidiSequencePluginBase::getParameterReal));
+   parameter->set (MakeDelegate (this, &MidiSequencePluginBase::setParameterReal));
+   parameter->text (MakeDelegate (this, &MidiSequencePluginBase::getParameterTextReal));
+   registerParameter (MIDISEQ_PARAMID_TRIGGERSYNCHED, parameter);         
+
 // parameters managed here start at 
 
    parameter = new AudioParameter ();
@@ -124,7 +132,16 @@ void MidiSequencePlugin::setParameterReal (int paramNumber, float value)
    if (paramNumber == MIDISEQ_PARAMID_SEQENABLED)
    {
       enableCCValue = value;
+      bool wasEnabled = isEnabledRightNow;
       isEnabledRightNow = (partNumber == 0) || (value >= enableCCMin && value < enableCCMax);
+      
+      // if we are not in synced-to-global mode (i.e. loop starts whenever sequence is retriggered)
+	  // just started playing, so set the phase..
+      if (!wasEnabled && isEnabledRightNow && getDoubleValue(PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 0) < 0.5)
+         loopPhaseInBeats = getLoopBeatPosition(); // may want to round this to beat, etc, should be a param for that
+
+      if (!isEnabledRightNow)
+         loopPhaseInBeats = 0; // reset phase so getLoopBeatPosition returns the right thing next time
    }
    else
       MidiSequencePluginBase::setParameterReal(paramNumber, value);

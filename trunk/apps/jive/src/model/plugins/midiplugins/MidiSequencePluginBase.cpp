@@ -86,7 +86,8 @@ MidiSequencePluginBase::MidiSequencePluginBase ()
     currentClip(0),
     doAllNotesOff (false),
     allNotesOff (MidiMessage::allNotesOff (1)),
-    uptoBeatReloopHack(0.0)
+    uptoBeatReloopHack(0.0),
+    loopPhaseInBeats(0.0)
 {
    midiSequence = new MidiMessageSequence();
    allClipsByChannelSequence = new MidiMessageSequence();
@@ -217,11 +218,11 @@ void MidiSequencePluginBase::newRenderEvents(
       if (!midiMessage || !midiMessage->isNoteOnOrOff()) // we only sequence note events - not a fully generic rec-play sequencer
          continue;
          
-      // filter notes that are hidden from view
+      // filter note-ons that are hidden from view
       int noteNumber = midiMessage->getNoteNumber();
       int minNote = getIntValue (PROP_SEQBOTTOMROW, 0);
       int maxNote = minNote + getIntValue (PROP_SEQNUMROWS, 127) - 1;
-      if (noteNumber < minNote || noteNumber > maxNote)
+      if ((noteNumber < minNote || noteNumber > maxNote) && !weAreRenderingNoteOffs)
          continue;
          
       // determine whether the event is one that we need to play in this time chunk..
@@ -670,6 +671,7 @@ void MidiSequencePluginBase::savePropertiesToXml (XmlElement* xml)
     xml->setAttribute (PROP_SEQROWHEIGHT,          getIntValue (PROP_SEQROWHEIGHT, 10));
     xml->setAttribute (PROP_SEQBOTTOMROW,          getIntValue (PROP_SEQBOTTOMROW, 0));
     xml->setAttribute (PROP_SEQNUMROWS,          getIntValue (PROP_SEQNUMROWS, 127));
+    xml->setAttribute (PROP_SEQTRIGGERSYNCHEDTOGLOBAL,          getDoubleValue (PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 1));
     
    XmlElement* clipsElement = new XmlElement(PROP_SEQCLIPFILES);
    for (int i=0; i<jmin(getMaxUsedClipIndex()+1, DEFAULT_MAXIMUM_CLIPS); i++)
@@ -697,6 +699,7 @@ void MidiSequencePluginBase::loadPropertiesFromXml (XmlElement* xml)
     setValue (PROP_SEQROWHEIGHT,                   xml->getIntAttribute (PROP_SEQROWHEIGHT, 10));
     setValue (PROP_SEQBOTTOMROW,                   xml->getIntAttribute (PROP_SEQBOTTOMROW, 0));
     setValue (PROP_SEQNUMROWS,                   xml->getIntAttribute (PROP_SEQNUMROWS, 127));
+    setValue (PROP_SEQTRIGGERSYNCHEDTOGLOBAL,                   xml->getDoubleAttribute (PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 1));
 
    XmlElement* clipsElement = xml->getChildByName(PROP_SEQCLIPFILES);
    if (clipsElement)
@@ -736,7 +739,13 @@ int MidiSequencePluginBase::getLoopRepeatIndex()
 
 double MidiSequencePluginBase::getLoopBeatPosition() 
 {
-	return transport->getPositionInBeats() - (getLoopRepeatIndex() * getLengthInBeats()); 
+// parameter-controlled phase (experiment!)
+//   double phaseInBeats = getDoubleValue(PROP_SEQLOOPPHASE, 00) * getLengthInBeats();
+   double phaseInBeats = loopPhaseInBeats;
+	double beat = phaseInBeats + transport->getPositionInBeats() - (getLoopRepeatIndex() * getLengthInBeats()); 
+    if (beat > getLengthInBeats())
+      beat = beat - getLengthInBeats();
+   return beat;
 }
 
 //==============================================================================
@@ -963,6 +972,8 @@ void MidiSequencePluginBase::setParameterReal (int paramNumber, float value)
       setValue (PROP_SEQBOTTOMROW, value * 127.0);
    if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
       setValue (PROP_SEQROWHEIGHT, minPx + value * (maxPx-minPx));
+   if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
+      setValue (PROP_SEQTRIGGERSYNCHEDTOGLOBAL, value);
 }
 
 float MidiSequencePluginBase::getParameterReal (int paramNumber)
@@ -977,6 +988,8 @@ float MidiSequencePluginBase::getParameterReal (int paramNumber)
       value = getIntValue(PROP_SEQBOTTOMROW, 0) / 127.0;
    if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
       value = (getIntValue(PROP_SEQROWHEIGHT, 10) - minPx) / static_cast<float>(maxPx-minPx);
+   if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
+      value = getDoubleValue(PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 1) > 0.5;
    return value;
 }
 
@@ -994,6 +1007,8 @@ const String MidiSequencePluginBase::getParameterTextReal (int paramNumber, floa
       paramTxt = String(getIntValue(PROP_SEQBOTTOMROW, 0));
    if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
       paramTxt = String(getIntValue(PROP_SEQROWHEIGHT, 10));
+   if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
+      paramTxt = String(getDoubleValue(PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 1));
 
    return paramTxt;
 }
