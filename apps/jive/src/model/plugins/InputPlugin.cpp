@@ -187,7 +187,12 @@ void TransportInputPlugin::setParameterReal (int index, float value)
    break;
    case PlayStop:
       if (!loadingParams)
-         t->togglePlay();
+      {
+         if (!t->isPlaying() && value > 0.5)
+            t->togglePlay();
+         else if (t->isPlaying() && value < 0.5)
+            t->togglePlay();
+      }
    break;
    }
 }
