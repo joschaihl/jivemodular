@@ -750,6 +750,15 @@ double MidiSequencePluginBase::getLoopBeatPosition()
 
 //==============================================================================
 
+void MidiSequencePluginBase::setMidiChannel(int chan)
+{
+   setValue(PROP_SEQMIDICHANNEL, chan);
+   
+   // automatically ensure any output midi filter is switched to the new channel
+   if (getMidiOutputChannel() != -1 && getMidiOutputChannel() != getMidiChannel())
+      setMidiOutputChannelFilter(getMidiChannel());
+}
+
 int MidiSequencePluginBase::getMaxUsedClipIndex()
 {
    int maxClip = 0;
