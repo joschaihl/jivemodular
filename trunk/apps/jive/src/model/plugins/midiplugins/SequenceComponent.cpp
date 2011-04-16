@@ -874,12 +874,17 @@ private:
    Transport* transport;
    SequenceComponent* sequenceUIComponent;
    
+   Label* channelNumLabel;
    Slider* channelNumSlider;
-
+   
+   Label* partPatternLabel;
    ToggleButton* enabledButton;
    ParamSlider* ccEnabledSlider;
    Slider* partPatternNumSlider;
+
+   Label* clipLabel;
    ClipListComponent* clipList;
+
    ParamSlider* currentClipSlider;
    Array<ParamSlider*> parameterSliders;
    Array<Label*> parameterLabels;
@@ -890,11 +895,16 @@ MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(M
    plugin(plugin_),
    transport(transport_),
    sequenceUIComponent(parentComponent_),
+   channelNumLabel(0),
    channelNumSlider(0),
    ccEnabledSlider(0),
    partPatternNumSlider(0),
+   clipLabel(0),
    clipList(0)
 {
+   channelNumLabel = new Label("Out Channel", "Out Channel");
+   addAndMakeVisible(channelNumLabel);
+
    addAndMakeVisible (channelNumSlider = new Slider ("MIDI Channel"));
    channelNumSlider->setRange (0, 16, 1);
    channelNumSlider->setSliderStyle (Slider::IncDecButtons);
@@ -904,6 +914,8 @@ MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(M
    channelNumSlider->addListener (this);
 
    const int patternsPerPart = MAXPATTERNSPERPART;
+   partPatternLabel = new Label("Part/Enabled", "Part/Enabled");
+   addAndMakeVisible(partPatternLabel);
    AudioParameter* theEnablyParameter = plugin->getParameterObject(MIDISEQ_PARAMID_SEQENABLED);
    addAndMakeVisible(ccEnabledSlider = new ParamSlider(plugin, theEnablyParameter, MIDISEQ_PARAMID_SEQENABLED));
    ccEnabledSlider->setTextBoxIsEditable(false);
@@ -913,6 +925,8 @@ MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(M
    partPatternNumSlider->setRange(0, patternsPerPart, 1);
    partPatternNumSlider->addListener(this);
    
+   clipLabel = new Label("MIDI Clip", "MIDI Clip");
+   addAndMakeVisible(clipLabel);
    addAndMakeVisible(clipList = new ClipListComponent("Clip list", "*.mid;*.midi"));
    clipList->addListener(this);
 
@@ -925,7 +939,7 @@ MidiSequencerConfigTabContentComponent::MidiSequencerConfigTabContentComponent(M
    {
       AudioParameter* curParam = plugin->getParameterObject(i);
       ParamSlider* curSlider = new ParamSlider(plugin, curParam, i);
-      channelNumSlider->setRange (0, 1, 0.01);
+      curSlider->setRange (0, 1, 0.01);
       addAndMakeVisible(curSlider);
       curSlider->setTextBoxIsEditable(false);   
       curSlider->addListener(this);
@@ -982,19 +996,23 @@ void MidiSequencerConfigTabContentComponent::resized()
    int rowHeight = 32;
    int curY = 10;
    int controlLeft = 100;
-   int labelWidth = 80;
-   int labelLeft = 10;
-   int width = getWidth() - (controlLeft + 20);
+   int control2Left = 190;
+   int labelWidth = 90;
+   int labelLeft = 2;
+   int width = getWidth() - (controlLeft + labelLeft);
 
+   channelNumLabel->setBounds(labelLeft, curY, labelWidth, 16);
    channelNumSlider->setBounds(controlLeft, curY, width, 16);
    curY += rowHeight;
 
-   ccEnabledSlider->setBounds(controlLeft, curY, width, 16);
-   partPatternNumSlider->setBounds(labelLeft, curY, labelWidth, 16);
+   partPatternLabel->setBounds(labelLeft, curY, labelWidth, 16);
+   partPatternNumSlider->setBounds(controlLeft, curY, labelWidth, 16);
+   ccEnabledSlider->setBounds(control2Left, curY, width-labelWidth, 16);
    curY += rowHeight;
    
-   currentClipSlider->setBounds(labelLeft, curY, labelWidth, 16);
-   clipList->setBounds (controlLeft, curY, width, 16);
+   clipLabel->setBounds(labelLeft, curY, labelWidth, 16);
+   currentClipSlider->setBounds(controlLeft, curY, labelWidth, 16);
+   clipList->setBounds (control2Left, curY, width-labelWidth, 16);
    curY += rowHeight;
    
    for (int i=0; i<parameterSliders.size(); i++)
@@ -1080,13 +1098,16 @@ SequenceComponent::SequenceComponent (MidiSequencePluginBase* plugin_)
 
 SequenceComponent::~SequenceComponent ()
 {
-    deleteAllChildren ();
+   MidiSequencePlugin* seq = getPlugin();
+   if (seq)
+      seq->removeChangeListener(this);
+   deleteAllChildren();
 }
 
 //==============================================================================
 void SequenceComponent::resized ()
 {
-   int headHeight = 32;
+   int headHeight = 0; // aargh we no longer have a head
 
    tabs->setBounds(0, headHeight, getWidth(), getHeight() - headHeight);
 }
