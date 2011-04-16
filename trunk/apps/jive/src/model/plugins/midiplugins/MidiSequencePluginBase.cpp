@@ -982,13 +982,13 @@ float MidiSequencePluginBase::getParameterReal (int paramNumber)
    if (paramNumber == MIDISEQ_PARAMID_CURRENTCLIP)
       value = static_cast<double>(currentClip) / DEFAULT_MAXIMUM_CLIPS;
 
-   if (paramNumber == MIDISEQ_PARAMID_NUMROWS)
+   else if (paramNumber == MIDISEQ_PARAMID_NUMROWS)
       value = (getIntValue(PROP_SEQNUMROWS, 127) - 1) / 126.0;
-   if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
+   else if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
       value = getIntValue(PROP_SEQBOTTOMROW, 0) / 127.0;
-   if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
+   else if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
       value = (getIntValue(PROP_SEQROWHEIGHT, 10) - minPx) / static_cast<float>(maxPx-minPx);
-   if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
+   else if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
       value = getDoubleValue(PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 1) > 0.5;
    return value;
 }
@@ -1003,12 +1003,17 @@ const String MidiSequencePluginBase::getParameterTextReal (int paramNumber, floa
    }
    if (paramNumber == MIDISEQ_PARAMID_NUMROWS)
       paramTxt = String(getIntValue(PROP_SEQNUMROWS, 127));
-   if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
+   else if (paramNumber == MIDISEQ_PARAMID_BOTTOMROWNOTE)
       paramTxt = String(getIntValue(PROP_SEQBOTTOMROW, 0));
-   if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
+   else if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
       paramTxt = String(getIntValue(PROP_SEQROWHEIGHT, 10));
-   if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
-      paramTxt = String(getDoubleValue(PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 1));
+   else if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
+   {
+      if (value > 0.5)
+         paramTxt = String("Phase locked to global");
+      else
+         paramTxt = String("Phase triggered on sequence trigger");
+   }
 
    return paramTxt;
 }
