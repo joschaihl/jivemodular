@@ -199,8 +199,9 @@ public:
    /* er.. virtual because the CC-bound enabledness is implemented in the subclass */
     virtual bool isEnabled() {return getBoolValue(PROP_SEQENABLED, true); };
 
-	/* Get the MIDI channel used for all events (notes & CCs) output from the sequencer */
+	/* Get/set the MIDI channel used for all events (notes & CCs) output from the sequencer */
     int getMidiChannel() {return getIntValue(PROP_SEQMIDICHANNEL, 1); };
+    void setMidiChannel(int chan);
 
     //==============================================================================
     /** Serialize internal properties to an Xml element */

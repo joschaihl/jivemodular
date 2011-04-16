@@ -1039,9 +1039,8 @@ void MidiSequencerConfigTabContentComponent::sliderValueChanged (Slider* sliderT
    }
    if (sliderThatWasMoved == channelNumSlider)
    {
-      plugin->setValue(PROP_SEQMIDICHANNEL, channelNumSlider->getValue());
-      if (plugin->getMidiOutputChannel() != -1 && plugin->getMidiOutputChannel() != plugin->getMidiChannel())
-         plugin->setMidiOutputChannelFilter(plugin->getMidiChannel());
+      int newChan = channelNumSlider->getValue();
+      plugin->setMidiChannel(newChan);
    }
    else
    {
