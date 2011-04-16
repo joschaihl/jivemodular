@@ -234,7 +234,10 @@ MidiFilter* BasePlugin::getMidiOutputChannelFilter()
 void BasePlugin::clearMidiOutputFilter()
 {
    if (outputMidiChanFilter)
+   {
       delete outputMidiChanFilter;
+      outputMidiChanFilter = 0;
+   }
    outputMidiChannel = -1;
 }
 
