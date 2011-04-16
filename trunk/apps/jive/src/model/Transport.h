@@ -238,7 +238,8 @@ private:
          recording      : 1,
          doStopRecord   : 1,
          doRewind       : 1,
-         doAllNotesOff  : 1;
+         doAllNotesOff  : 1,
+         ensureAllNotesOffGetsNoticed : 1;
 
 #if JOST_USE_VST
     // vst internal timeinfo

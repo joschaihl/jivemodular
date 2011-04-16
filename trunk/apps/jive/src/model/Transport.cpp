@@ -50,6 +50,7 @@ Transport::Transport (HostFilterBase* owner_)
     doStopRecord (false),
     doRewind (false),
     doAllNotesOff (false),
+    ensureAllNotesOffGetsNoticed(0),
     externalTransport (0),
     curAbsolute(0)
 {
@@ -315,9 +316,20 @@ void Transport::processBlock (const int blockSize)
         }
     }
 
+
     if (doAllNotesOff)
     {
+      // ensureAllNotesOffGetsNoticed is used to ensure allNotesOff() gets noticed by all plugins -  
+      // if the stop/allnotesoff gets triggered after plugins have rendered, the transport eats it here,
+      // so to work around that we let it stay set for 2 buffers worth of playback to prevent any dangling notes!
+      if (ensureAllNotesOffGetsNoticed)
+      {
         doAllNotesOff = false;
+         ensureAllNotesOffGetsNoticed = false;
+      }
+      else 
+         ensureAllNotesOffGetsNoticed = true;
+      
     }
 
     if (doRewind)
