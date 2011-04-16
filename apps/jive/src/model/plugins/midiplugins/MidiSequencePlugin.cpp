@@ -138,7 +138,7 @@ void MidiSequencePlugin::setParameterReal (int paramNumber, float value)
       // if we are not in synced-to-global mode (i.e. loop starts whenever sequence is retriggered)
 	  // just started playing, so set the phase..
       if (!wasEnabled && isEnabledRightNow && getDoubleValue(PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 0) < 0.5)
-         loopPhaseInBeats = getLoopBeatPosition(); // may want to round this to beat, etc, should be a param for that
+         loopPhaseInBeats = ceil(getLoopBeatPosition()); // round to next beat so snaps nicely (in future have param for snap - e.g. beat/bar/none)
 
       if (!isEnabledRightNow)
          loopPhaseInBeats = 0; // reset phase so getLoopBeatPosition returns the right thing next time
@@ -151,6 +151,8 @@ float MidiSequencePlugin::getParameterReal (int paramNumber)
 {
    if (paramNumber == MIDISEQ_PARAMID_SEQENABLED)
       return enableCCValue;
+   else if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
+      return (MidiSequencePluginBase::getParameterReal(paramNumber) > 0.5);
    else 
       return MidiSequencePluginBase::getParameterReal(paramNumber);
 }
@@ -162,7 +164,7 @@ const String MidiSequencePlugin::getParameterTextReal (int paramNumber, float va
    {
       if (partNumber == 0)
          paramTxt = String("Always");
-      else if ((paramNumber == 0) && (value >= enableCCMin) && (value < enableCCMax))
+      else if ((paramNumber == MIDISEQ_PARAMID_SEQENABLED) && (value >= enableCCMin) && (value < enableCCMax))
          paramTxt = String("On");
    }
    else 
