@@ -53,7 +53,10 @@ public:
       const float newVal = (float) getValue();
 
       if (owner->getParameter (index) != newVal)
+      {
           owner->setParameter (index, newVal);
+         updateText();
+      }
    }
 
    const String getTextFromValue (double /*value*/)
