@@ -39,15 +39,17 @@
    noise - add some noise (0-1)
    
    To Do:
+   Mix.
+   Full on at 100% rate? Full off at 0% rate?
+   Duration. Could specify duration as a %, and this would affect trig off (currently is 
+   instantaneous - sustain would mean something, could be brought back), and would also control 
+   the output midi note's duration.
    Manual Trigger. Above 0.5 instantaneously triggers.
    Phase. So can have off-beat hi-hat style pattern with some groove. 
    Tricky balancing this with wanting different phases at different rates; but could just 
    implement as % latency, so works transparently for all rates. Or have a beat phase and 
    a percent phase in combination.
    Output note. A param for the note number, and the plugin outputs a note for each trigger.
-   Duration. Could specify duration as a %, and this would affect trig off (currently is 
-   instantaneous - sustain would mean something, could be brought back), and would also control 
-   the output midi note's duration.
 
    Coming soon parameters:
    trigger - manually trigger at will (nice when rate is off!)
@@ -133,7 +135,8 @@ public:
 
 private:
    double rateParamToTicksPerBar();
-   double fudgeReleaseTime() {return release * 0.5;};
+   double fudgeReleaseTime() {return logifyEnvelopeParameter(release) * 0.5;};
+   double logifyEnvelopeParameter(double p);
    bool isGateOpen() {return adsrState.state != ADSR_IDLE;};
 
    adsr_t adsrState; 
