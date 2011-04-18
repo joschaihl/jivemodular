@@ -53,6 +53,7 @@
 #define PROP_SEQBOTTOMROW                   T("sBottomRow")
 #define PROP_SEQNUMROWS                   T("sNumRows")
 #define PROP_SEQTRIGGERSYNCHEDTOGLOBAL                   T("sSyncToGlobal") // parameter controlling whether trigger "unmutes" or starts sequence from zero
+#define PROP_SEQPLAYRATE                   T("sPlayRate") // 0 = 1 beat is 4 bars; >0.33 = 1 beat is 1 bar; >0.666 = normal
 
 #define MIDISEQ_BASESEQUENCERPARAMCOUNT 4
 #define MIDISEQ_PARAMID_CURRENTCLIP 0
@@ -60,7 +61,8 @@
 #define MIDISEQ_PARAMID_BOTTOMROWNOTE 2
 #define MIDISEQ_PARAMID_ROWHEIGHT 3
 #define MIDISEQ_PARAMID_TRIGGERSYNCHED 4
-#define MIDISEQ_PARAMID_NEXTAVAILABLE 5
+#define MIDISEQ_PARAMID_PLAYRATE 5
+#define MIDISEQ_PARAMID_NEXTAVAILABLE 6
 
 //==============================================================================
 /**
@@ -190,7 +192,7 @@ public:
 	double getLoopBeatPosition();
 
 	/* Get the length of the sequence expressed as a number of beats */
-	int getLengthInBeats() { return getIntValue(PROP_SEQBAR, 4) * getBeatsPerBar(); };
+	int getLengthInBeats() { return getIntValue(PROP_SEQBAR, 4) * getBeatsPerBar() / getPlayRate(); };
 	
 	/* Get the number of beats per bar (currently hard-coded to four) */
 	double getBeatsPerBar() { return 4; };
@@ -202,6 +204,8 @@ public:
 	/* Get/set the MIDI channel used for all events (notes & CCs) output from the sequencer */
     int getMidiChannel() {return getIntValue(PROP_SEQMIDICHANNEL, 1); };
     void setMidiChannel(int chan);
+
+   double getPlayRate();
 
     //==============================================================================
     /** Serialize internal properties to an Xml element */
