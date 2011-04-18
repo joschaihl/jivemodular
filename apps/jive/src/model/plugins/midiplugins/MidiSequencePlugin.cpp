@@ -150,6 +150,8 @@ void MidiSequencePlugin::setParameterReal (int paramNumber, float value)
 
       if (!isEnabledRightNow)
          loopPhaseInBeats = 0; // reset phase so getLoopBeatPosition returns the right thing next time
+
+     sendChangeMessage (this);
    }
    else
       MidiSequencePluginBase::setParameterReal(paramNumber, value);

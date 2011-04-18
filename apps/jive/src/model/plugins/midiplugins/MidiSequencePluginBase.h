@@ -270,6 +270,7 @@ protected:
 
    double uptoBeatReloopHack;
    double loopPhaseInBeats;
+   double playRate;
 };
 
 

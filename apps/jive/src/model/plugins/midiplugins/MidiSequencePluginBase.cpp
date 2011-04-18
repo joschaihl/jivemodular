@@ -87,7 +87,8 @@ MidiSequencePluginBase::MidiSequencePluginBase ()
     doAllNotesOff (false),
     allNotesOff (MidiMessage::allNotesOff (1)),
     uptoBeatReloopHack(0.0),
-    loopPhaseInBeats(0.0)
+    loopPhaseInBeats(0.0),
+    playRate(1.0)
 {
    midiSequence = new MidiMessageSequence();
    allClipsByChannelSequence = new MidiMessageSequence();
@@ -208,7 +209,6 @@ void MidiSequencePluginBase::newRenderEvents(
    const int midiChannel // the midi channel to use for all rendered events
    )
 {
-      double playRate = getPlayRate();
    bool weAreRenderingNoteOffs = (&sourceMidiBuffer == &noteOffs);
 
 	for (int i = sourceMidiBuffer.getNextIndexAtTime(beatCount*playRate);
@@ -296,7 +296,8 @@ void MidiSequencePluginBase::cleanUpNoteOffs(double fromTime, double toTime)
 {
 	for (int i=noteOffs.getNumEvents()-1; i>=0; i--)
 	{
-		if (noteOffs.getEventPointer (i)->message.getTimeStamp() >= fromTime && noteOffs.getEventPointer (i)->message.getTimeStamp() < toTime)
+      double beatsTime = noteOffs.getEventPointer(i)->message.getTimeStamp() / playRate;
+		if (beatsTime >= fromTime && beatsTime < toTime)
 			noteOffs.deleteEvent(i, false);
 	}
 }
@@ -752,15 +753,7 @@ double MidiSequencePluginBase::getLoopBeatPosition()
 
 double MidiSequencePluginBase::getPlayRate()
 {
-   double value = getDoubleValue(PROP_SEQPLAYRATE, 1);
-   double div = 1 / 3.0;
-   if (value < div * 1)
-      value = 1/16.0;
-   else if (value < div * 2)
-      value = 1/4.0;
-   else
-      value = 1.0;
-   return value;
+   return playRate;
 }
 
 //==============================================================================
@@ -999,7 +992,21 @@ void MidiSequencePluginBase::setParameterReal (int paramNumber, float value)
    if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
       setValue (PROP_SEQTRIGGERSYNCHEDTOGLOBAL, value);
    if (paramNumber == MIDISEQ_PARAMID_PLAYRATE)
+   {
       setValue (PROP_SEQPLAYRATE, value);
+      double oldPlayRate = playRate;
+      double div = 1 / 3.0;
+      if (value < div * 1)
+         playRate = 1/16.0;
+      else if (value < div * 2)
+         playRate = 1/4.0;
+      else
+         playRate = 1.0;
+      
+      if ((playRate != oldPlayRate) && transport->isPlaying())
+         doAllNotesOff = true;
+   }
+  sendChangeMessage (this);
 }
 
 float MidiSequencePluginBase::getParameterReal (int paramNumber)
