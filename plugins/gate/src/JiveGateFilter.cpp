@@ -135,11 +135,7 @@ double JiveGateFilter::rateParamToTicksPerBar()
 }
 
 void JiveGateFilter::setParameter (int index, float newValue)
-{
-   float max = 10;
-   float min = 1;
-   int logstrength = 5;
-   
+{   
    if (index == Rate)
    {
       gateRate = newValue;
@@ -147,13 +143,11 @@ void JiveGateFilter::setParameter (int index, float newValue)
    }
    if (index == Attack)
    {
-      newValue = pow(log10(newValue * (max - min) + min), logstrength);
       attack = newValue;
       sendChangeMessage (this);
    }
    if (index == Release)
    {
-      newValue = pow(log10(newValue * (max - min) + min), logstrength);
       release = newValue;
       sendChangeMessage (this);
    }
@@ -162,6 +156,15 @@ void JiveGateFilter::setParameter (int index, float newValue)
       noise = newValue;
       sendChangeMessage (this);
    }
+}
+
+double JiveGateFilter::logifyEnvelopeParameter(double newValue)
+{
+   float max = 10;
+   float min = 1;
+   int logstrength = 5;
+   newValue = pow(log10(newValue * (max - min) + min), logstrength);
+   return newValue;
 }
 
 const String JiveGateFilter::getParameterName (int index)
@@ -239,7 +242,7 @@ void JiveGateFilter::processBlock (AudioSampleBuffer& buffer,
    AudioPlayHead::CurrentPositionInfo pos;
 
    bool rolling = false;
-   double ppqPosition, tick = 0;
+   double ppqPosition = 0, tick = 0;
    double beatsPerSample = 0;
    if (getPlayHead() != 0 && getPlayHead()->getCurrentPosition(pos))
    {
@@ -263,8 +266,8 @@ void JiveGateFilter::processBlock (AudioSampleBuffer& buffer,
          if (prevBeat != tick)
          {   
             trig = true;
-            adsr_trigger(&adsrState, attack * sampleRate, fudgeReleaseTime() * sampleRate, 0, 0);
-            std::cerr << "trigger!" << std::endl;
+            adsr_trigger(&adsrState, logifyEnvelopeParameter(attack) * sampleRate, fudgeReleaseTime() * sampleRate, 0, 0);
+            //std::cerr << "trigger!" << std::endl;
          }
       }
 
