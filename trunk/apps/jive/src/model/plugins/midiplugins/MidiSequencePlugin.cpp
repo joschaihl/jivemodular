@@ -86,6 +86,14 @@ MidiSequencePlugin::MidiSequencePlugin()
    parameter->text (MakeDelegate (this, &MidiSequencePluginBase::getParameterTextReal));
    registerParameter (MIDISEQ_PARAMID_TRIGGERSYNCHED, parameter);         
 
+   parameter = new AudioParameter ();
+   parameter->part (MIDISEQ_PARAMID_PLAYRATE);
+   parameter->name ("Play Rate");
+   parameter->get (MakeDelegate (this, &MidiSequencePluginBase::getParameterReal));
+   parameter->set (MakeDelegate (this, &MidiSequencePluginBase::setParameterReal));
+   parameter->text (MakeDelegate (this, &MidiSequencePluginBase::getParameterTextReal));
+   registerParameter (MIDISEQ_PARAMID_PLAYRATE, parameter);         
+
 // parameters managed here start at 
 
    parameter = new AudioParameter ();

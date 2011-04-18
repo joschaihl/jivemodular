@@ -158,7 +158,7 @@ void MidiSequencePluginBase::processBlock (AudioSampleBuffer& buffer,
       const int nextBlockFrameNumber = frameCounter + blockSize;        
 		const int seqIndex = getLoopRepeatIndex();
 		double beatCount = getLoopBeatPosition();
-		const double frameLenBeatCount = (nextBlockFrameNumber - frameCounter) / (double)framesPerBeat;		
+		const double frameLenBeatCount = (nextBlockFrameNumber - frameCounter) / ((double)framesPerBeat);		
 		double frameEndBeatCount = beatCount + frameLenBeatCount;
 		if (frameEndBeatCount > getLengthInBeats())
 			frameEndBeatCount -= getLengthInBeats();
@@ -208,9 +208,10 @@ void MidiSequencePluginBase::newRenderEvents(
    const int midiChannel // the midi channel to use for all rendered events
    )
 {
+      double playRate = getPlayRate();
    bool weAreRenderingNoteOffs = (&sourceMidiBuffer == &noteOffs);
 
-	for (int i = sourceMidiBuffer.getNextIndexAtTime(beatCount);
+	for (int i = sourceMidiBuffer.getNextIndexAtTime(beatCount*playRate);
 		i < sourceMidiBuffer.getNumEvents(); i++)
 	{
       // get the event (its time is in beats)
@@ -226,7 +227,7 @@ void MidiSequencePluginBase::newRenderEvents(
          continue;
          
       // determine whether the event is one that we need to play in this time chunk..
-      double beatsTime = sourceMidiBuffer.getEventTime(i);
+      double beatsTime = sourceMidiBuffer.getEventTime(i)/playRate;
       // we care about note offs after the end of the loop (in case the user has resized loop and cut off the end of a note)
       bool specialNoteOffPastReloop = !weAreRenderingNoteOffs && (isEndOfLoop && midiMessage->isNoteOff() && beatsTime >= frameEndBeatCount); 
       if (
@@ -700,6 +701,7 @@ void MidiSequencePluginBase::loadPropertiesFromXml (XmlElement* xml)
     setValue (PROP_SEQBOTTOMROW,                   xml->getIntAttribute (PROP_SEQBOTTOMROW, 0));
     setValue (PROP_SEQNUMROWS,                   xml->getIntAttribute (PROP_SEQNUMROWS, 127));
     setValue (PROP_SEQTRIGGERSYNCHEDTOGLOBAL,                   xml->getDoubleAttribute (PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 1));
+    setValue (PROP_SEQPLAYRATE,                   xml->getDoubleAttribute (PROP_SEQPLAYRATE, 1));
 
    XmlElement* clipsElement = xml->getChildByName(PROP_SEQCLIPFILES);
    if (clipsElement)
@@ -742,10 +744,23 @@ double MidiSequencePluginBase::getLoopBeatPosition()
 // parameter-controlled phase (experiment!)
 //   double phaseInBeats = getDoubleValue(PROP_SEQLOOPPHASE, 00) * getLengthInBeats();
    double phaseInBeats = loopPhaseInBeats;
-	double beat = phaseInBeats + transport->getPositionInBeats() - (getLoopRepeatIndex() * getLengthInBeats()); 
+	double beat = ((phaseInBeats + transport->getPositionInBeats())) - (getLoopRepeatIndex() * getLengthInBeats()); 
     if (beat > getLengthInBeats())
       beat = beat - getLengthInBeats();
    return beat;
+}
+
+double MidiSequencePluginBase::getPlayRate()
+{
+   double value = getDoubleValue(PROP_SEQPLAYRATE, 1);
+   double div = 1 / 3.0;
+   if (value < div * 1)
+      value = 1/16.0;
+   else if (value < div * 2)
+      value = 1/4.0;
+   else
+      value = 1.0;
+   return value;
 }
 
 //==============================================================================
@@ -983,6 +998,8 @@ void MidiSequencePluginBase::setParameterReal (int paramNumber, float value)
       setValue (PROP_SEQROWHEIGHT, minPx + value * (maxPx-minPx));
    if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
       setValue (PROP_SEQTRIGGERSYNCHEDTOGLOBAL, value);
+   if (paramNumber == MIDISEQ_PARAMID_PLAYRATE)
+      setValue (PROP_SEQPLAYRATE, value);
 }
 
 float MidiSequencePluginBase::getParameterReal (int paramNumber)
@@ -999,6 +1016,9 @@ float MidiSequencePluginBase::getParameterReal (int paramNumber)
       value = (getIntValue(PROP_SEQROWHEIGHT, 10) - minPx) / static_cast<float>(maxPx-minPx);
    else if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
       value = getDoubleValue(PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 1) > 0.5;
+   else if (paramNumber == MIDISEQ_PARAMID_PLAYRATE)
+      value = getDoubleValue(PROP_SEQPLAYRATE, 1);
+   
    return value;
 }
 
@@ -1016,6 +1036,16 @@ const String MidiSequencePluginBase::getParameterTextReal (int paramNumber, floa
       paramTxt = String(getIntValue(PROP_SEQBOTTOMROW, 0));
    else if (paramNumber == MIDISEQ_PARAMID_ROWHEIGHT)
       paramTxt = String(getIntValue(PROP_SEQROWHEIGHT, 10));
+   else if (paramNumber == MIDISEQ_PARAMID_PLAYRATE)
+   {
+      double div = 1 / 3.0;
+      if (value < div * 1)
+         paramTxt = String("1 beat => 4 bars");
+      else if (value < div * 2)
+         paramTxt = String("1 beat => 1 bar (quarter speed)");
+      else
+         paramTxt = String("normal");
+   }
    else if (paramNumber == MIDISEQ_PARAMID_TRIGGERSYNCHED)
    {
       if (value > 0.5)
