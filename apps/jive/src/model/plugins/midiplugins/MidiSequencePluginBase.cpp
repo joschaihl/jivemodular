@@ -745,9 +745,12 @@ double MidiSequencePluginBase::getLoopBeatPosition()
 // parameter-controlled phase (experiment!)
 //   double phaseInBeats = getDoubleValue(PROP_SEQLOOPPHASE, 00) * getLengthInBeats();
    double phaseInBeats = loopPhaseInBeats;
-	double beat = ((phaseInBeats + transport->getPositionInBeats())) - (getLoopRepeatIndex() * getLengthInBeats()); 
-    if (beat > getLengthInBeats())
-      beat = beat - getLengthInBeats();
+   double loopLenBeats = getLengthInBeats();
+	double beat = ((transport->getPositionInBeats() - phaseInBeats)) - (getLoopRepeatIndex() * loopLenBeats); 
+    if (beat > loopLenBeats)
+      beat -= loopLenBeats;
+   else if (beat < 0)
+      beat += loopLenBeats;
    return beat;
 }
 
