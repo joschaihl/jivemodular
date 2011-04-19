@@ -142,16 +142,16 @@ void MidiSequencePlugin::setParameterReal (int paramNumber, float value)
       enableCCValue = value;
       bool wasEnabled = isEnabledRightNow;
       isEnabledRightNow = (partNumber == 0) || (value >= enableCCMin && value < enableCCMax);
-      
+
       // if we are not in synced-to-global mode (i.e. loop starts whenever sequence is retriggered)
-	  // just started playing, so set the phase..
+      // just started playing, so set the phase..
       if (!wasEnabled && isEnabledRightNow && getDoubleValue(PROP_SEQTRIGGERSYNCHEDTOGLOBAL, 0) < 0.5)
+      {
+         loopPhaseInBeats = 0; // so getLoopBeatPosition returns unphased position!
          loopPhaseInBeats = ceil(getLoopBeatPosition()); // round to next beat so snaps nicely (in future have param for snap - e.g. beat/bar/none)
+      }
 
-      if (!isEnabledRightNow)
-         loopPhaseInBeats = 0; // reset phase so getLoopBeatPosition returns the right thing next time
-
-     sendChangeMessage (this);
+      sendChangeMessage (this);
    }
    else
       MidiSequencePluginBase::setParameterReal(paramNumber, value);
@@ -396,6 +396,7 @@ void MidiSequencePlugin::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mi
 		const int seqIndex = getLoopRepeatIndex();
 		const double beatCount = getLoopBeatPosition();
 		const double frameLenBeatCount = (nextBlockFrameNumber - frameCounter) / (double)framesPerBeat;		
+      const double playRate = getPlayRate();
 		double frameEndBeatCount = beatCount + frameLenBeatCount;
 		if (frameEndBeatCount > getLengthInBeats())
 			frameEndBeatCount -= getLengthInBeats();
@@ -410,7 +411,7 @@ void MidiSequencePlugin::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mi
 			int i;
 			for (i = 0;	i < sourceMidi.getNumEvents (); i++)
 			{
-				int timeStampInSeq = roundFloatToInt (sourceMidi.getEventTime (i) * framesPerBeat);
+				int timeStampInSeq = roundFloatToInt (sourceMidi.getEventTime(i)/playRate * framesPerBeat);
 				int timeStamp = timeStampInSeq + (seqIndex * getLengthInBeats() * framesPerBeat);
 
 				MidiMessage* midiMessage = &sourceMidi.getEventPointer (i)->message;
@@ -441,8 +442,8 @@ void MidiSequencePlugin::processBlock (AudioSampleBuffer& buffer, MidiBuffer& mi
 				// render an interpolated event!...
 				if (nextCtrlEvent)
 				{
-					double bt = nextCtrlEvent->getTimeStamp();
-					double at = lastCtrlEvent->getTimeStamp();
+					double bt = nextCtrlEvent->getTimeStamp()/playRate;
+					double at = lastCtrlEvent->getTimeStamp()/playRate;
 					double deltaBeats = bt - at;
 					int a = lastCtrlEvent->getControllerValue();
 					int b = nextCtrlEvent->getControllerValue();
