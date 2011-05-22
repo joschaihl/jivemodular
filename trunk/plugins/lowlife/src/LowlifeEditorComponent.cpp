@@ -185,8 +185,6 @@ LowlifeEditorComponent::LowlifeEditorComponent (DemoJuceFilter* const ownerFilte
    numSlotsSlider(0),
    polyModeCombo(0)
 {
-   updateParametersFromFilter();
-
     // add the triangular resizer component for the bottom-right of the UI
     addAndMakeVisible (resizer = new ResizableCornerComponent (this, &resizeLimits));
    resizeLimits.setSizeLimits (440, 250, 1600, 1200);
@@ -215,6 +213,8 @@ LowlifeEditorComponent::LowlifeEditorComponent (DemoJuceFilter* const ownerFilte
     ownerFilter->addChangeListener (this);
 
    setSize(resizeLimits.getMinimumWidth(), resizeLimits.getMinimumHeight());
+
+   updateParametersFromFilter();
 }
 
 LowlifeEditorComponent::~LowlifeEditorComponent()
